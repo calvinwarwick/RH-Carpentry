@@ -1,0 +1,72 @@
+services:
+  db:
+    image: mariadb:11.4
+    container_name: rhc_wp_db
+    restart: unless-stopped
+    environment:
+      MYSQL_DATABASE: wordpress
+      MYSQL_USER: wordpress
+      MYSQL_PASSWORD: wordpress
+      MYSQL_ROOT_PASSWORD: rootpass
+    volumes:
+      - rhc_wp_db_data:/var/lib/mysql
+    healthcheck:
+      test: ["CMD", "healthcheck.sh", "--connect", "--innodb_initialized"]
+      interval: 5s
+      timeout: 5s
+      retries: 20
+
+  wordpress:
+    image: wordpress:6.7-apache
+    container_name: rhc_wordpress
+    restart: unless-stopped
+    depends_on:
+      db:
+        condition: service_healthy
+    ports:
+      - "8088:80"
+    environment:
+      WORDPRESS_DB_HOST: db:3306
+      WORDPRESS_DB_USER: wordpress
+      WORDPRESS_DB_PASSWORD: wordpress
+      WORDPRESS_DB_NAME: wordpress
+      # Must match production dump (wp db export); default wp_ breaks after import
+      WORDPRESS_TABLE_PREFIX: tdz_
+    volumes:
+      - rhc_wp_core:/var/www/html
+      - ./wp-content:/var/www/html/wp-content
+
+  phpmyadmin:
+    image: phpmyadmin:5.2-apache
+    container_name: rhc_phpmyadmin
+    restart: unless-stopped
+    depends_on:
+      db:
+        condition: service_healthy
+    ports:
+      - "8082:80"
+    environment:
+      PMA_HOST: db
+      PMA_USER: root
+      PMA_PASSWORD: rootpass
+
+  wpcli:
+    image: wordpress:cli
+    depends_on:
+      db:
+        condition: service_healthy
+    environment:
+      WORDPRESS_DB_HOST: db:3306
+      WORDPRESS_DB_USER: wordpress
+      WORDPRESS_DB_PASSWORD: wordpress
+      WORDPRESS_DB_NAME: wordpress
+      WORDPRESS_TABLE_PREFIX: tdz_
+    volumes:
+      - ./wp-content:/var/www/html/wp-content
+      - rhc_wp_core:/var/www/html
+    working_dir: /var/www/html
+    entrypoint: ["wp"]
+
+volumes:
+  rhc_wp_db_data:
+  rhc_wp_core:

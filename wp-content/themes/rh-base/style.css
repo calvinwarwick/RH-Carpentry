@@ -1,0 +1,16 @@
+/*
+Theme Name: RH Base
+Theme URI: https://example.com
+Author: RH Carpentry
+Author URI: https://example.com
+Description: Client-agnostic parent starter theme. Use a child theme for per-project branding and overrides.
+Version: 1.0.0
+Requires at least: 6.0
+Tested up to: 6.9
+Requires PHP: 8.1
+License: GNU General Public License v2 or later
+License URI: https://www.gnu.org/licenses/gpl-2.0.html
+Text Domain: rh-base
+*/
+
+/* Compiled styles load from build/main.css via inc/enqueue.php */

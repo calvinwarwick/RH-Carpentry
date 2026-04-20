@@ -1,0 +1,30 @@
+/*
+Theme Name: RH Base Child
+Theme URI: https://example.com
+Description: Example child of RH Base — duplicate/rename this folder per client project.
+Author: RH Carpentry
+Template: rh-base
+Version: 1.0.0
+License: GNU General Public License v2 or later
+License URI: https://www.gnu.org/licenses/gpl-2.0.html
+Text Domain: rh-base-child
+*/
+
+/*
+ * Client-specific overrides: prefer CSS variables (defined in the parent tokens)
+ * or add rules below. For larger changes, copy a template from the parent into
+ * this theme and edit (WordPress loads child templates first).
+ *
+ * Home hero styles load from assets/css/home-hero.css on the front page only.
+ */
+
+:root {
+	--rh-color-accent: #0e396e;
+	/* Page / bento field: off-white (clients band uses --rh-color-surface) */
+	--rh-color-bg: #f5f4f0;
+	--rh-color-surface: #ffffff;
+}
+
+body:not(.rh-carpentry-home) .site-title {
+	letter-spacing: -0.02em;
+}
