@@ -102,6 +102,18 @@ function rh_base_child_enqueue_styles(): void {
 		);
 	}
 
+	$rh_inner_pages = is_page(array('about', 'services'))
+		|| is_post_type_archive('rh_project')
+		|| is_singular('rh_project');
+	if ($rh_inner_pages) {
+		wp_enqueue_style(
+			'rh-carpentry-inner-pages',
+			get_stylesheet_directory_uri() . '/assets/css/inner-pages.css',
+			array('rh-base-child-style', 'rh-carpentry-fonts'),
+			wp_get_theme()->get('Version')
+		);
+	}
+
 	wp_enqueue_style(
 		'rh-carpentry-site-footer',
 		get_stylesheet_directory_uri() . '/assets/css/site-footer.css',

@@ -145,7 +145,7 @@ body:not(.rh-carpentry-home) .rh-site-footer__surface-inner {
 			minmax(0, 1fr)
 			minmax(280px, min(42vw, 440px));
 		gap: clamp(1.5rem, 3.5vw, 2.75rem);
-		align-items: start;
+		align-items: stretch;
 	}
 
 	.rh-site-footer__grid--no-contact {
@@ -154,6 +154,11 @@ body:not(.rh-carpentry-home) .rh-site-footer__surface-inner {
 
 	.rh-site-footer__col--brand {
 		justify-self: start;
+		height: 100%;
+	}
+
+	.rh-site-footer__col--contact {
+		height: 100%;
 	}
 
 	.rh-site-footer__col--map {
@@ -181,6 +186,70 @@ body:not(.rh-carpentry-home) .rh-site-footer__surface-inner {
 	text-align: center;
 }
 
+.rh-site-footer__primary-nav {
+	margin-top: 0.25rem;
+	align-self: center;
+	width: max-content;
+	text-align: left;
+}
+
+.rh-site-footer__menu--primary {
+	align-items: flex-start;
+	gap: clamp(0.45rem, 0.9vw, 0.65rem);
+	text-transform: uppercase;
+	font-size: clamp(0.9rem, 1.15vw, 1.05rem);
+	font-weight: 600;
+	letter-spacing: 0.12em;
+}
+
+.rh-site-footer__menu--primary a {
+	position: relative;
+	display: inline-block;
+	color: #fff;
+	padding-bottom: 4px;
+	transition: color 0.2s ease;
+}
+
+.rh-site-footer__menu--primary:has(a:hover) a:not(:hover),
+.rh-site-footer__menu--primary:has(a:focus-visible) a:not(:focus-visible) {
+	color: rgba(255, 255, 255, 0.45);
+}
+
+.rh-site-footer__menu--primary a::after {
+	content: "";
+	position: absolute;
+	left: 0;
+	bottom: 0;
+	width: 100%;
+	height: 2px;
+	background: currentColor;
+	transform: scaleX(0);
+	transform-origin: right center;
+	transition: transform 0.32s cubic-bezier(0.33, 1, 0.68, 1);
+}
+
+.rh-site-footer__menu--primary a:hover::after,
+.rh-site-footer__menu--primary a:focus-visible::after {
+	transform: scaleX(1);
+	transform-origin: left center;
+}
+
+@media (prefers-reduced-motion: reduce) {
+	.rh-site-footer__menu--primary a::after {
+		transition-duration: 0.01ms;
+	}
+}
+
+.rh-site-footer__social-row {
+	margin-top: auto;
+	display: flex;
+	flex-direction: column;
+	align-items: center;
+	gap: 0.55rem;
+	width: max-content;
+	align-self: center;
+}
+
 .rh-site-footer__hero-logo.rh-hero-logo {
 	line-height: 0;
 }
@@ -202,8 +271,9 @@ body:not(.rh-carpentry-home) .rh-site-footer__surface-inner {
 	display: flex;
 	flex-wrap: wrap;
 	align-items: center;
-	gap: clamp(0.4rem, 1.2vw, 0.65rem);
+	gap: clamp(0.7rem, 1.8vw, 1rem);
 	max-width: 100%;
+	margin-top: auto;
 }
 
 .rh-site-footer__badges img {

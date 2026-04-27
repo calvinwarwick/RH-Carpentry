@@ -57,11 +57,37 @@ $footer_grid_class    = 'rh-site-footer__grid' . ( $footer_has_contact ? '' : ' 
 
 				<?php if ($footer_has_contact) : ?>
 					<div class="rh-site-footer__col rh-site-footer__col--contact">
-						<p class="rh-home-kicker rh-site-footer__kicker">
-							<span class="rh-home-kicker__line" aria-hidden="true"></span>
-							<?php esc_html_e('Get in touch', 'rh-base-child'); ?>
-						</p>
-						<?php rh_carpentry_render_footer_contact_icons(); ?>
+						<nav class="rh-site-footer__primary-nav" aria-label="<?php esc_attr_e('Primary menu', 'rh-base-child'); ?>">
+							<?php
+							if (has_nav_menu('primary')) {
+								wp_nav_menu(
+									array(
+										'theme_location' => 'primary',
+										'menu_id'        => 'rh-footer-primary-menu',
+										'depth'          => 1,
+										'container'      => false,
+										'fallback_cb'    => false,
+										'menu_class'     => 'rh-site-footer__menu rh-site-footer__menu--primary',
+									)
+								);
+							} else {
+								?>
+								<ul id="rh-footer-primary-menu" class="rh-site-footer__menu rh-site-footer__menu--primary">
+									<li><a href="<?php echo esc_url(home_url('/about/')); ?>"><?php esc_html_e('About', 'rh-base-child'); ?></a></li>
+									<li><a href="<?php echo esc_url(home_url('/services/')); ?>"><?php esc_html_e('Services', 'rh-base-child'); ?></a></li>
+									<li><a href="<?php echo esc_url(rh_carpentry_projects_archive_url()); ?>"><?php esc_html_e('Projects', 'rh-base-child'); ?></a></li>
+								</ul>
+								<?php
+							}
+							?>
+						</nav>
+						<div class="rh-site-footer__social-row">
+							<p class="rh-home-kicker rh-site-footer__kicker">
+								<span class="rh-home-kicker__line" aria-hidden="true"></span>
+								<?php esc_html_e('Get in touch', 'rh-base-child'); ?>
+							</p>
+							<?php rh_carpentry_render_footer_contact_icons(); ?>
+						</div>
 					</div>
 				<?php endif; ?>
 

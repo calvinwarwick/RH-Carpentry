@@ -8,14 +8,20 @@ cd "${ROOT_DIR}"
 REMOTE_HOST="${REMOTE_HOST:-sg-calvinw15}"
 REMOTE_WP_PATH="${REMOTE_WP_PATH:-www/calvinw15.sg-host.com/public_html}"
 LOCAL_URL="${LOCAL_URL:-http://localhost:8088}"
+SSH_BATCH_MODE="${SSH_BATCH_MODE:-1}"
 DUMP_DIR="${ROOT_DIR}/data"
 STAMP="$(date +%Y%m%d-%H%M%S)"
 DUMP_FILE="${DUMP_DIR}/remote-db-${STAMP}.sql"
 
 mkdir -p "${DUMP_DIR}"
 
+SSH_CMD=(ssh)
+if [[ "${SSH_BATCH_MODE}" == "1" ]]; then
+	SSH_CMD+=(-o BatchMode=yes)
+fi
+
 echo "Fetching site URL from ${REMOTE_HOST}..."
-REMOTE_URL="$(ssh -o BatchMode=yes "${REMOTE_HOST}" "cd ${REMOTE_WP_PATH} && wp option get siteurl 2>/dev/null" | tr -d '\r')"
+REMOTE_URL="$("${SSH_CMD[@]}" "${REMOTE_HOST}" "cd ${REMOTE_WP_PATH} && wp option get siteurl 2>/dev/null" | tr -d '\r')"
 if [[ -z "${REMOTE_URL}" ]]; then
 	echo "Could not read remote siteurl. Check REMOTE_HOST and REMOTE_WP_PATH." >&2
 	exit 1
@@ -23,7 +29,7 @@ fi
 echo "Remote site URL: ${REMOTE_URL}"
 
 echo "Exporting database to ${DUMP_FILE}..."
-ssh -o BatchMode=yes "${REMOTE_HOST}" "cd ${REMOTE_WP_PATH} && wp db export - --add-drop-table" > "${DUMP_FILE}"
+"${SSH_CMD[@]}" "${REMOTE_HOST}" "cd ${REMOTE_WP_PATH} && wp db export - --add-drop-table" > "${DUMP_FILE}"
 echo "Dump size: $(wc -c < "${DUMP_FILE}") bytes"
 
 echo "Starting local stack (if needed)..."
