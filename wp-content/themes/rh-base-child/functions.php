@@ -18,21 +18,89 @@ require_once get_stylesheet_directory() . '/inc/static-front-page.php';
 require_once get_stylesheet_directory() . '/inc/projects.php';
 
 /**
+ * URL to a homepage section (fragment id without leading #, e.g. about, services, contact).
+ */
+function rh_carpentry_home_section_url(string $fragment_id): string {
+	$fragment_id = ltrim($fragment_id, '#');
+	return trailingslashit(home_url('/')) . '#' . $fragment_id;
+}
+
+/**
+ * Point primary menu items at homepage sections when they target old About/Services/Projects URLs.
+ *
+ * @param WP_Post[] $sorted_menu_items Menu items.
+ * @param stdClass  $args              Menu arguments.
+ * @return WP_Post[]
+ */
+function rh_carpentry_primary_menu_home_sections(array $sorted_menu_items, $args): array {
+	if (! isset($args->theme_location) || $args->theme_location !== 'primary') {
+		return $sorted_menu_items;
+	}
+
+	$projects = trailingslashit(rh_carpentry_projects_archive_url());
+
+	foreach ($sorted_menu_items as $item) {
+		if (! isset($item->url) || ! is_string($item->url)) {
+			continue;
+		}
+		$url  = $item->url;
+		$path = (string) wp_parse_url($url, PHP_URL_PATH);
+		$path = '/' . trim($path, '/') . '/';
+
+		if ($path === '/about/') {
+			$item->url = rh_carpentry_home_section_url('about');
+			continue;
+		}
+		if ($path === '/services/') {
+			$item->url = rh_carpentry_home_section_url('services');
+			continue;
+		}
+		if ($path === '/contact/') {
+			$item->url = rh_carpentry_home_section_url('contact');
+			continue;
+		}
+		$proj_path = (string) wp_parse_url($projects, PHP_URL_PATH);
+		$proj_path = '/' . trim($proj_path, '/') . '/';
+		if ($path === $proj_path || $path === '/projects/') {
+			$item->url = rh_carpentry_home_section_url('projects');
+			continue;
+		}
+
+		$frag = (string) wp_parse_url($url, PHP_URL_FRAGMENT);
+		$legacy_sections = array(
+			'rh-home-section-about'    => 'about',
+			'rh-home-section-services' => 'services',
+			'rh-home-section-projects' => 'projects',
+			'rh-home-about-heading'    => 'about',
+			'rh-home-work-heading'     => 'services',
+			'rh-home-projects-heading' => 'projects',
+		);
+		if (isset($legacy_sections[ $frag ])) {
+			$item->url = rh_carpentry_home_section_url($legacy_sections[ $frag ]);
+			continue;
+		}
+	}
+
+	return $sorted_menu_items;
+}
+add_filter('wp_nav_menu_objects', 'rh_carpentry_primary_menu_home_sections', 10, 2);
+
+/**
  * Default menu when no Primary menu is assigned.
  */
 function rh_carpentry_hero_fallback_menu(): void {
 	$items = array(
 		array(
 			'label' => __('About', 'rh-base-child'),
-			'url'   => home_url('/about/'),
+			'url'   => rh_carpentry_home_section_url('about'),
 		),
 		array(
 			'label' => __('Services', 'rh-base-child'),
-			'url'   => home_url('/services/'),
+			'url'   => rh_carpentry_home_section_url('services'),
 		),
 		array(
 			'label' => __('Projects', 'rh-base-child'),
-			'url'   => rh_carpentry_projects_archive_url(),
+			'url'   => rh_carpentry_home_section_url('projects'),
 		),
 	);
 
@@ -102,18 +170,6 @@ function rh_base_child_enqueue_styles(): void {
 		);
 	}
 
-	$rh_inner_pages = is_page(array('about', 'services'))
-		|| is_post_type_archive('rh_project')
-		|| is_singular('rh_project');
-	if ($rh_inner_pages) {
-		wp_enqueue_style(
-			'rh-carpentry-inner-pages',
-			get_stylesheet_directory_uri() . '/assets/css/inner-pages.css',
-			array('rh-base-child-style', 'rh-carpentry-fonts'),
-			wp_get_theme()->get('Version')
-		);
-	}
-
 	wp_enqueue_style(
 		'rh-carpentry-site-footer',
 		get_stylesheet_directory_uri() . '/assets/css/site-footer.css',
@@ -160,6 +216,40 @@ function rh_carpentry_contact_page_url(): string {
 	 */
 	return (string) apply_filters('rh_carpentry_contact_page_url', $url);
 }
+
+/**
+ * Handle homepage full-screen contact form (admin-post.php).
+ */
+function rh_carpentry_handle_home_contact_submit(): void {
+	if (! isset($_POST['rh_home_contact_nonce']) || ! wp_verify_nonce(sanitize_text_field(wp_unslash($_POST['rh_home_contact_nonce'])), 'rh_home_contact')) {
+		wp_safe_redirect(esc_url_raw(add_query_arg('contact', 'invalid', trailingslashit(home_url('/'))) . '#contact'));
+		exit;
+	}
+
+	$name    = sanitize_text_field(wp_unslash($_POST['rh_contact_name'] ?? ''));
+	$email   = sanitize_email(wp_unslash($_POST['rh_contact_email'] ?? ''));
+	$phone   = sanitize_text_field(wp_unslash($_POST['rh_contact_phone'] ?? ''));
+	$message = sanitize_textarea_field(wp_unslash($_POST['rh_contact_message'] ?? ''));
+
+	if ($name === '' || ! is_email($email) || $message === '') {
+		wp_safe_redirect(esc_url_raw(add_query_arg('contact', 'required', trailingslashit(home_url('/'))) . '#contact'));
+		exit;
+	}
+
+	$admin = (string) get_option('admin_email');
+	$subj  = sprintf(
+		/* translators: %s: site name */
+		__('[%s] Website contact form', 'rh-base-child'),
+		wp_specialchars_decode((string) get_bloginfo('name'), ENT_QUOTES)
+	);
+	$body = "Name: {$name}\nEmail: {$email}\nPhone: {$phone}\n\n{$message}\n";
+	wp_mail($admin, $subj, $body, array('Reply-To: ' . $email));
+
+	wp_safe_redirect(esc_url_raw(add_query_arg('contact', 'sent', trailingslashit(home_url('/'))) . '#contact'));
+	exit;
+}
+add_action('admin_post_nopriv_rh_home_contact', 'rh_carpentry_handle_home_contact_submit');
+add_action('admin_post_rh_home_contact', 'rh_carpentry_handle_home_contact_submit');
 
 /**
  * Projects archive URL: CPT archive when registered, else /projects/.
@@ -388,19 +478,19 @@ function rh_carpentry_footer_menu_fallback(): void {
 		),
 		array(
 			'label' => __('About', 'rh-base-child'),
-			'url'   => home_url('/about/'),
+			'url'   => rh_carpentry_home_section_url('about'),
 		),
 		array(
 			'label' => __('Services', 'rh-base-child'),
-			'url'   => home_url('/services/'),
+			'url'   => rh_carpentry_home_section_url('services'),
 		),
 		array(
 			'label' => __('Projects', 'rh-base-child'),
-			'url'   => rh_carpentry_projects_archive_url(),
+			'url'   => rh_carpentry_home_section_url('projects'),
 		),
 		array(
 			'label' => __('Contact', 'rh-base-child'),
-			'url'   => rh_carpentry_contact_page_url(),
+			'url'   => rh_carpentry_home_section_url('contact'),
 		),
 	);
 

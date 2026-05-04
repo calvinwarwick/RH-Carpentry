@@ -9,9 +9,8 @@ if (! defined('ABSPATH')) {
 	exit;
 }
 
-$bg_url       = rh_carpentry_get_hero_background_url();
-$cta_contact  = rh_carpentry_contact_page_url();
-$cta_projects = rh_carpentry_projects_archive_url();
+$bg_url        = rh_carpentry_get_hero_background_url();
+$cta_contact   = rh_carpentry_home_section_url('contact');
 
 $hero_title = (string) get_theme_mod('rh_hero_title', '');
 $hero_lede  = (string) get_theme_mod('rh_hero_lede', '');
@@ -28,7 +27,7 @@ $hero_lede  = (string) get_theme_mod('rh_hero_lede', '');
 					class="rh-hero-logo__img"
 					src="<?php echo esc_url(get_stylesheet_directory_uri() . '/assets/images/rh-logo-hero.png'); ?>"
 					width="598"
-					height="129"
+					height="127"
 					alt="<?php echo esc_attr(get_bloginfo('name')); ?>"
 					decoding="async"
 					fetchpriority="high"
@@ -76,7 +75,7 @@ $hero_lede  = (string) get_theme_mod('rh_hero_lede', '');
 					</p>
 					<div class="rh-hero-actions">
 						<a class="rh-hero-btn rh-hero-btn--muted" href="<?php echo esc_url($cta_contact); ?>"><?php esc_html_e('Get in touch', 'rh-base-child'); ?></a>
-						<a class="rh-hero-btn rh-hero-btn--accent" href="<?php echo esc_url($cta_projects); ?>"><?php esc_html_e('View projects', 'rh-base-child'); ?></a>
+						<a class="rh-hero-btn rh-hero-btn--accent" href="<?php echo esc_url($cta_contact); ?>"><?php esc_html_e('Get in touch', 'rh-base-child'); ?></a>
 					</div>
 				</div>
 			</div>

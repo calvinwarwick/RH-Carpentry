@@ -10,10 +10,6 @@
 	if (!heroInner) {
 		return;
 	}
-	const heroShell = heroInner.closest('.rh-hero-home');
-	if (!heroShell) {
-		return;
-	}
 
 	const interactive =
 		'a[href], button, input[type="submit"], input[type="button"], input[type="reset"], label[for], [role="link"], [role="button"], summary, select, textarea';
@@ -61,32 +57,31 @@
 		}
 	};
 
+	const isInCursorZone = (target) => {
+		if (!target || typeof target.closest !== 'function') {
+			return false;
+		}
+		/* Full hero shell (bg + overlay + inner) and contact dialog (frame + safe-area padding). */
+		return Boolean(target.closest('.rh-hero-home') || target.closest('.rh-contact-overlay'));
+	};
+
 	document.addEventListener(
 		'mousemove',
 		(e) => {
-			const inHeroInner = e.target && typeof e.target.closest === 'function' && e.target.closest('.rh-hero-home__inner');
-			if (!inHeroInner) {
+			if (!isInCursorZone(e.target)) {
 				setActive(false);
+				el.classList.add('is-hidden');
 				return;
 			}
 			if (!active) {
 				setActive(true);
 			}
+			el.classList.remove('is-hidden');
 			setPos(e.clientX, e.clientY);
 			setExpanded(e.target);
 		},
 		{ passive: true }
 	);
-
-	heroInner.addEventListener('mouseleave', () => {
-		setActive(false);
-		el.classList.add('is-hidden');
-	});
-
-	heroInner.addEventListener('mouseenter', () => {
-		setActive(true);
-		el.classList.remove('is-hidden');
-	});
 
 	mq.addEventListener('change', (e) => {
 		if (!e.matches) {

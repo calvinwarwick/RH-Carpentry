@@ -6,7 +6,7 @@ ROOT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
 cd "${ROOT_DIR}"
 
 REMOTE_HOST="${REMOTE_HOST:-sg-calvinw15}"
-REMOTE_WP_PATH="${REMOTE_WP_PATH:-www/calvinw15.sg-host.com/public_html}"
+REMOTE_WP_PATH="${REMOTE_WP_PATH:-/home/customer/www/rhcarpentry.uk/public_html}"
 LOCAL_URL="${LOCAL_URL:-http://localhost:8088}"
 SSH_BATCH_MODE="${SSH_BATCH_MODE:-1}"
 DUMP_DIR="${ROOT_DIR}/data"

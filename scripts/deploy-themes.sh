@@ -5,8 +5,8 @@ set -euo pipefail
 
 ROOT="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
 REMOTE_HOST="${REMOTE_HOST:-sg-calvinw15}"
-REMOTE_BASE="${REMOTE_BASE:-www/calvinw15.sg-host.com/public_html/wp-content/themes}"
-PUBLIC_HTML="${PUBLIC_HTML:-www/calvinw15.sg-host.com/public_html}"
+REMOTE_BASE="${REMOTE_BASE:-/home/customer/www/rhcarpentry.uk/public_html/wp-content/themes}"
+PUBLIC_HTML="${PUBLIC_HTML:-/home/customer/www/rhcarpentry.uk/public_html}"
 
 echo "Syncing rh-base → ${REMOTE_HOST}:${REMOTE_BASE}/rh-base/"
 rsync -avz --delete \

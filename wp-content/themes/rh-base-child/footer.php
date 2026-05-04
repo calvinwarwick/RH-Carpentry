@@ -19,6 +19,10 @@ if (! defined('ABSPATH')) {
 
 <?php get_template_part('template-parts/footer/site-footer-full'); ?>
 
+<?php if (is_front_page()) : ?>
+	<?php get_template_part('template-parts/home/contact-overlay'); ?>
+<?php endif; ?>
+
 <?php wp_footer(); ?>
 </body>
 </html>

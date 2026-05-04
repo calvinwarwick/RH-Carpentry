@@ -127,6 +127,735 @@ body.rh-carpentry-home {
 	overflow-x: clip;
 }
 
+/* In-page nav: smooth scroll to section bands (not heading text). */
+@media (prefers-reduced-motion: no-preference) {
+	html {
+		scroll-behavior: smooth;
+	}
+}
+
+#about,
+#projects,
+#services {
+	scroll-margin-top: clamp(0.75rem, 2.5vw, 1.5rem);
+}
+
+/* --- Full-screen contact overlay (#contact) — hero-matched shell --- */
+
+body.rh-contact-overlay-open {
+	overflow: hidden;
+}
+
+.rh-contact-overlay {
+	--rh-contact-overlay-dur: 0.44s;
+	--rh-contact-overlay-ease: cubic-bezier(0.32, 0.72, 0, 1);
+	--rh-contact-ease-out: cubic-bezier(0.33, 1, 0.68, 1);
+	--rh-contact-ease-in-out: cubic-bezier(0.45, 0, 0.2, 1);
+	--rh-contact-ease-in: cubic-bezier(0.4, 0, 1, 1);
+	--rh-contact-hero-in-ease: cubic-bezier(0.33, 0.06, 0.15, 1);
+	/* Hero in: slide → short pause → shrink + frame border (square shell); form fades mid-timeline */
+	--rh-contact-hero-in-dur: 2.75s;
+	--rh-contact-hero-out-dur: 0.45s;
+	--rh-contact-step: 0.065s;
+	/* Form copy starts mid–late hero-in (not after full duration) */
+	--rh-contact-content-t0: calc(var(--rh-contact-hero-in-dur) * 0.52 + 0.04s);
+	--rh-contact-t-photo: var(--rh-contact-content-t0);
+	--rh-contact-t-title: calc(var(--rh-contact-content-t0) + 0.05s);
+	--rh-contact-t-bar: calc(var(--rh-contact-content-t0) + 0.09s);
+	--rh-contact-t-form: calc(var(--rh-contact-content-t0) + 0.13s);
+	/* OR pill + divider share one stroke token */
+	--rh-contact-or-hr: rgba(255, 255, 255, 0.22);
+	position: fixed;
+	inset: 0;
+	z-index: 50000;
+	display: flex;
+	align-items: stretch;
+	justify-content: center;
+	box-sizing: border-box;
+	padding: max(env(safe-area-inset-top, 0px), 0px) max(env(safe-area-inset-right, 0px), 0px)
+		max(env(safe-area-inset-bottom, 0px), 0px) max(env(safe-area-inset-left, 0px), 0px);
+	background: transparent;
+	visibility: hidden;
+	pointer-events: none;
+	transition: visibility 0s linear calc(var(--rh-contact-hero-out-dur) + 0.04s);
+}
+
+/* Backdrop: full-bleed navy wash, square corners (radius only on the hero card / image) */
+.rh-contact-overlay::before {
+	content: "";
+	position: absolute;
+	inset: 0;
+	z-index: 0;
+	border-radius: 0;
+	background: var(--rh-hero-overlay-gradient);
+	opacity: 0;
+	pointer-events: none;
+	transition: opacity 0.5s var(--rh-contact-ease-in-out);
+}
+
+.rh-contact-overlay.is-open {
+	visibility: visible;
+	pointer-events: auto;
+	transition: visibility 0s;
+}
+
+.rh-contact-overlay.is-open::before {
+	opacity: 0.92;
+	pointer-events: auto;
+}
+
+.rh-contact-overlay.is-closing::before {
+	opacity: 0;
+	pointer-events: none;
+	transition: opacity var(--rh-contact-hero-out-dur) var(--rh-contact-ease-in);
+}
+
+.rh-contact-overlay.is-closing {
+	visibility: visible;
+	pointer-events: auto;
+	transition: none;
+}
+
+/* Closed / idle: hero panel off-screen, full-bleed “blue stage” sizing */
+.rh-contact-overlay:not(.is-open):not(.is-closing) .rh-contact-overlay__hero.rh-hero-home {
+	animation: none;
+	transform: translate3d(0, 110%, 0) scale(1);
+	width: 100dvw;
+	height: 100dvh;
+	max-width: none;
+	min-height: 100dvh;
+	max-height: none;
+	margin: 0 auto;
+	align-self: stretch;
+	border-width: 0;
+	border-radius: 0;
+	/* Same stack as main hero: image + wash, not a solid accent fill */
+	background-color: transparent;
+}
+
+.rh-contact-overlay__hero.rh-hero-home {
+	position: relative;
+	z-index: 1;
+	width: min(var(--rh-hero-vw), 100%);
+	max-width: 100%;
+	height: min(var(--rh-hero-vh), 100%);
+	min-height: min(var(--rh-hero-vh), 100%);
+	max-height: min(var(--rh-hero-vh), 100%);
+	margin: auto;
+	flex: 0 1 auto;
+	border-style: solid;
+	border-color: var(--rh-color-bg, #f5f4f0);
+	background-color: transparent;
+	/* Square shell + beige frame; rounded photo lives on .rh-hero-home__bg / __overlay */
+	border-radius: 0;
+	will-change: transform, opacity, width, height, border-width;
+}
+
+.rh-contact-overlay.is-open .rh-contact-overlay__hero.rh-hero-home {
+	animation: rh-contact-hero-in var(--rh-contact-hero-in-dur) var(--rh-contact-hero-in-ease) both;
+}
+
+.rh-contact-overlay.is-closing .rh-contact-overlay__hero.rh-hero-home {
+	animation: rh-contact-hero-out var(--rh-contact-hero-out-dur) var(--rh-contact-ease-in) forwards;
+}
+
+@keyframes rh-contact-hero-in {
+	0% {
+		transform: translate3d(0, 108%, 0) scale(1);
+		width: 100dvw;
+		height: 100dvh;
+		max-width: none;
+		min-height: 100dvh;
+		max-height: none;
+		border-width: 0;
+		border-radius: 0;
+		background-color: transparent;
+	}
+	/* Full-bleed, square corners — slide in complete */
+	22% {
+		transform: translate3d(0, 0, 0) scale(1);
+		width: 100dvw;
+		height: 100dvh;
+		max-width: none;
+		min-height: 100dvh;
+		max-height: none;
+		border-width: 0;
+		border-radius: 0;
+		background-color: transparent;
+	}
+	/* Short hold on full viewport before scale */
+	27% {
+		transform: translate3d(0, 0, 0) scale(1);
+		width: 100dvw;
+		height: 100dvh;
+		max-width: none;
+		min-height: 100dvh;
+		max-height: none;
+		border-width: 0;
+		border-radius: 0;
+		background-color: transparent;
+	}
+	/* Shrink + frame border; outer shell stays square — radius on image layers only */
+	72% {
+		transform: translate3d(0, 0, 0) scale(1);
+		width: min(var(--rh-hero-vw), 100%);
+		height: min(var(--rh-hero-vh), 100%);
+		min-height: min(var(--rh-hero-vh), 100%);
+		max-height: min(var(--rh-hero-vh), 100%);
+		border-width: var(--rh-frame-inset);
+		border-radius: 0;
+		background-color: transparent;
+	}
+	100% {
+		transform: translate3d(0, 0, 0) scale(1);
+		width: min(var(--rh-hero-vw), 100%);
+		height: min(var(--rh-hero-vh), 100%);
+		min-height: min(var(--rh-hero-vh), 100%);
+		max-height: min(var(--rh-hero-vh), 100%);
+		border-width: var(--rh-frame-inset);
+		border-radius: 0;
+		background-color: transparent;
+	}
+}
+
+@keyframes rh-contact-hero-out {
+	from {
+		opacity: 1;
+	}
+	to {
+		opacity: 0;
+	}
+}
+
+/* Match hero-in / hero-out: square photo until shrink, then inner radius with the frame */
+@keyframes rh-contact-overlay-bg-radius-in {
+	0%,
+	27% {
+		border-radius: 0;
+	}
+	72%,
+	100% {
+		border-radius: var(--rh-hero-inner-radius);
+	}
+}
+
+/* Full-bleed and framed states: same image + gradient wash as main hero (no delayed fade over solid fill) */
+.rh-contact-overlay.is-open .rh-contact-overlay__hero .rh-hero-home__bg,
+.rh-contact-overlay.is-open .rh-contact-overlay__hero .rh-hero-home__overlay {
+	opacity: 1;
+	animation: rh-contact-overlay-bg-radius-in var(--rh-contact-hero-in-dur) var(--rh-contact-hero-in-ease) both;
+}
+
+.rh-contact-overlay.is-closing .rh-contact-overlay__hero .rh-hero-home__bg,
+.rh-contact-overlay.is-closing .rh-contact-overlay__hero .rh-hero-home__overlay {
+	animation: none;
+	border-radius: 0;
+	opacity: 1;
+}
+
+.rh-contact-overlay:not(.is-open):not(.is-closing) .rh-contact-overlay__hero .rh-hero-home__bg,
+.rh-contact-overlay:not(.is-open):not(.is-closing) .rh-contact-overlay__hero .rh-hero-home__overlay {
+	animation: none;
+	opacity: 0;
+	border-radius: 0;
+}
+
+.rh-contact-overlay.is-open .rh-contact-overlay__title.rh-hero-title {
+	animation: rh-contact-fade-up 0.48s var(--rh-contact-ease-out) var(--rh-contact-t-title) both;
+}
+
+.rh-contact-overlay.is-open .rh-contact-overlay__bar {
+	animation: rh-contact-fade-up 0.45s var(--rh-contact-ease-out) var(--rh-contact-t-bar) both;
+}
+
+.rh-contact-overlay.is-open .rh-contact-overlay__notice {
+	animation: rh-contact-fade-up 0.4s var(--rh-contact-ease-out) var(--rh-contact-t-form) both;
+}
+
+.rh-contact-overlay.is-open .rh-contact-overlay__field:nth-child(1) {
+	animation: rh-contact-fade-up 0.42s var(--rh-contact-ease-out) calc(var(--rh-contact-t-form) + var(--rh-contact-step)) both;
+}
+
+.rh-contact-overlay.is-open .rh-contact-overlay__field:nth-child(2) {
+	animation: rh-contact-fade-up 0.42s var(--rh-contact-ease-out) calc(var(--rh-contact-t-form) + var(--rh-contact-step) * 2) both;
+}
+
+.rh-contact-overlay.is-open .rh-contact-overlay__field:nth-child(3) {
+	animation: rh-contact-fade-up 0.42s var(--rh-contact-ease-out) calc(var(--rh-contact-t-form) + var(--rh-contact-step) * 3) both;
+}
+
+.rh-contact-overlay.is-open .rh-contact-overlay__field:nth-child(4) {
+	animation: rh-contact-fade-up 0.42s var(--rh-contact-ease-out) calc(var(--rh-contact-t-form) + var(--rh-contact-step) * 4) both;
+}
+
+.rh-contact-overlay.is-open .rh-contact-overlay__actions {
+	animation: rh-contact-fade-up 0.45s var(--rh-contact-ease-out) calc(var(--rh-contact-t-form) + var(--rh-contact-step) * 5) both;
+}
+
+.rh-contact-overlay.is-open .rh-contact-overlay__or {
+	animation: rh-contact-fade-up 0.42s var(--rh-contact-ease-out) calc(var(--rh-contact-t-form) + var(--rh-contact-step) * 6) both;
+}
+
+.rh-contact-overlay.is-open .rh-contact-overlay__call-btn {
+	animation: rh-contact-fade-up 0.45s var(--rh-contact-ease-out) calc(var(--rh-contact-t-form) + var(--rh-contact-step) * 7) both;
+}
+
+.rh-contact-overlay.is-open .rh-contact-overlay__social-kicker {
+	animation: rh-contact-fade-up 0.42s var(--rh-contact-ease-out) calc(var(--rh-contact-t-form) + var(--rh-contact-step) * 8) both;
+}
+
+.rh-contact-overlay.is-open .rh-contact-overlay__social {
+	animation: rh-contact-fade-up 0.45s var(--rh-contact-ease-out) calc(var(--rh-contact-t-form) + var(--rh-contact-step) * 9) both;
+}
+
+.rh-contact-overlay:not(.is-open):not(.is-closing) .rh-contact-overlay__title.rh-hero-title,
+.rh-contact-overlay:not(.is-open):not(.is-closing) .rh-contact-overlay__bar,
+.rh-contact-overlay:not(.is-open):not(.is-closing) .rh-contact-overlay__notice,
+.rh-contact-overlay:not(.is-open):not(.is-closing) .rh-contact-overlay__field,
+.rh-contact-overlay:not(.is-open):not(.is-closing) .rh-contact-overlay__actions,
+.rh-contact-overlay:not(.is-open):not(.is-closing) .rh-contact-overlay__or,
+.rh-contact-overlay:not(.is-open):not(.is-closing) .rh-contact-overlay__call-btn,
+.rh-contact-overlay:not(.is-open):not(.is-closing) .rh-contact-overlay__social-kicker,
+.rh-contact-overlay:not(.is-open):not(.is-closing) .rh-contact-overlay__social {
+	animation: none;
+	opacity: 0;
+	transform: translate3d(0, 0.35rem, 0);
+}
+
+@keyframes rh-contact-fade-up {
+	from {
+		opacity: 0;
+		transform: translate3d(0, 0.45rem, 0);
+	}
+	to {
+		opacity: 1;
+		transform: translate3d(0, 0, 0);
+	}
+}
+
+.rh-contact-overlay__inner {
+	display: flex;
+	flex-direction: column;
+	min-height: 0;
+}
+
+.rh-contact-overlay__bar {
+	display: flex;
+	align-items: center;
+	justify-content: space-between;
+	gap: 1rem;
+	flex-shrink: 0;
+	width: 100%;
+	margin-bottom: 0;
+}
+
+.rh-contact-overlay__kicker {
+	flex: 1;
+	min-width: 0;
+}
+
+.rh-hero-kicker.rh-contact-overlay__kicker {
+	margin: 0;
+}
+
+.rh-contact-overlay__close {
+	flex-shrink: 0;
+	display: grid;
+	place-items: center;
+	width: 2.75rem;
+	height: 2.75rem;
+	padding: 0;
+	margin: 0;
+	border: 1px solid var(--rh-hero-btn-muted-border);
+	border-radius: 999px;
+	background: var(--rh-hero-btn-muted);
+	color: #fff;
+	cursor: pointer;
+	transition:
+		background 0.15s ease,
+		border-color 0.15s ease,
+		transform 0.15s ease;
+}
+
+.rh-contact-overlay__close:hover,
+.rh-contact-overlay__close:focus-visible {
+	background: rgba(255, 255, 255, 0.22);
+	border-color: rgba(255, 255, 255, 0.22);
+	outline: none;
+}
+
+.rh-contact-overlay__close:focus-visible {
+	box-shadow: 0 0 0 2px rgba(255, 255, 255, 0.35);
+}
+
+.rh-contact-overlay__close-icon {
+	position: relative;
+	display: block;
+	width: 1.1rem;
+	height: 1.1rem;
+}
+
+.rh-contact-overlay__close-icon::before,
+.rh-contact-overlay__close-icon::after {
+	content: "";
+	position: absolute;
+	left: 50%;
+	top: 50%;
+	width: 100%;
+	height: 2px;
+	border-radius: 1px;
+	background: currentcolor;
+	transform-origin: center;
+}
+
+.rh-contact-overlay__close-icon::before {
+	transform: translate(-50%, -50%) rotate(45deg);
+}
+
+.rh-contact-overlay__close-icon::after {
+	transform: translate(-50%, -50%) rotate(-45deg);
+}
+
+.rh-contact-overlay__body {
+	flex: 1 1 auto;
+	min-height: 0;
+	overflow-y: auto;
+	-webkit-overflow-scrolling: touch;
+	padding-top: 0;
+	padding-bottom: clamp(0.5rem, 2vw, 1rem);
+}
+
+.rh-contact-overlay__title.rh-hero-title {
+	margin-top: 0;
+	margin-bottom: clamp(0.65rem, 1.8vw, 1rem);
+}
+
+.rh-contact-overlay__notice {
+	margin: 0 0 1rem;
+	padding: 0.75rem 1rem;
+	border-radius: var(--rh-bento-radius);
+	font-size: 0.95rem;
+	font-weight: 500;
+	line-height: 1.45;
+}
+
+.rh-contact-overlay__notice--success {
+	background: rgba(255, 255, 255, 0.12);
+	border: 1px solid rgba(255, 255, 255, 0.18);
+	color: rgba(255, 255, 255, 0.95);
+}
+
+.rh-contact-overlay__notice--warn {
+	background: rgba(180, 60, 50, 0.35);
+	border: 1px solid rgba(255, 200, 200, 0.25);
+	color: #fff;
+}
+
+.rh-contact-overlay__form {
+	margin: 0;
+	max-width: 40rem;
+}
+
+.rh-contact-overlay__fields {
+	display: grid;
+	grid-template-columns: repeat(2, minmax(0, 1fr));
+	gap: clamp(0.75rem, 2vw, 1.1rem);
+	margin-top: clamp(0.5rem, 2vw, 1rem);
+}
+
+.rh-contact-overlay__field {
+	margin: 0;
+	min-width: 0;
+}
+
+.rh-contact-overlay__field--full {
+	grid-column: 1 / -1;
+}
+
+/*
+ * Bootstrap-style floating labels: <label> wraps control + .rh-form-floating__label-text.
+ * Native <label> text is not shown as a block — only the span floats (no duplicate block labels).
+ */
+.rh-contact-overlay label.rh-form-floating {
+	position: relative;
+	display: block;
+	width: 100%;
+	margin: 0;
+	font-weight: inherit;
+	cursor: text;
+}
+
+.rh-contact-overlay .rh-form-floating__control {
+	position: relative;
+	z-index: 2;
+	display: block;
+	width: 100%;
+	box-sizing: border-box;
+	height: calc(3.35rem + 2px);
+	padding: 1.05rem 0.85rem 0.45rem;
+	border: 1px solid rgba(255, 255, 255, 0.18);
+	border-radius: calc(var(--rh-bento-radius) * 0.65);
+	background: rgba(255, 255, 255, 0.1);
+	color: #fff;
+	font-family: inherit;
+	font-size: 1rem;
+	line-height: 1.35;
+	transition:
+		border-color 0.15s ease,
+		background 0.15s ease;
+}
+
+.rh-contact-overlay .rh-form-floating__control::placeholder {
+	color: transparent;
+}
+
+.rh-contact-overlay .rh-form-floating__control:focus {
+	outline: none;
+	border-color: rgba(255, 255, 255, 0.42);
+	background: rgba(255, 255, 255, 0.14);
+}
+
+.rh-contact-overlay .rh-form-floating__label-text {
+	position: absolute;
+	top: 0;
+	left: 0;
+	z-index: 1;
+	width: 100%;
+	height: 100%;
+	max-height: calc(3.35rem + 2px);
+	padding: 1.05rem 0.85rem 0.45rem;
+	margin: 0;
+	overflow: hidden;
+	text-align: left;
+	text-overflow: ellipsis;
+	white-space: nowrap;
+	pointer-events: none;
+	border: 1px solid transparent;
+	transform-origin: 0 0;
+	font-size: 1rem;
+	font-weight: 500;
+	letter-spacing: 0.01em;
+	text-transform: none;
+	color: rgba(255, 255, 255, 0.58);
+	line-height: 1.35;
+	transition:
+		transform 0.2s ease,
+		opacity 0.2s ease,
+		color 0.2s ease,
+		max-height 0.2s ease,
+		padding 0.2s ease;
+}
+
+.rh-contact-overlay .rh-form-floating:focus-within .rh-form-floating__label-text,
+.rh-contact-overlay .rh-form-floating__control:not(:placeholder-shown) + .rh-form-floating__label-text {
+	opacity: 0.95;
+	color: rgba(255, 255, 255, 0.92);
+	max-height: none;
+	padding: 0.45rem 0.85rem 0;
+	transform: scale(0.82) translateY(-0.08rem) translateX(0.04rem);
+}
+
+.rh-contact-overlay .rh-form-floating--textarea .rh-form-floating__control--textarea {
+	height: auto;
+	min-height: 8rem;
+	padding-top: 1.55rem;
+	padding-bottom: 0.65rem;
+	resize: none;
+}
+
+.rh-contact-overlay .rh-form-floating--textarea .rh-form-floating__label-text {
+	max-height: none;
+	min-height: 2.75rem;
+	height: auto;
+	padding: 1.55rem 0.85rem 0.5rem;
+	white-space: normal;
+}
+
+.rh-contact-overlay .rh-form-floating--textarea:focus-within .rh-form-floating__label-text,
+.rh-contact-overlay .rh-form-floating--textarea .rh-form-floating__control:not(:placeholder-shown) + .rh-form-floating__label-text {
+	padding: 0.4rem 0.85rem 0;
+	transform: scale(0.82) translateY(-0.12rem) translateX(0.04rem);
+}
+
+.rh-contact-overlay__actions {
+	margin: clamp(1rem, 3vw, 1.5rem) 0 0;
+}
+
+.rh-contact-overlay__actions .rh-contact-overlay__submit {
+	display: flex;
+	width: 100%;
+	box-sizing: border-box;
+}
+
+.rh-contact-overlay__after-form {
+	max-width: 40rem;
+	margin: 0;
+}
+
+.rh-contact-overlay__or {
+	position: relative;
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	margin: clamp(1.25rem, 3vw, 1.75rem) 0 clamp(1rem, 2.5vw, 1.35rem);
+}
+
+.rh-contact-overlay__or-line {
+	width: 100%;
+	margin: 0;
+	border: 0;
+	border-top: 1px solid var(--rh-contact-or-hr);
+}
+
+.rh-contact-overlay__or-label {
+	position: absolute;
+	left: 50%;
+	transform: translateX(-50%);
+	padding: 0.2rem 0.85rem;
+	border-radius: 999px;
+	background: var(--rh-contact-or-hr);
+	color: rgba(255, 255, 255, 0.96);
+	text-shadow: 0 0.06rem 0.35rem rgb(0 0 0 / 55%);
+	font-size: 0.65rem;
+	font-weight: 700;
+	letter-spacing: 0.16em;
+	line-height: 1.2;
+	text-transform: uppercase;
+}
+
+.rh-contact-overlay__call-btn.rh-hero-btn {
+	width: 100%;
+	box-sizing: border-box;
+	justify-content: flex-start;
+	gap: 0.75rem;
+	padding: 0.9rem 1.15rem;
+	margin: 0 0 clamp(1rem, 2.5vw, 1.35rem);
+	text-align: left;
+	text-transform: none;
+	letter-spacing: 0.03em;
+	font-weight: 600;
+}
+
+.rh-contact-overlay__call-btn.rh-hero-btn::after {
+	content: none;
+	display: none;
+}
+
+.rh-contact-overlay__call-icon {
+	flex-shrink: 0;
+	font-size: 1.15rem;
+	opacity: 0.95;
+}
+
+.rh-contact-overlay__call-inner {
+	display: flex;
+	flex-direction: column;
+	align-items: flex-start;
+	gap: 0.12rem;
+	min-width: 0;
+}
+
+.rh-contact-overlay__call-kicker {
+	font-size: 0.65rem;
+	font-weight: 700;
+	letter-spacing: 0.12em;
+	text-transform: uppercase;
+	opacity: 0.88;
+}
+
+.rh-contact-overlay__call-number {
+	font-size: 1rem;
+	font-weight: 600;
+	letter-spacing: 0.02em;
+}
+
+.rh-contact-overlay__social-wrap {
+	display: flex;
+	flex-direction: column;
+	align-items: center;
+	gap: clamp(0.5rem, 1.5vw, 0.75rem);
+	margin: clamp(0.35rem, 1.5vw, 0.85rem) 0 clamp(0.35rem, 1.5vw, 0.65rem);
+}
+
+.rh-contact-overlay__social-kicker.rh-hero-kicker {
+	margin: 0;
+	justify-content: center;
+	text-align: center;
+}
+
+.rh-contact-overlay__social {
+	justify-content: center;
+	flex-wrap: wrap;
+	margin: 0;
+}
+
+@media (max-width: 640px) {
+	.rh-contact-overlay__fields {
+		grid-template-columns: 1fr;
+	}
+}
+
+@media (prefers-reduced-motion: reduce) {
+	.rh-contact-overlay {
+		--rh-contact-overlay-dur: 0.12s;
+		--rh-contact-hero-in-dur: 0.01ms;
+		--rh-contact-hero-out-dur: 0.12s;
+		--rh-contact-step: 0.01ms;
+		--rh-contact-t-photo: 0.01ms;
+		--rh-contact-t-title: 0.01ms;
+		--rh-contact-t-bar: 0.01ms;
+		--rh-contact-t-form: 0.01ms;
+		transition: visibility 0s linear var(--rh-contact-overlay-dur);
+	}
+
+	.rh-contact-overlay.is-open {
+		transition: visibility 0s;
+	}
+
+	.rh-contact-overlay::before {
+		transition-duration: 0.01ms;
+	}
+
+	.rh-contact-overlay.is-open .rh-contact-overlay__hero.rh-hero-home {
+		animation: none;
+		transform: translate3d(0, 0, 0);
+		width: min(var(--rh-hero-vw), 100%);
+		max-width: 100%;
+		height: min(var(--rh-hero-vh), 100%);
+		min-height: min(var(--rh-hero-vh), 100%);
+		max-height: min(var(--rh-hero-vh), 100%);
+		border-width: var(--rh-frame-inset);
+		border-radius: 0;
+		background-color: transparent;
+	}
+
+	.rh-contact-overlay.is-closing .rh-contact-overlay__hero.rh-hero-home {
+		animation: none;
+	}
+
+	.rh-contact-overlay.is-open .rh-contact-overlay__hero .rh-hero-home__bg,
+	.rh-contact-overlay.is-open .rh-contact-overlay__hero .rh-hero-home__overlay {
+		animation: none;
+		opacity: 1;
+		transform: none;
+		border-radius: var(--rh-hero-inner-radius);
+	}
+
+	.rh-contact-overlay.is-open .rh-contact-overlay__title.rh-hero-title,
+	.rh-contact-overlay.is-open .rh-contact-overlay__bar,
+	.rh-contact-overlay.is-open .rh-contact-overlay__notice,
+	.rh-contact-overlay.is-open .rh-contact-overlay__field,
+	.rh-contact-overlay.is-open .rh-contact-overlay__actions,
+	.rh-contact-overlay.is-open .rh-contact-overlay__or,
+	.rh-contact-overlay.is-open .rh-contact-overlay__call-btn,
+	.rh-contact-overlay.is-open .rh-contact-overlay__social-kicker,
+	.rh-contact-overlay.is-open .rh-contact-overlay__social {
+		animation: none;
+		opacity: 1;
+		transform: none;
+	}
+}
+
 .rh-page-frame {
 	position: relative;
 	padding: 0;
@@ -959,11 +1688,22 @@ body.rh-carpentry-home {
 	color: #fff;
 	text-decoration: none;
 	font-size: 1.05rem;
-	transition: background 0.2s ease, border-color 0.2s ease, color 0.2s ease;
+	transition:
+		background 0.2s ease,
+		border-color 0.2s ease,
+		color 0.2s ease,
+		opacity 0.2s ease;
+}
+
+/* Hero aside + contact overlay: hover one icon, dim the others (same idea as .rh-hero-nav__menu). */
+.rh-hero-social:has(.rh-hero-icon-btn:hover) .rh-hero-icon-btn:not(:hover),
+.rh-hero-social:has(.rh-hero-icon-btn:focus-visible) .rh-hero-icon-btn:not(:focus-visible) {
+	opacity: 0.45;
 }
 
 .rh-hero-icon-btn:hover,
 .rh-hero-icon-btn:focus-visible {
+	opacity: 1;
 	background: rgba(255, 255, 255, 0.2);
 	border-color: rgba(255, 255, 255, 0.22);
 	color: #fff;
@@ -1002,6 +1742,11 @@ body.rh-carpentry-home .site-main--front > :first-child {
 
 body.rh-carpentry-home .site-main--front > * + * {
 	margin-top: var(--rh-home-section-gap);
+}
+
+/* Tighter band above global footer (testimonials / projects use large hero inner padding by default) */
+body.rh-carpentry-home .site-main--front > .rh-home-section:last-child .rh-clients-hero__inner {
+	padding-bottom: clamp(0.85rem, 2.4vw, 1.5rem);
 }
 
 /* Stacked bento bands: one vertical step between sections (previous __inner bottom pad only) */
@@ -1312,10 +2057,9 @@ body.rh-carpentry-home .rh-bento-page > .rh-home-section + .rh-home-section .rh-
 	padding: var(--rh-hero-pad) var(--rh-hero-pad-x-end) var(--rh-hero-pad) var(--rh-hero-pad-x);
 }
 
-.rh-home-about__text-card > .rh-home-section__header--about,
-.rh-home-about__text-card > .rh-home-about__body,
-.rh-home-about__text-card > .rh-home-about__actions {
+.rh-home-about__text-content {
 	max-width: 28rem;
+	padding-block: clamp(2rem, 6vw, 4.5rem);
 }
 
 .rh-home-about__text-card .rh-home-kicker {
@@ -1417,6 +2161,13 @@ body.rh-carpentry-home .rh-bento-page > .rh-home-section + .rh-home-section .rh-
 	}
 }
 
+/* Wide viewports: image column half of the text + image row */
+@media (min-width: 1280px) {
+	.rh-home-about__grid {
+		grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+	}
+}
+
 .rh-home-section__header--about {
 	margin-bottom: clamp(1rem, 2.2vw, 1.35rem);
 }
@@ -1426,6 +2177,11 @@ body.rh-carpentry-home .rh-bento-page > .rh-home-section + .rh-home-section .rh-
 	line-height: 0.95;
 	letter-spacing: 0.02em;
 	margin-bottom: 0;
+}
+
+.rh-home-about__body {
+	text-align: justify;
+	hyphens: auto;
 }
 
 .rh-home-about__body .rh-home-lede + .rh-home-lede {

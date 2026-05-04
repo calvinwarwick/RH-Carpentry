@@ -14,14 +14,18 @@ Production deploy is done with **rsync over SSH** (see [`scripts/deploy-themes.s
 
    ```sshconfig
    Host sg-calvinw15
-       HostName ssh.calvinw15.sg-host.com
-       User u123456789
-       IdentityFile ~/.ssh/id_ed25519
+       HostName gukm1054.siteground.biz
+       User u2404-hqhjr6jnwqpg
+       Port 18765
+       IdentityFile ~/.ssh/rh_siteground_2026
    ```
 
    Use the host **alias** you choose (`Host` line) as `REMOTE_HOST`.
 
-3. **Correct remote paths** under your account’s `public_html` (SiteGround: `www/yoursite.sg-host.com/public_html/`).
+3. **Correct remote paths** under your account’s `public_html`.
+   This project currently uses:
+   - `PUBLIC_HTML=/home/customer/www/rhcarpentry.uk/public_html`
+   - `REMOTE_BASE=/home/customer/www/rhcarpentry.uk/public_html/wp-content/themes`
 
 ## One-command deploy (recommended)
 
@@ -36,7 +40,7 @@ Defaults are set inside the script. Override without editing files:
 
 ```bash
 export REMOTE_HOST=sg-your-host-alias
-export REMOTE_BASE=www/yoursite.sg-host.com/public_html/wp-content/themes
+export REMOTE_BASE=/home/customer/www/rhcarpentry.uk/public_html/wp-content/themes
 ./scripts/deploy-themes.sh
 ```
 

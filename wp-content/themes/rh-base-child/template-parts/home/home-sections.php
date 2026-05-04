@@ -9,8 +9,7 @@ if (! defined('ABSPATH')) {
 	exit;
 }
 
-$cta_contact   = rh_carpentry_contact_page_url();
-$projects_url  = rh_carpentry_projects_archive_url();
+$cta_contact = rh_carpentry_home_section_url('contact');
 
 $about_section_image_id = (int) get_theme_mod('rh_about_section_image_id', 0);
 
@@ -190,27 +189,29 @@ if (post_type_exists('rh_project')) {
 $home_projects = array_merge( $home_projects, rh_carpentry_home_projects_example_cards() );
 ?>
 
-<section class="rh-home-section rh-home-section--about" aria-labelledby="rh-home-about-heading">
+<section id="about" class="rh-home-section rh-home-section--about" aria-labelledby="rh-home-about-heading">
 	<div class="rh-home-about-container">
 		<div class="rh-home-about__grid">
 			<div class="rh-home-about__text-card">
-				<header class="rh-home-section__header rh-home-section__header--about">
-					<p class="rh-home-kicker">
-						<span class="rh-home-kicker__line" aria-hidden="true"></span>
-						<?php esc_html_e('Who we are', 'rh-base-child'); ?>
-					</p>
-					<h2 class="rh-home-heading rh-home-heading--section" id="rh-home-about-heading"><?php esc_html_e('About us', 'rh-base-child'); ?></h2>
-				</header>
-				<div class="rh-home-about__body">
-					<p class="rh-home-lede">
-						<?php esc_html_e('We work closely with homeowners, developers and contractors to deliver reliable workmanship, attention to detail and projects completed to a high professional standard.', 'rh-base-child'); ?>
-					</p>
-					<p class="rh-home-lede">
-						<?php esc_html_e('From full roof structures and timber framing to kitchen installations and complete property renovations, we take pride in every job we undertake.', 'rh-base-child'); ?>
-					</p>
-				</div>
-				<div class="rh-home-about__actions rh-hero-actions">
-					<a class="rh-hero-btn rh-hero-btn--accent" href="<?php echo esc_url($projects_url); ?>"><?php esc_html_e('View projects', 'rh-base-child'); ?></a>
+				<div class="rh-home-about__text-content">
+					<header class="rh-home-section__header rh-home-section__header--about">
+						<p class="rh-home-kicker">
+							<span class="rh-home-kicker__line" aria-hidden="true"></span>
+							<?php esc_html_e('Who we are', 'rh-base-child'); ?>
+						</p>
+						<h2 class="rh-home-heading rh-home-heading--section" id="rh-home-about-heading"><?php esc_html_e('About us', 'rh-base-child'); ?></h2>
+					</header>
+					<div class="rh-home-about__body">
+						<p class="rh-home-lede">
+							<?php esc_html_e('We work closely with homeowners, developers and contractors to deliver reliable workmanship, attention to detail and projects completed to a high professional standard.', 'rh-base-child'); ?>
+						</p>
+						<p class="rh-home-lede">
+							<?php esc_html_e('From full roof structures and timber framing to kitchen installations and complete property renovations, we take pride in every job we undertake.', 'rh-base-child'); ?>
+						</p>
+					</div>
+					<div class="rh-home-about__actions rh-hero-actions">
+						<a class="rh-hero-btn rh-hero-btn--accent" href="<?php echo esc_url($cta_contact); ?>"><?php esc_html_e('Get in touch', 'rh-base-child'); ?></a>
+					</div>
 				</div>
 			</div>
 			<div class="rh-home-about__media-card">
@@ -250,7 +251,7 @@ $home_projects = array_merge( $home_projects, rh_carpentry_home_projects_example
 	<?php
 	$home_projects_count = count($home_projects);
 	?>
-<section class="rh-home-section rh-home-section--projects" aria-labelledby="rh-home-projects-heading">
+<section id="projects" class="rh-home-section rh-home-section--projects" aria-labelledby="rh-home-projects-heading">
 	<div class="rh-clients-hero rh-testimonials-hero rh-projects-hero">
 		<div class="rh-clients-hero__bg" aria-hidden="true"></div>
 		<div class="rh-clients-hero__overlay" aria-hidden="true"></div>
@@ -263,7 +264,7 @@ $home_projects = array_merge( $home_projects, rh_carpentry_home_projects_example
 					</p>
 					<h2 class="rh-home-heading rh-home-heading--section" id="rh-home-projects-heading"><?php esc_html_e('Projects', 'rh-base-child'); ?></h2>
 				</div>
-				<a class="rh-hero-btn rh-hero-btn--muted" href="<?php echo esc_url($projects_url); ?>"><?php esc_html_e('View all projects', 'rh-base-child'); ?></a>
+				<a class="rh-hero-btn rh-hero-btn--muted" href="<?php echo esc_url($cta_contact); ?>"><?php esc_html_e('Get in touch', 'rh-base-child'); ?></a>
 			</header>
 			<div
 				class="rh-home-projects-carousel"
@@ -397,7 +398,7 @@ $home_projects = array_merge( $home_projects, rh_carpentry_home_projects_example
 <?php endif; ?>
 
 <div class="rh-bento-page">
-	<section class="rh-home-section rh-home-section--features" aria-labelledby="rh-home-work-heading">
+	<section id="services" class="rh-home-section rh-home-section--features" aria-labelledby="rh-home-work-heading">
 		<div class="rh-home-section__inner">
 			<header class="rh-home-section__header rh-home-section__header--features rh-home-section__header--row">
 				<div>
@@ -436,7 +437,7 @@ $home_projects = array_merge( $home_projects, rh_carpentry_home_projects_example
 				</p>
 				<h2 class="rh-home-heading rh-home-heading--section" id="rh-home-clients-heading"><?php esc_html_e('Our Clients', 'rh-base-child'); ?></h2>
 			</div>
-			<a class="rh-hero-btn rh-hero-btn--accent" href="<?php echo esc_url($projects_url); ?>"><?php esc_html_e('View projects', 'rh-base-child'); ?></a>
+			<a class="rh-hero-btn rh-hero-btn--accent" href="<?php echo esc_url($cta_contact); ?>"><?php esc_html_e('Get in touch', 'rh-base-child'); ?></a>
 		</header>
 		<div class="rh-client-marquee-panel">
 			<div class="rh-client-marquee">
@@ -479,7 +480,7 @@ $home_projects = array_merge( $home_projects, rh_carpentry_home_projects_example
 				</p>
 				<h2 class="rh-home-heading rh-home-heading--section" id="rh-home-clients-heading-empty"><?php esc_html_e('Our Clients', 'rh-base-child'); ?></h2>
 			</div>
-			<a class="rh-hero-btn rh-hero-btn--accent" href="<?php echo esc_url($projects_url); ?>"><?php esc_html_e('View projects', 'rh-base-child'); ?></a>
+			<a class="rh-hero-btn rh-hero-btn--accent" href="<?php echo esc_url($cta_contact); ?>"><?php esc_html_e('Get in touch', 'rh-base-child'); ?></a>
 		</header>
 		<div class="rh-client-marquee-panel">
 			<p class="rh-client-marquee__hint">

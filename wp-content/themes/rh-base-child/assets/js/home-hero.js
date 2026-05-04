@@ -40,6 +40,9 @@
 
 	document.addEventListener('keydown', (e) => {
 		if (e.key === 'Escape') {
+			if (document.body.classList.contains('rh-contact-overlay-open')) {
+				return;
+			}
 			setNavOpen(null, false);
 		}
 	});
@@ -963,4 +966,125 @@
 	window.requestAnimationFrame(() => {
 		updateEdgeState();
 	});
+})();
+
+/**
+ * Full-screen #contact overlay: hash, close control, Escape, scroll lock.
+ */
+(function () {
+	const overlay = document.querySelector('[data-rh-contact-overlay]');
+	if (!overlay) {
+		return;
+	}
+
+	const HERO_OUT_MS = 450;
+	/* After contact hero-in + earlier form stagger; keep in sync with --rh-contact-content-t0 */
+	const FOCUS_IN_MS = 2400;
+	let closeTimer = null;
+	let focusTimer = null;
+
+	const finishClose = () => {
+		closeTimer = null;
+		overlay.classList.remove('is-closing');
+		overlay.setAttribute('aria-hidden', 'true');
+		document.body.classList.remove('rh-contact-overlay-open');
+		document.body.style.overflow = '';
+	};
+
+	const animateClose = () => {
+		window.clearTimeout(focusTimer);
+		focusTimer = null;
+		if (!overlay.classList.contains('is-open')) {
+			return;
+		}
+		overlay.classList.remove('is-open');
+		overlay.classList.add('is-closing');
+		window.clearTimeout(closeTimer);
+		closeTimer = window.setTimeout(finishClose, HERO_OUT_MS);
+	};
+
+	const setOpen = (open) => {
+		if (open) {
+			window.clearTimeout(focusTimer);
+			focusTimer = null;
+			window.clearTimeout(closeTimer);
+			closeTimer = null;
+			overlay.classList.remove('is-closing');
+			overlay.classList.add('is-open');
+			overlay.setAttribute('aria-hidden', 'false');
+			document.body.classList.add('rh-contact-overlay-open');
+			document.body.style.overflow = 'hidden';
+			return;
+		}
+		overlay.classList.remove('is-open');
+		if (!overlay.classList.contains('is-closing')) {
+			overlay.setAttribute('aria-hidden', 'true');
+			document.body.classList.remove('rh-contact-overlay-open');
+			document.body.style.overflow = '';
+		}
+	};
+
+	const syncFromLocation = () => {
+		const open = window.location.hash === '#contact';
+		if (open) {
+			setOpen(true);
+			window.clearTimeout(focusTimer);
+			focusTimer = window.setTimeout(() => {
+				focusTimer = null;
+				const focusable = overlay.querySelector(
+					'button[data-rh-contact-close], input:not([type="hidden"]), textarea, select, a[href]'
+				);
+				if (focusable && typeof focusable.focus === 'function') {
+					focusable.focus();
+				}
+			}, FOCUS_IN_MS);
+			return;
+		}
+		animateClose();
+	};
+
+	const closeOverlay = () => {
+		try {
+			const u = new URL(window.location.href);
+			u.hash = '';
+			u.searchParams.delete('contact');
+			const q = u.searchParams.toString();
+			const next = u.pathname + (q ? '?' + q : '');
+			history.replaceState(null, '', next || '/');
+		} catch {
+			history.replaceState(null, '', window.location.pathname);
+		}
+		animateClose();
+	};
+
+	window.addEventListener('hashchange', syncFromLocation);
+	window.addEventListener('pageshow', syncFromLocation);
+	document.addEventListener('DOMContentLoaded', syncFromLocation);
+
+	overlay.querySelectorAll('[data-rh-contact-close]').forEach((btn) => {
+		btn.addEventListener('click', () => {
+			closeOverlay();
+		});
+	});
+
+	document.addEventListener(
+		'keydown',
+		(e) => {
+			if (e.key !== 'Escape') {
+				return;
+			}
+			if (overlay.classList.contains('is-closing')) {
+				window.clearTimeout(closeTimer);
+				finishClose();
+				e.preventDefault();
+				return;
+			}
+			if (!overlay.classList.contains('is-open')) {
+				return;
+			}
+			e.preventDefault();
+			closeOverlay();
+		},
+		true
+	);
 })();

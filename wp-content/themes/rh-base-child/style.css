@@ -23,6 +23,42 @@ Text Domain: rh-base-child
 	/* Page / bento field: off-white (clients band uses --rh-color-surface) */
 	--rh-color-bg: #f5f4f0;
 	--rh-color-surface: #ffffff;
+	/* Scrollbar (matches home hero / footer navy palette) */
+	--rh-scrollbar-track: #e4e2dc;
+	--rh-scrollbar-thumb: var(--rh-color-accent);
+	--rh-scrollbar-thumb-hover: #124a8a;
+	--rh-scrollbar-corner: var(--rh-scrollbar-track);
+}
+
+/* Custom scrollbar — WebKit (Chrome, Safari, Edge) + Firefox */
+html {
+	scrollbar-color: var(--rh-scrollbar-thumb) var(--rh-scrollbar-track);
+	scrollbar-width: thin;
+}
+
+html::-webkit-scrollbar {
+	width: 11px;
+	height: 11px;
+}
+
+html::-webkit-scrollbar-track {
+	background: var(--rh-scrollbar-track);
+	border-radius: 999px;
+}
+
+html::-webkit-scrollbar-thumb {
+	background: linear-gradient(180deg, #154a82 0%, var(--rh-scrollbar-thumb) 42%, #0a2a4d 100%);
+	border-radius: 999px;
+	border: 2px solid var(--rh-scrollbar-track);
+	box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.12);
+}
+
+html::-webkit-scrollbar-thumb:hover {
+	background: linear-gradient(180deg, #1a5694 0%, var(--rh-scrollbar-thumb-hover) 45%, #0c3158 100%);
+}
+
+html::-webkit-scrollbar-corner {
+	background: var(--rh-scrollbar-corner);
 }
 
 body:not(.rh-carpentry-home) .site-title {

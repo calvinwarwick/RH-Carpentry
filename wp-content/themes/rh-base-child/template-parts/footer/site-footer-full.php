@@ -1,6 +1,6 @@
 <?php
 /**
- * Global site footer: hero logo + accreditations (left), get in touch (centre), map (right).
+ * Global site footer: brand (left), map (centre), primary menu + social (end).
  *
  * @package RH_Base_Child
  */
@@ -42,7 +42,7 @@ $footer_grid_class    = 'rh-site-footer__grid' . ( $footer_has_contact ? '' : ' 
 							class="rh-hero-logo__img"
 							src="<?php echo esc_url($hero_logo); ?>"
 							width="598"
-							height="129"
+							height="127"
 							alt="<?php echo esc_attr(get_bloginfo('name')); ?>"
 							loading="lazy"
 							decoding="async"
@@ -52,6 +52,22 @@ $footer_grid_class    = 'rh-site-footer__grid' . ( $footer_has_contact ? '' : ' 
 						<img src="<?php echo esc_url($footer_uri . 'citb.png'); ?>" width="3840" height="1450" alt="<?php echo esc_attr__('CITB', 'rh-base-child'); ?>" loading="lazy" decoding="async" />
 						<img src="<?php echo esc_url($footer_uri . 'chas.png'); ?>" width="600" height="306" alt="<?php echo esc_attr__('CHAS — Accredited Contractor', 'rh-base-child'); ?>" loading="lazy" decoding="async" />
 						<img src="<?php echo esc_url($footer_uri . 'fsb.png'); ?>" width="237" height="155" alt="<?php echo esc_attr__('FSB member', 'rh-base-child'); ?>" loading="lazy" decoding="async" />
+					</div>
+				</div>
+
+				<div class="rh-site-footer__col rh-site-footer__col--map">
+					<p class="rh-home-kicker rh-site-footer__kicker">
+						<span class="rh-home-kicker__line" aria-hidden="true"></span>
+						<?php esc_html_e('Find us', 'rh-base-child'); ?>
+					</p>
+					<address class="rh-site-footer__address"><?php echo esc_html($footer_address); ?></address>
+					<div class="rh-site-footer__map">
+						<iframe
+							title="<?php esc_attr_e('Map showing company location', 'rh-base-child'); ?>"
+							loading="lazy"
+							referrerpolicy="no-referrer-when-downgrade"
+							src="<?php echo esc_url($map_src); ?>"
+						></iframe>
 					</div>
 				</div>
 
@@ -73,9 +89,9 @@ $footer_grid_class    = 'rh-site-footer__grid' . ( $footer_has_contact ? '' : ' 
 							} else {
 								?>
 								<ul id="rh-footer-primary-menu" class="rh-site-footer__menu rh-site-footer__menu--primary">
-									<li><a href="<?php echo esc_url(home_url('/about/')); ?>"><?php esc_html_e('About', 'rh-base-child'); ?></a></li>
-									<li><a href="<?php echo esc_url(home_url('/services/')); ?>"><?php esc_html_e('Services', 'rh-base-child'); ?></a></li>
-									<li><a href="<?php echo esc_url(rh_carpentry_projects_archive_url()); ?>"><?php esc_html_e('Projects', 'rh-base-child'); ?></a></li>
+									<li><a href="<?php echo esc_url(rh_carpentry_home_section_url('about')); ?>"><?php esc_html_e('About', 'rh-base-child'); ?></a></li>
+									<li><a href="<?php echo esc_url(rh_carpentry_home_section_url('services')); ?>"><?php esc_html_e('Services', 'rh-base-child'); ?></a></li>
+									<li><a href="<?php echo esc_url(rh_carpentry_home_section_url('projects')); ?>"><?php esc_html_e('Projects', 'rh-base-child'); ?></a></li>
 								</ul>
 								<?php
 							}
@@ -90,22 +106,6 @@ $footer_grid_class    = 'rh-site-footer__grid' . ( $footer_has_contact ? '' : ' 
 						</div>
 					</div>
 				<?php endif; ?>
-
-				<div class="rh-site-footer__col rh-site-footer__col--map">
-					<p class="rh-home-kicker rh-site-footer__kicker">
-						<span class="rh-home-kicker__line" aria-hidden="true"></span>
-						<?php esc_html_e('Find us', 'rh-base-child'); ?>
-					</p>
-					<address class="rh-site-footer__address"><?php echo esc_html($footer_address); ?></address>
-					<div class="rh-site-footer__map">
-						<iframe
-							title="<?php esc_attr_e('Map showing company location', 'rh-base-child'); ?>"
-							loading="lazy"
-							referrerpolicy="no-referrer-when-downgrade"
-							src="<?php echo esc_url($map_src); ?>"
-						></iframe>
-					</div>
-				</div>
 			</div>
 
 			<?php if (has_nav_menu('footer')) : ?>
