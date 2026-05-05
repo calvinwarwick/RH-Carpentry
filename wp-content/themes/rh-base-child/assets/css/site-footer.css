@@ -163,8 +163,8 @@ body:not(.rh-carpentry-home) .rh-site-footer__surface-inner {
 		max-width: 440px;
 		min-width: 0;
 		height: 100%;
-		align-items: center;
-		text-align: center;
+		align-items: flex-start;
+		text-align: left;
 	}
 
 	/* Two-column footer: keep map toward the right edge of the band. */
@@ -175,7 +175,7 @@ body:not(.rh-carpentry-home) .rh-site-footer__surface-inner {
 	}
 
 	.rh-site-footer__grid:not(.rh-site-footer__grid--no-contact) .rh-site-footer__col--map .rh-home-kicker {
-		justify-content: center;
+		justify-content: flex-start;
 	}
 
 	.rh-site-footer__col--contact {

@@ -298,11 +298,10 @@ $home_projects = array_merge( $home_projects, rh_carpentry_home_projects_example
 									$proj_badges = array_slice( $proj_badges, 0, 4 );
 								}
 								?>
-								<a
+								<article
 									class="rh-home-project-card rh-bento-cell<?php echo 0 === $pi ? ' is-active' : ''; ?>"
 									id="<?php echo esc_attr('rh-home-project-' . $pi); ?>"
 									role="listitem"
-									href="<?php echo esc_url($proj['url']); ?>"
 									data-rh-project-slide
 									data-rh-project-index="<?php echo (int) $pi; ?>"
 									aria-label="<?php
@@ -335,7 +334,7 @@ $home_projects = array_merge( $home_projects, rh_carpentry_home_projects_example
 											</ul>
 										<?php endif; ?>
 									</div>
-								</a>
+								</article>
 							<?php endforeach; ?>
 						</div>
 					</div>
@@ -425,71 +424,6 @@ $home_projects = array_merge( $home_projects, rh_carpentry_home_projects_example
 		</div>
 	</section>
 </div>
-
-<?php if ($client_logos !== array()) : ?>
-<section class="rh-home-section rh-home-section--clients" aria-labelledby="rh-home-clients-heading">
-	<div class="rh-home-clients-container">
-		<header class="rh-home-section__header rh-home-section__header--clients rh-home-section__header--row">
-			<div>
-				<p class="rh-home-kicker">
-					<span class="rh-home-kicker__line" aria-hidden="true"></span>
-					<?php esc_html_e('Over 1,000+ Happy customers', 'rh-base-child'); ?>
-				</p>
-				<h2 class="rh-home-heading rh-home-heading--section" id="rh-home-clients-heading"><?php esc_html_e('Our Clients', 'rh-base-child'); ?></h2>
-			</div>
-			<a class="rh-hero-btn rh-hero-btn--accent" href="<?php echo esc_url($cta_contact); ?>"><?php esc_html_e('Get in touch', 'rh-base-child'); ?></a>
-		</header>
-		<div class="rh-client-marquee-panel">
-			<div class="rh-client-marquee">
-				<div class="rh-client-marquee__mask">
-					<div
-						class="rh-client-marquee__track"
-						style="<?php echo esc_attr('--rh-marquee-duration: ' . (string) round($marquee_secs, 1) . 's'); ?>"
-					>
-						<?php foreach (array(false, true) as $is_duplicate) : ?>
-						<ul class="rh-client-marquee__row"<?php echo $is_duplicate ? ' aria-hidden="true"' : ''; ?>>
-							<?php foreach ($client_logos as $logo) : ?>
-							<li class="rh-client-marquee__item">
-								<img
-									class="rh-client-marquee__img"
-									src="<?php echo esc_url($logo['url']); ?>"
-									alt="<?php echo esc_attr($logo['alt']); ?>"
-									loading="lazy"
-									decoding="async"
-									width="180"
-									height="90"
-								/>
-							</li>
-							<?php endforeach; ?>
-						</ul>
-						<?php endforeach; ?>
-					</div>
-				</div>
-			</div>
-		</div>
-	</div>
-</section>
-<?php elseif (current_user_can('edit_theme_options')) : ?>
-<section class="rh-home-section rh-home-section--clients rh-home-section--clients-empty" aria-labelledby="rh-home-clients-heading-empty">
-	<div class="rh-home-clients-container">
-		<header class="rh-home-section__header rh-home-section__header--clients rh-home-section__header--row">
-			<div>
-				<p class="rh-home-kicker">
-					<span class="rh-home-kicker__line" aria-hidden="true"></span>
-					<?php esc_html_e('Over 1,000+ Happy customers', 'rh-base-child'); ?>
-				</p>
-				<h2 class="rh-home-heading rh-home-heading--section" id="rh-home-clients-heading-empty"><?php esc_html_e('Our Clients', 'rh-base-child'); ?></h2>
-			</div>
-			<a class="rh-hero-btn rh-hero-btn--accent" href="<?php echo esc_url($cta_contact); ?>"><?php esc_html_e('Get in touch', 'rh-base-child'); ?></a>
-		</header>
-		<div class="rh-client-marquee-panel">
-			<p class="rh-client-marquee__hint">
-				<?php esc_html_e('Add client logos under Appearance -> Customize -> Client logos (marquee).', 'rh-base-child'); ?>
-			</p>
-		</div>
-	</div>
-</section>
-<?php endif; ?>
 
 <section class="rh-home-section rh-home-section--testimonials" aria-labelledby="rh-home-testimonials-heading">
 	<div class="rh-clients-hero rh-testimonials-hero">
@@ -616,3 +550,68 @@ $home_projects = array_merge( $home_projects, rh_carpentry_home_projects_example
 		</div>
 	</div>
 </section>
+
+<?php if ($client_logos !== array()) : ?>
+<section class="rh-home-section rh-home-section--clients" aria-labelledby="rh-home-clients-heading">
+	<div class="rh-home-clients-container">
+		<header class="rh-home-section__header rh-home-section__header--clients rh-home-section__header--row">
+			<div>
+				<p class="rh-home-kicker">
+					<span class="rh-home-kicker__line" aria-hidden="true"></span>
+					<?php esc_html_e('Over 1,000+ Happy customers', 'rh-base-child'); ?>
+				</p>
+				<h2 class="rh-home-heading rh-home-heading--section" id="rh-home-clients-heading"><?php esc_html_e('Our Clients', 'rh-base-child'); ?></h2>
+			</div>
+			<a class="rh-hero-btn rh-hero-btn--accent" href="<?php echo esc_url($cta_contact); ?>"><?php esc_html_e('Get in touch', 'rh-base-child'); ?></a>
+		</header>
+		<div class="rh-client-marquee-panel">
+			<div class="rh-client-marquee">
+				<div class="rh-client-marquee__mask">
+					<div
+						class="rh-client-marquee__track"
+						style="<?php echo esc_attr('--rh-marquee-duration: ' . (string) round($marquee_secs, 1) . 's'); ?>"
+					>
+						<?php foreach (array(false, true) as $is_duplicate) : ?>
+						<ul class="rh-client-marquee__row"<?php echo $is_duplicate ? ' aria-hidden="true"' : ''; ?>>
+							<?php foreach ($client_logos as $logo) : ?>
+							<li class="rh-client-marquee__item">
+								<img
+									class="rh-client-marquee__img"
+									src="<?php echo esc_url($logo['url']); ?>"
+									alt="<?php echo esc_attr($logo['alt']); ?>"
+									loading="lazy"
+									decoding="async"
+									width="180"
+									height="90"
+								/>
+							</li>
+							<?php endforeach; ?>
+						</ul>
+						<?php endforeach; ?>
+					</div>
+				</div>
+			</div>
+		</div>
+	</div>
+</section>
+<?php elseif (current_user_can('edit_theme_options')) : ?>
+<section class="rh-home-section rh-home-section--clients rh-home-section--clients-empty" aria-labelledby="rh-home-clients-heading-empty">
+	<div class="rh-home-clients-container">
+		<header class="rh-home-section__header rh-home-section__header--clients rh-home-section__header--row">
+			<div>
+				<p class="rh-home-kicker">
+					<span class="rh-home-kicker__line" aria-hidden="true"></span>
+					<?php esc_html_e('Over 1,000+ Happy customers', 'rh-base-child'); ?>
+				</p>
+				<h2 class="rh-home-heading rh-home-heading--section" id="rh-home-clients-heading-empty"><?php esc_html_e('Our Clients', 'rh-base-child'); ?></h2>
+			</div>
+			<a class="rh-hero-btn rh-hero-btn--accent" href="<?php echo esc_url($cta_contact); ?>"><?php esc_html_e('Get in touch', 'rh-base-child'); ?></a>
+		</header>
+		<div class="rh-client-marquee-panel">
+			<p class="rh-client-marquee__hint">
+				<?php esc_html_e('Add client logos under Appearance -> Customize -> Client logos (marquee).', 'rh-base-child'); ?>
+			</p>
+		</div>
+	</div>
+</section>
+<?php endif; ?>

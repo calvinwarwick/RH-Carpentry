@@ -21,7 +21,10 @@ $map_query = (string) apply_filters(
 $map_src   = 'https://maps.google.com/maps?q=' . rawurlencode($map_query) . '&z=14&output=embed';
 
 $footer_uri = get_stylesheet_directory_uri() . '/assets/images/footer/';
-$hero_logo  = get_stylesheet_directory_uri() . '/assets/images/rh-logo-hero.png';
+$hero_logo_path = get_stylesheet_directory() . '/assets/images/rh-logo-hero.png';
+$hero_logo_url  = get_stylesheet_directory_uri() . '/assets/images/rh-logo-hero.png';
+$hero_logo_ver  = file_exists($hero_logo_path) ? (string) filemtime($hero_logo_path) : wp_get_theme()->get('Version');
+$hero_logo      = add_query_arg('v', $hero_logo_ver, $hero_logo_url);
 
 $footer_contact_items = function_exists('rh_carpentry_get_footer_contact_icon_items')
 	? rh_carpentry_get_footer_contact_icon_items()

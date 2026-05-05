@@ -9,8 +9,12 @@ if (! defined('ABSPATH')) {
 	exit;
 }
 
-$bg_url        = rh_carpentry_get_hero_background_url();
-$cta_contact   = rh_carpentry_home_section_url('contact');
+$bg_url         = rh_carpentry_get_hero_background_url();
+$cta_contact    = rh_carpentry_home_section_url('contact');
+$cta_projects   = rh_carpentry_home_section_url('projects');
+$hero_logo_path = get_stylesheet_directory() . '/assets/images/rh-logo-hero.png';
+$hero_logo_url  = get_stylesheet_directory_uri() . '/assets/images/rh-logo-hero.png';
+$hero_logo_ver  = file_exists($hero_logo_path) ? (string) filemtime($hero_logo_path) : wp_get_theme()->get('Version');
 
 $hero_title = (string) get_theme_mod('rh_hero_title', '');
 $hero_lede  = (string) get_theme_mod('rh_hero_lede', '');
@@ -25,7 +29,7 @@ $hero_lede  = (string) get_theme_mod('rh_hero_lede', '');
 			<a class="rh-hero-logo" href="<?php echo esc_url(home_url('/')); ?>">
 				<img
 					class="rh-hero-logo__img"
-					src="<?php echo esc_url(get_stylesheet_directory_uri() . '/assets/images/rh-logo-hero.png'); ?>"
+					src="<?php echo esc_url(add_query_arg('v', $hero_logo_ver, $hero_logo_url)); ?>"
 					width="598"
 					height="127"
 					alt="<?php echo esc_attr(get_bloginfo('name')); ?>"
@@ -75,7 +79,7 @@ $hero_lede  = (string) get_theme_mod('rh_hero_lede', '');
 					</p>
 					<div class="rh-hero-actions">
 						<a class="rh-hero-btn rh-hero-btn--muted" href="<?php echo esc_url($cta_contact); ?>"><?php esc_html_e('Get in touch', 'rh-base-child'); ?></a>
-						<a class="rh-hero-btn rh-hero-btn--accent" href="<?php echo esc_url($cta_contact); ?>"><?php esc_html_e('Get in touch', 'rh-base-child'); ?></a>
+						<a class="rh-hero-btn rh-hero-btn--accent" href="<?php echo esc_url($cta_projects); ?>"><?php esc_html_e('Our Projects', 'rh-base-child'); ?></a>
 					</div>
 				</div>
 			</div>

@@ -71,6 +71,13 @@ function rh_carpentry_render_hero_contact_icons(string $extra_classes = ''): voi
 	}
 
 	$items = array();
+	$items[] = array(
+		'href'     => rh_carpentry_home_section_url('contact'),
+		'label'    => __('Open contact form', 'rh-base-child'),
+		'icon'     => 'fa-solid fa-envelope',
+		'title'    => '',
+		'external' => false,
+	);
 	if ($phone_item) {
 		$items[] = $phone_item;
 	}
@@ -82,10 +89,6 @@ function rh_carpentry_render_hero_contact_icons(string $extra_classes = ''): voi
 	}
 	if ($ig_item) {
 		$items[] = $ig_item;
-	}
-
-	if ($items === array()) {
-		return;
 	}
 
 	$classes = trim('rh-hero-social ' . $extra_classes);

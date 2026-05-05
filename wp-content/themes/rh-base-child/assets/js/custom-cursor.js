@@ -6,10 +6,6 @@
 	if (!mq.matches) {
 		return;
 	}
-	const heroInner = document.querySelector('.rh-hero-home__inner');
-	if (!heroInner) {
-		return;
-	}
 
 	const interactive =
 		'a[href], button, input[type="submit"], input[type="button"], input[type="reset"], label[for], [role="link"], [role="button"], summary, select, textarea';

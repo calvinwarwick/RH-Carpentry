@@ -43,17 +43,18 @@ $overlay_show_alt = ($overlay_phone_href !== '' || $overlay_social_items !== arr
 
 		<div class="rh-hero-home__inner rh-contact-overlay__inner">
 			<header class="rh-contact-overlay__bar">
-				<p class="rh-hero-kicker rh-contact-overlay__kicker">
-					<span class="rh-hero-kicker__line" aria-hidden="true"></span>
-					<?php esc_html_e('Start your project now', 'rh-base-child'); ?>
-				</p>
 				<button type="button" class="rh-contact-overlay__close" data-rh-contact-close aria-label="<?php esc_attr_e('Close', 'rh-base-child'); ?>">
 					<span class="rh-contact-overlay__close-icon" aria-hidden="true"></span>
 				</button>
 			</header>
 
 			<div class="rh-contact-overlay__body">
+				<p class="rh-hero-kicker rh-contact-overlay__kicker">
+					<span class="rh-hero-kicker__line" aria-hidden="true"></span>
+					<?php esc_html_e('Start your project now', 'rh-base-child'); ?>
+				</p>
 				<h2 class="rh-hero-title rh-contact-overlay__title" id="rh-contact-heading"><?php esc_html_e('Get in touch', 'rh-base-child'); ?></h2>
+				<p class="rh-contact-overlay__intro"><?php esc_html_e('Tell us a little about your project and we will get back to you shortly.', 'rh-base-child'); ?></p>
 
 				<?php if ($notice === 'sent') : ?>
 					<p class="rh-contact-overlay__notice rh-contact-overlay__notice--success" role="status">
@@ -100,53 +101,57 @@ $overlay_show_alt = ($overlay_phone_href !== '' || $overlay_social_items !== arr
 						</div>
 					</div>
 					<p class="rh-contact-overlay__actions">
-						<button type="submit" class="rh-hero-btn rh-hero-btn--accent rh-contact-overlay__submit"><?php esc_html_e('Send', 'rh-base-child'); ?></button>
+						<button type="submit" class="rh-hero-btn rh-hero-btn--accent rh-contact-overlay__submit"><?php esc_html_e('Send message', 'rh-base-child'); ?></button>
 					</p>
 				</form>
 
 				<?php if ($overlay_show_alt) : ?>
 					<div class="rh-contact-overlay__after-form">
-						<div class="rh-contact-overlay__or" role="presentation">
-							<hr class="rh-contact-overlay__or-line" aria-hidden="true" />
-							<span class="rh-contact-overlay__or-label"><?php esc_html_e('OR', 'rh-base-child'); ?></span>
-						</div>
-
-						<?php if ($overlay_phone_href !== '') : ?>
-							<a
-								class="rh-hero-btn rh-hero-btn--muted rh-contact-overlay__call-btn"
-								href="<?php echo esc_url($overlay_phone_href); ?>"
-							>
-								<i class="fa-solid fa-phone rh-contact-overlay__call-icon" aria-hidden="true"></i>
-								<span class="rh-contact-overlay__call-inner">
-									<span class="rh-contact-overlay__call-kicker"><?php esc_html_e('Give us a call', 'rh-base-child'); ?></span>
-									<span class="rh-contact-overlay__call-number"><?php echo esc_html($overlay_phone_label); ?></span>
-								</span>
-							</a>
-						<?php endif; ?>
-
-						<?php if ($overlay_social_items !== array()) : ?>
+						<?php if ($overlay_phone_href !== '' || $overlay_social_items !== array()) : ?>
 							<div class="rh-contact-overlay__social-wrap">
-								<p class="rh-hero-kicker rh-contact-overlay__social-kicker">
-									<span class="rh-hero-kicker__line" aria-hidden="true"></span>
-									<?php esc_html_e('Socials', 'rh-base-child'); ?>
-								</p>
-								<nav class="rh-contact-overlay__social rh-hero-social" aria-label="<?php esc_attr_e('Social media', 'rh-base-child'); ?>">
-								<?php
-								foreach ($overlay_social_items as $item) {
-									$rel_target   = ! empty($item['external']) ? ' rel="noopener noreferrer" target="_blank"' : '';
-									$title_attr   = ($item['title'] ?? '') !== '' ? ' title="' . esc_attr((string) $item['title']) . '"' : '';
-									$icon_classes = isset($item['icon']) ? (string) $item['icon'] : 'fa-solid fa-link';
-									printf(
-										'<a class="rh-hero-icon-btn" href="%s"%s%s><span class="screen-reader-text">%s</span><i class="%s" aria-hidden="true"></i></a>',
-										esc_url($item['href']),
-										$title_attr,
-										$rel_target,
-										esc_html($item['label']),
-										esc_attr($icon_classes)
-									);
-								}
-								?>
-								</nav>
+								<?php if ($overlay_phone_href !== '') : ?>
+									<div class="rh-contact-overlay__alt-col rh-contact-overlay__alt-col--phone">
+										<p class="rh-hero-kicker rh-contact-overlay__call-kicker-title">
+											<span class="rh-hero-kicker__line" aria-hidden="true"></span>
+											<?php esc_html_e('Give us a call', 'rh-base-child'); ?>
+										</p>
+										<a
+											class="rh-hero-btn rh-hero-btn--muted rh-contact-overlay__call-btn"
+											href="<?php echo esc_url($overlay_phone_href); ?>"
+										>
+											<i class="fa-solid fa-phone rh-contact-overlay__call-icon" aria-hidden="true"></i>
+											<span class="rh-contact-overlay__call-inner">
+												<span class="rh-contact-overlay__call-number"><?php echo esc_html($overlay_phone_label); ?></span>
+											</span>
+										</a>
+									</div>
+								<?php endif; ?>
+
+								<?php if ($overlay_social_items !== array()) : ?>
+									<div class="rh-contact-overlay__alt-col rh-contact-overlay__alt-col--social">
+										<p class="rh-hero-kicker rh-contact-overlay__social-kicker">
+											<span class="rh-hero-kicker__line" aria-hidden="true"></span>
+											<?php esc_html_e('Socials', 'rh-base-child'); ?>
+										</p>
+										<nav class="rh-contact-overlay__social rh-hero-social" aria-label="<?php esc_attr_e('Social media', 'rh-base-child'); ?>">
+										<?php
+										foreach ($overlay_social_items as $item) {
+											$rel_target   = ! empty($item['external']) ? ' rel="noopener noreferrer" target="_blank"' : '';
+											$title_attr   = ($item['title'] ?? '') !== '' ? ' title="' . esc_attr((string) $item['title']) . '"' : '';
+											$icon_classes = isset($item['icon']) ? (string) $item['icon'] : 'fa-solid fa-link';
+											printf(
+												'<a class="rh-hero-icon-btn" href="%s"%s%s><span class="screen-reader-text">%s</span><i class="%s" aria-hidden="true"></i></a>',
+												esc_url($item['href']),
+												$title_attr,
+												$rel_target,
+												esc_html($item['label']),
+												esc_attr($icon_classes)
+											);
+										}
+										?>
+										</nav>
+									</div>
+								<?php endif; ?>
 							</div>
 						<?php endif; ?>
 					</div>

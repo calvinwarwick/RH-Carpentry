@@ -11,7 +11,7 @@ body.rh-custom-cursor--on * {
 	position: fixed;
 	left: 0;
 	top: 0;
-	z-index: 999999;
+	z-index: 2147483647;
 	width: 12px;
 	height: 12px;
 	margin: 0;
@@ -65,6 +65,18 @@ body.rh-custom-cursor--on * {
 	border-color: rgba(255, 255, 255, 0.22);
 	background: rgba(255, 255, 255, 0.2);
 	mix-blend-mode: difference;
+}
+
+/* Keep cursor clearly visible over the contact overlay wash. */
+body.rh-contact-overlay-open .rh-custom-cursor__shape {
+	border-color: rgba(255, 255, 255, 0.72);
+	background: rgba(255, 255, 255, 0.26);
+	mix-blend-mode: normal;
+}
+
+body.rh-contact-overlay-open .rh-custom-cursor.is-link .rh-custom-cursor__shape {
+	border-color: rgba(255, 255, 255, 0.9);
+	background: rgba(255, 255, 255, 0.34);
 }
 
 @media (prefers-reduced-motion: reduce) {

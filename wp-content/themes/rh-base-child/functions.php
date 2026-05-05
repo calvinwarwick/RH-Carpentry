@@ -162,27 +162,30 @@ function rh_base_child_enqueue_styles(): void {
 		|| is_singular('rh_project');
 
 	if ($rh_brand_surfaces) {
+		$home_hero_css_path = get_stylesheet_directory() . '/assets/css/home-hero.css';
 		wp_enqueue_style(
 			'rh-carpentry-home-hero',
 			get_stylesheet_directory_uri() . '/assets/css/home-hero.css',
 			array('rh-base-child-style', 'rh-carpentry-fonts', 'font-awesome-6'),
-			wp_get_theme()->get('Version')
+			file_exists($home_hero_css_path) ? (string) filemtime($home_hero_css_path) : wp_get_theme()->get('Version')
 		);
 	}
 
+	$site_footer_css_path = get_stylesheet_directory() . '/assets/css/site-footer.css';
 	wp_enqueue_style(
 		'rh-carpentry-site-footer',
 		get_stylesheet_directory_uri() . '/assets/css/site-footer.css',
 		array('rh-base-child-style', 'rh-carpentry-fonts', 'font-awesome-6'),
-		wp_get_theme()->get('Version')
+		file_exists($site_footer_css_path) ? (string) filemtime($site_footer_css_path) : wp_get_theme()->get('Version')
 	);
 
 	if (is_front_page()) {
+		$home_hero_js_path = get_stylesheet_directory() . '/assets/js/home-hero.js';
 		wp_enqueue_script(
 			'rh-carpentry-home-hero',
 			get_stylesheet_directory_uri() . '/assets/js/home-hero.js',
 			array(),
-			wp_get_theme()->get('Version'),
+			file_exists($home_hero_js_path) ? (string) filemtime($home_hero_js_path) : wp_get_theme()->get('Version'),
 			true
 		);
 	}

@@ -883,6 +883,22 @@
 		nextBtn.addEventListener('click', () => goTo(index + 1));
 	}
 
+	root.addEventListener('click', (e) => {
+		const card = e.target.closest('[data-rh-project-slide]');
+		if (!card || !root.contains(card)) {
+			return;
+		}
+		const raw = card.getAttribute('data-rh-project-index');
+		if (raw === null) {
+			return;
+		}
+		const i = parseInt(raw, 10);
+		if (Number.isNaN(i)) {
+			return;
+		}
+		goTo(i);
+	});
+
 	viewport.addEventListener(
 		'wheel',
 		() => {
@@ -1087,4 +1103,265 @@
 		},
 		true
 	);
+})();
+
+/**
+ * Home hero: per-line link-style wipe when title/lede wrap to multiple lines (front page).
+ */
+(function () {
+	if (!document.body.classList.contains('rh-carpentry-home')) {
+		return;
+	}
+
+	const root = document.querySelector('.rh-home-hero');
+	const copy = root && root.querySelector('.rh-hero-copy');
+	const title = copy && copy.querySelector('.rh-hero-title');
+	const lede = copy && copy.querySelector('.rh-hero-lede');
+	if (!root || !copy || !title || !lede) {
+		return;
+	}
+
+	const prefersReduced =
+		typeof window.matchMedia === 'function' && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+	if (prefersReduced) {
+		return;
+	}
+
+	const TITLE_T0 = 1.16;
+	const LINE_STAGGER = 0.18;
+	const LEDE_AFTER_TITLE = 0.06;
+	const BTN_AFTER_LEDE = 0.36;
+	const BTN_STAGGER = 0.14;
+	const WIPE_S = 0.92;
+	const LINE_TOP_THRESHOLD = 6;
+
+	function ensurePlain(el, dataKey) {
+		const stored = (el.dataset[dataKey] || '').trim();
+		if (stored) {
+			return stored;
+		}
+		const t = (el.textContent || '').replace(/\s+/g, ' ').trim();
+		el.dataset[dataKey] = t;
+		return t;
+	}
+
+	function splitIntoLines(el, lineClass, plain) {
+		const text = plain.replace(/\s+/g, ' ').trim();
+		if (!text) {
+			el.textContent = '';
+			return 0;
+		}
+
+		const words = text.split(/\s+/);
+		el.textContent = '';
+		const frag = document.createDocumentFragment();
+		const wordSpans = [];
+		words.forEach((w, i) => {
+			const s = document.createElement('span');
+			s.className = 'rh-hero-copy-word';
+			s.textContent = w;
+			frag.appendChild(s);
+			if (i < words.length - 1) {
+				frag.appendChild(document.createTextNode(' '));
+			}
+			wordSpans.push(s);
+		});
+		el.appendChild(frag);
+
+		const lineGroups = [];
+		let group = [];
+		let lineTop = null;
+
+		wordSpans.forEach((span) => {
+			const top = span.getBoundingClientRect().top;
+			if (!group.length) {
+				group.push(span);
+				lineTop = top;
+				return;
+			}
+			if (Math.abs(top - lineTop) <= LINE_TOP_THRESHOLD) {
+				group.push(span);
+			} else {
+				lineGroups.push(group);
+				group = [span];
+				lineTop = top;
+			}
+		});
+		if (group.length) {
+			lineGroups.push(group);
+		}
+
+		el.textContent = '';
+		lineGroups.forEach((group, li) => {
+			const line = document.createElement('span');
+			line.className = lineClass;
+			line.style.setProperty('--rh-hero-line-i', String(li));
+			line.textContent = group.map((n) => n.textContent).join(' ');
+			el.appendChild(line);
+		});
+
+		return lineGroups.length;
+	}
+
+	let settleTimer = 0;
+	let resizeTimer = 0;
+
+	function applyTiming(titleLines, ledeLines) {
+		window.clearTimeout(settleTimer);
+		const tl = Math.max(1, titleLines);
+		const ml = Math.max(0, ledeLines);
+
+		const ledeStart = TITLE_T0 + tl * LINE_STAGGER + LEDE_AFTER_TITLE;
+		let btn1;
+		if (ml > 0) {
+			btn1 = ledeStart + (ml - 1) * LINE_STAGGER + BTN_AFTER_LEDE;
+		} else {
+			btn1 = TITLE_T0 + (tl - 1) * LINE_STAGGER + BTN_AFTER_LEDE;
+		}
+		const btn2 = btn1 + BTN_STAGGER;
+
+		copy.style.setProperty('--rh-hero-title-line-count', String(Math.max(1, titleLines)));
+		copy.style.setProperty('--rh-hero-lede-line-count', String(ml));
+		copy.style.setProperty('--rh-hero-btn-1-delay', `${btn1}s`);
+		copy.style.setProperty('--rh-hero-btn-2-delay', `${btn2}s`);
+
+		const lastLineStart =
+			ml > 0 ? ledeStart + (ml - 1) * LINE_STAGGER : TITLE_T0 + (tl - 1) * LINE_STAGGER;
+		settleTimer = window.setTimeout(() => {
+			copy.classList.add('rh-hero-lines-settled');
+		}, (lastLineStart + WIPE_S) * 1000 + 180);
+	}
+
+	function run() {
+		const titlePlain = ensurePlain(title, 'rhHeroTitlePlain');
+		const ledePlain = ensurePlain(lede, 'rhHeroLedePlain');
+
+		let n = 0;
+		let m = 0;
+
+		if (titlePlain) {
+			title.classList.add('rh-hero-title--lines-applied');
+			n = splitIntoLines(title, 'rh-hero-title-line', titlePlain);
+		} else {
+			title.textContent = '';
+			title.classList.remove('rh-hero-title--lines-applied');
+		}
+
+		if (ledePlain) {
+			lede.classList.add('rh-hero-lede--lines-applied');
+			m = splitIntoLines(lede, 'rh-hero-lede-line', ledePlain);
+		} else {
+			lede.textContent = '';
+			lede.classList.remove('rh-hero-lede--lines-applied');
+		}
+
+		if (n === 0 && titlePlain) {
+			title.textContent = titlePlain;
+			title.classList.remove('rh-hero-title--lines-applied');
+		}
+		if (m === 0 && ledePlain) {
+			lede.textContent = ledePlain;
+			lede.classList.remove('rh-hero-lede--lines-applied');
+		}
+
+		if (
+			!title.classList.contains('rh-hero-title--lines-applied') &&
+			!lede.classList.contains('rh-hero-lede--lines-applied')
+		) {
+			return;
+		}
+
+		applyTiming(n || 1, m);
+	}
+
+	function scheduleRun() {
+		window.requestAnimationFrame(() => {
+			window.requestAnimationFrame(run);
+		});
+	}
+
+	function onResize() {
+		if (!copy.classList.contains('rh-hero-lines-settled')) {
+			return;
+		}
+		window.clearTimeout(resizeTimer);
+		resizeTimer = window.setTimeout(() => {
+			window.clearTimeout(settleTimer);
+			const tp = title.dataset.rhHeroTitlePlain || '';
+			const lp = lede.dataset.rhHeroLedePlain || '';
+			title.classList.remove('rh-hero-title--lines-applied');
+			lede.classList.remove('rh-hero-lede--lines-applied');
+			title.textContent = tp;
+			lede.textContent = lp;
+			scheduleRun();
+		}, 120);
+	}
+
+	function bootstrap() {
+		if (document.fonts && document.fonts.ready) {
+			document.fonts.ready.then(scheduleRun).catch(scheduleRun);
+		} else {
+			scheduleRun();
+		}
+	}
+
+	window.addEventListener('resize', onResize, { passive: true });
+
+	if (document.readyState === 'loading') {
+		document.addEventListener('DOMContentLoaded', bootstrap);
+	} else {
+		bootstrap();
+	}
+})();
+
+/**
+ * Homepage sections/footer: fade/slide in when entering viewport.
+ */
+(function () {
+	if (!document.body.classList.contains('rh-carpentry-home')) {
+		return;
+	}
+
+	const targets = Array.from(
+		document.querySelectorAll(
+			'.site-main--front > .rh-home-section, .site-main--front > .rh-bento-page, body.rh-carpentry-home .rh-site-footer'
+		)
+	);
+	if (!targets.length) {
+		return;
+	}
+
+	const prefersReduced =
+		typeof window.matchMedia === 'function' && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+	targets.forEach((el) => {
+		el.setAttribute('data-rh-reveal', '');
+	});
+
+	if (prefersReduced || typeof IntersectionObserver === 'undefined') {
+		targets.forEach((el) => el.classList.add('is-inview'));
+		return;
+	}
+
+	const observer = new IntersectionObserver(
+		(entries) => {
+			entries.forEach((entry) => {
+				if (!entry.isIntersecting) {
+					return;
+				}
+				entry.target.classList.add('is-inview');
+				observer.unobserve(entry.target);
+			});
+		},
+		{ root: null, rootMargin: '0px 0px -10% 0px', threshold: 0.16 }
+	);
+
+	targets.forEach((el, index) => {
+		if (index <= 1) {
+			/* Avoid hiding the first visible bands on initial paint. */
+			el.classList.add('is-inview');
+			return;
+		}
+		observer.observe(el);
+	});
 })();
