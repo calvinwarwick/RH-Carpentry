@@ -4287,6 +4287,138 @@ body.rh-carpentry-home .rh-bento-page > .rh-home-section + .rh-home-section .rh-
 	color: var(--rh-hero-accent, #0e396e);
 }
 
+/* --- Bento mode: < 5 projects, no slider, grid layout instead --- */
+
+/* Drop the fixed viewport-height band so the grid can grow with content */
+.rh-home-section--projects.rh-home-section--projects--bento#projects,
+.rh-home-section--projects.rh-home-section--projects--bento {
+	height: auto;
+	min-height: 0;
+	max-height: none;
+	overflow: visible;
+}
+
+/* "More projects" band: same — let the navy shell grow with the bento grid */
+.rh-single-related.rh-single-related--bento .rh-clients-hero__inner,
+.rh-single-related--band.rh-single-related--bento .rh-clients-hero__inner {
+	min-height: 0;
+	height: auto;
+}
+
+/* Bento carousel root: no flex column / overflow gymnastics */
+.rh-home-projects-carousel--bento {
+	display: block;
+	height: auto;
+	min-height: 0;
+	flex: 0 1 auto;
+}
+
+.rh-home-projects-carousel--bento .rh-home-projects-carousel__viewport {
+	display: block;
+	overflow: visible;
+	height: auto;
+	min-height: 0;
+	margin-block: 0;
+	mask-image: none;
+	-webkit-mask-image: none;
+	scroll-snap-type: none;
+	touch-action: auto;
+}
+
+.rh-home-projects-carousel--bento .rh-home-projects-carousel__track {
+	display: grid;
+	gap: clamp(0.75rem, 2vw, 1.25rem);
+	padding: 0;
+	width: 100%;
+	height: auto;
+	min-height: 0;
+	align-items: stretch;
+	scroll-snap-type: none;
+}
+
+/* Per-count grids — 4 → 2×2, 3 → 3 cols, 2 → 2 cols, 1 → single full-width card */
+.rh-home-projects-carousel--bento[data-count="1"] .rh-home-projects-carousel__track {
+	grid-template-columns: minmax(0, 1fr);
+}
+
+.rh-home-projects-carousel--bento[data-count="2"] .rh-home-projects-carousel__track {
+	grid-template-columns: repeat(2, minmax(0, 1fr));
+}
+
+.rh-home-projects-carousel--bento[data-count="3"] .rh-home-projects-carousel__track {
+	grid-template-columns: repeat(3, minmax(0, 1fr));
+}
+
+.rh-home-projects-carousel--bento[data-count="4"] .rh-home-projects-carousel__track {
+	grid-template-columns: repeat(2, minmax(0, 1fr));
+}
+
+@media (max-width: 900px) {
+	.rh-home-projects-carousel--bento[data-count="3"] .rh-home-projects-carousel__track {
+		grid-template-columns: repeat(2, minmax(0, 1fr));
+	}
+}
+
+@media (max-width: 560px) {
+	.rh-home-projects-carousel--bento[data-count="2"] .rh-home-projects-carousel__track,
+	.rh-home-projects-carousel--bento[data-count="3"] .rh-home-projects-carousel__track,
+	.rh-home-projects-carousel--bento[data-count="4"] .rh-home-projects-carousel__track {
+		grid-template-columns: minmax(0, 1fr);
+	}
+}
+
+/* Cards in bento: fixed aspect, no flex stretch, no scroll snap. */
+.rh-home-projects-carousel--bento .rh-home-project-card.rh-bento-cell {
+	flex: 0 0 auto;
+	width: 100%;
+	min-width: 0;
+	min-height: 0;
+	height: auto;
+	aspect-ratio: 4 / 3;
+	scroll-snap-align: none;
+	opacity: 1;
+	transition: transform 0.2s ease, box-shadow 0.2s ease, border-color 0.2s ease;
+}
+
+/* Single card spans wider — banner-style */
+.rh-home-projects-carousel--bento[data-count="1"] .rh-home-project-card.rh-bento-cell {
+	aspect-ratio: 21 / 9;
+}
+
+/* Disable the per-slide reveal animations — every card is "live" in bento. */
+.rh-home-projects-carousel--bento .rh-home-project-card.rh-bento-cell .rh-home-project-card__title,
+.rh-home-projects-carousel--bento .rh-home-project-card.rh-bento-cell .rh-home-project-card__badges,
+.rh-home-projects-carousel--bento .rh-home-project-card.rh-bento-cell .rh-home-project-card__badge {
+	transition: none;
+	animation: none;
+}
+
+.rh-home-projects-carousel--bento .rh-home-project-card.rh-bento-cell .rh-home-project-card__badges {
+	max-height: none;
+	opacity: 1;
+	transform: none;
+	margin-bottom: clamp(0.35rem, 1.2vw, 0.55rem);
+}
+
+.rh-home-projects-carousel--bento .rh-home-project-card.rh-bento-cell .rh-home-project-card__badge {
+	opacity: 1;
+	transform: none;
+}
+
+/* Hover lift for cards in bento (replaces the slider's active emphasis) */
+.rh-home-projects-carousel--bento .rh-home-project-card.rh-bento-cell:hover,
+.rh-home-projects-carousel--bento .rh-home-project-card.rh-bento-cell:focus-within {
+	transform: translateY(-3px);
+	box-shadow: 0 18px 48px rgba(12, 28, 52, 0.3);
+}
+
+/* Show the CTA at rest on every bento card (slider only shows it on hover) */
+.rh-home-projects-carousel--bento .rh-home-project-card.rh-bento-cell .rh-home-project-card__cta {
+	opacity: 1;
+	transform: none;
+	pointer-events: none;
+}
+
 /* Projects band: exactly one viewport including outer padding (replaces default section gap above). */
 body.rh-carpentry-home .site-main--front > #projects.rh-home-section--projects {
 	margin-top: 0;

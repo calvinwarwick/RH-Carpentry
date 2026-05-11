@@ -201,10 +201,11 @@ if ($current_project_id > 0 && function_exists('rh_project_get_other_projects'))
 	$other_projects = rh_project_get_other_projects($current_project_id);
 }
 if ($other_projects !== array()) :
-	$other_count = count($other_projects);
-	$other_multi = $other_count > 1;
+	$other_count    = count($other_projects);
+	$other_multi    = $other_count > 1;
+	$other_is_bento = $other_count < 5;
 	?>
-	<section class="rh-single-related rh-single-related--band" aria-labelledby="rh-single-related-heading">
+	<section class="rh-single-related rh-single-related--band<?php echo $other_is_bento ? ' rh-single-related--bento' : ''; ?>" data-count="<?php echo (int) $other_count; ?>" aria-labelledby="rh-single-related-heading">
 		<div class="rh-single-project__shell">
 			<div class="rh-clients-hero rh-testimonials-hero rh-single-project-hero">
 				<div class="rh-clients-hero__bg" aria-hidden="true"></div>
@@ -220,13 +221,14 @@ if ($other_projects !== array()) :
 						</h2>
 					</header>
 					<div
-						class="rh-home-projects-carousel rh-single-related-carousel"
-						data-rh-projects-carousel
+						class="rh-home-projects-carousel rh-single-related-carousel<?php echo $other_is_bento ? ' rh-home-projects-carousel--bento' : ''; ?>"
+						<?php if (! $other_is_bento) : ?>data-rh-projects-carousel
 						data-interval="5000"
 						data-at-start="true"
-						data-at-end="<?php echo esc_attr($other_count <= 1 ? 'true' : 'false'); ?>"
+						data-at-end="<?php echo esc_attr($other_count <= 1 ? 'true' : 'false'); ?>"<?php endif; ?>
+						data-count="<?php echo (int) $other_count; ?>"
 						role="region"
-						aria-roledescription="<?php echo esc_attr__('Carousel', 'rh-base-child'); ?>"
+						<?php if (! $other_is_bento) : ?>aria-roledescription="<?php echo esc_attr__('Carousel', 'rh-base-child'); ?>"<?php endif; ?>
 						aria-label="<?php echo esc_attr__('Other projects', 'rh-base-child'); ?>"
 					>
 						<div class="rh-home-projects-carousel__viewport" tabindex="0">
@@ -247,14 +249,14 @@ if ($other_projects !== array()) :
 											$badges[] = (string) $t->name;
 										}
 									}
-									$is_active = 0 === $oi;
+									$is_active = $other_is_bento || 0 === $oi;
 									?>
 									<article
 										class="rh-home-project-card rh-bento-cell<?php echo $is_active ? ' is-active' : ''; ?>"
 										id="<?php echo esc_attr('rh-single-related-project-' . $oi); ?>"
 										role="listitem"
-										data-rh-project-slide
-										data-rh-project-index="<?php echo (int) $oi; ?>"
+										<?php if (! $other_is_bento) : ?>data-rh-project-slide
+										data-rh-project-index="<?php echo (int) $oi; ?>"<?php endif; ?>
 										data-rh-project-url="<?php echo esc_url(is_string($rel_url) ? $rel_url : ''); ?>"
 										aria-label="<?php
 										echo esc_attr(
@@ -296,6 +298,7 @@ if ($other_projects !== array()) :
 								?>
 							</div>
 						</div>
+						<?php if (! $other_is_bento) : ?>
 						<div class="rh-home-projects-carousel__bottom-bar">
 							<?php if ($other_multi) : ?>
 								<button
@@ -347,6 +350,7 @@ if ($other_projects !== array()) :
 								</button>
 							</div>
 						</div>
+						<?php endif; ?>
 					</div>
 				</div>
 			</div>
