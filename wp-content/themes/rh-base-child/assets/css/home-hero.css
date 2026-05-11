@@ -5589,6 +5589,159 @@ body.rh-carpentry-home .rh-bento-page > .rh-home-section + .rh-home-section .rh-
 	}
 }
 
+/* --- Single project: static bento grid gallery (replaces the carousel) --- */
+
+.rh-single-project-gallery--grid {
+	display: grid;
+	grid-template-columns: 1fr;
+	gap: clamp(0.5rem, 1.4vw, 0.95rem);
+	width: 100%;
+	margin-block: clamp(0.25rem, 1vw, 0.65rem);
+}
+
+@media (min-width: 700px) {
+	.rh-single-project-gallery--grid {
+		grid-template-columns: repeat(2, 1fr);
+	}
+}
+
+@media (min-width: 1100px) {
+	.rh-single-project-gallery--grid {
+		grid-template-columns: repeat(3, 1fr);
+	}
+}
+
+.rh-single-project-gallery--grid[data-count="1"] {
+	grid-template-columns: 1fr;
+}
+
+@media (min-width: 700px) {
+	.rh-single-project-gallery--grid[data-count="2"],
+	.rh-single-project-gallery--grid[data-count="4"] {
+		grid-template-columns: repeat(2, 1fr);
+	}
+}
+
+@media (min-width: 1100px) {
+	.rh-single-project-gallery--grid[data-count="2"],
+	.rh-single-project-gallery--grid[data-count="4"] {
+		grid-template-columns: repeat(2, 1fr);
+	}
+
+	/* Feature first image on 3-col counts where it adds visual hierarchy */
+	.rh-single-project-gallery--grid[data-count="5"] > .rh-single-project-gallery__card:first-child,
+	.rh-single-project-gallery--grid[data-count="7"] > .rh-single-project-gallery__card:first-child {
+		grid-column: span 2;
+		aspect-ratio: 16 / 9;
+	}
+}
+
+/* Grid mode overrides the carousel card sizing/state styling */
+.rh-single-project__shell .rh-single-project-gallery--grid .rh-single-project-gallery__card.rh-bento-cell {
+	flex: none;
+	width: auto;
+	min-width: 0;
+	aspect-ratio: 4 / 3;
+	scroll-snap-align: none;
+	scroll-snap-stop: normal;
+	opacity: 1;
+	cursor: default;
+	background: rgba(12, 28, 52, 0.04);
+	border: 1px solid rgba(12, 28, 52, 0.06);
+	box-shadow: 0 8px 22px rgba(12, 28, 52, 0.08);
+	transition:
+		box-shadow 0.4s ease,
+		transform 0.4s ease;
+}
+
+.rh-single-project__shell .rh-single-project-gallery--grid[data-count="1"] > .rh-single-project-gallery__card.rh-bento-cell {
+	aspect-ratio: 21 / 9;
+}
+
+.rh-single-project__shell .rh-single-project-gallery--grid .rh-single-project-gallery__card.rh-bento-cell:hover {
+	box-shadow: 0 14px 32px rgba(12, 28, 52, 0.14);
+	transform: translateY(-2px);
+}
+
+.rh-single-project__shell .rh-single-project-gallery--grid .rh-single-project-gallery__media {
+	background: transparent;
+}
+
+.rh-single-project__shell .rh-single-project-gallery--grid .rh-single-project-gallery__img {
+	animation: none;
+	transform: none;
+	transition: transform 0.55s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.rh-single-project__shell .rh-single-project-gallery--grid .rh-single-project-gallery__card:hover .rh-single-project-gallery__img {
+	transform: scale(1.04);
+}
+
+@media (prefers-reduced-motion: reduce) {
+	.rh-single-project__shell .rh-single-project-gallery--grid .rh-single-project-gallery__card.rh-bento-cell,
+	.rh-single-project__shell .rh-single-project-gallery--grid .rh-single-project-gallery__card.rh-bento-cell:hover,
+	.rh-single-project__shell .rh-single-project-gallery--grid .rh-single-project-gallery__img,
+	.rh-single-project__shell .rh-single-project-gallery--grid .rh-single-project-gallery__card:hover .rh-single-project-gallery__img {
+		transform: none;
+		transition: none;
+	}
+}
+
+/* --- Remove the navy/blue hero background from single project pages
+       (lead band + content band + More projects band). Card-design backgrounds
+       on the More projects' individual project cards are kept — that's the card,
+       not the section background. --- */
+
+.rh-single-project__shell > .rh-single-project-hero.rh-clients-hero .rh-clients-hero__bg,
+.rh-single-project__shell > .rh-single-project-hero.rh-clients-hero .rh-clients-hero__overlay,
+.rh-single-related--band .rh-clients-hero__bg,
+.rh-single-related--band .rh-clients-hero__overlay {
+	background: transparent;
+	background-image: none;
+}
+
+.rh-single-project__shell .rh-clients-hero {
+	color: var(--rh-color-text, #1a1a1a);
+}
+
+.rh-single-project__shell .rh-single-project__sectors,
+.rh-single-project__shell .rh-single-project__sectors a {
+	color: var(--rh-color-muted, #5c5c5c);
+}
+
+.rh-single-project__shell .rh-single-project__sectors .rh-home-kicker__line {
+	background: rgba(12, 28, 52, 0.2);
+}
+
+.rh-single-project__shell .rh-single-project__sectors a {
+	color: var(--rh-hero-accent, #0e396e);
+}
+
+.rh-single-project__shell .rh-single-project__sectors a:hover,
+.rh-single-project__shell .rh-single-project__sectors a:focus-visible {
+	color: var(--rh-hero-accent-hover, #082a55);
+}
+
+.rh-single-project__shell .rh-single-project__title {
+	color: var(--rh-heading-color);
+}
+
+.rh-single-project__band--content {
+	border-top: 1px solid rgba(12, 28, 52, 0.08);
+}
+
+.rh-single-related--band .rh-single-related__intro .rh-home-kicker {
+	color: var(--rh-color-muted, #5c5c5c);
+}
+
+.rh-single-related--band .rh-single-related__intro .rh-home-kicker__line {
+	background: rgba(12, 28, 52, 0.2);
+}
+
+.rh-single-related--band .rh-single-related__intro .rh-home-heading--section {
+	color: var(--rh-heading-color);
+}
+
 .rh-single-project__content {
 	font-size: 1.05rem;
 	line-height: 1.65;
@@ -5598,22 +5751,22 @@ body.rh-carpentry-home .rh-bento-page > .rh-home-section + .rh-home-section .rh-
 .rh-single-project__shell .rh-single-project__content {
 	font-size: clamp(1rem, 1.15vw, 1.08rem);
 	line-height: 1.65;
-	color: rgba(255, 255, 255, 0.9);
+	color: var(--rh-color-text, #1a1a1a);
 }
 
 .rh-single-project__shell .rh-single-project__content a {
-	color: #c8ddff;
+	color: var(--rh-hero-accent, #0e396e);
 	text-decoration: underline;
 	text-underline-offset: 0.14em;
 }
 
 .rh-single-project__shell .rh-single-project__content a:hover,
 .rh-single-project__shell .rh-single-project__content a:focus-visible {
-	color: #fff;
+	color: var(--rh-hero-accent-hover, #082a55);
 }
 
 .rh-single-project__shell .rh-single-project__content :where(h2, h3, h4) {
-	color: #fff;
+	color: var(--rh-heading-color);
 	font-weight: 800;
 	letter-spacing: 0.02em;
 }
@@ -5629,17 +5782,17 @@ body.rh-carpentry-home .rh-bento-page > .rh-home-section + .rh-home-section .rh-
 }
 
 .rh-single-project__shell .rh-single-project__content :where(strong) {
-	color: #fff;
+	color: var(--rh-heading-color);
 }
 
 .rh-single-project__shell .rh-single-project__content :where(blockquote) {
-	border-left: 3px solid rgba(255, 255, 255, 0.35);
-	color: rgba(255, 255, 255, 0.82);
+	border-left: 3px solid rgba(12, 28, 52, 0.18);
+	color: var(--rh-color-muted, #5c5c5c);
 }
 
 .rh-single-project__shell .rh-single-project__content :where(hr) {
 	border: none;
-	border-top: 1px solid rgba(255, 255, 255, 0.18);
+	border-top: 1px solid rgba(12, 28, 52, 0.1);
 	margin-block: 1.5rem;
 }
 

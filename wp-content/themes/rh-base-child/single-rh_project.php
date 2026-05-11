@@ -69,115 +69,51 @@ $other_projects     = array();
 							</header>
 
 							<?php if ($slideshow_ids !== array()) : ?>
-								<?php
-								$n_slides = count($slideshow_ids);
-								$multi    = $n_slides > 1;
-								?>
+								<?php $n_slides = count($slideshow_ids); ?>
 								<div
-									class="rh-home-projects-carousel rh-single-project-gallery"
-									data-rh-projects-carousel
-									data-interval="3000"
-									data-at-start="true"
-									data-at-end="<?php echo esc_attr($n_slides <= 1 ? 'true' : 'false'); ?>"
+									class="rh-single-project-gallery rh-single-project-gallery--grid"
+									data-count="<?php echo (int) $n_slides; ?>"
 									role="region"
-									aria-roledescription="<?php echo esc_attr__('Carousel', 'rh-base-child'); ?>"
 									aria-label="<?php echo esc_attr(sprintf(
 										/* translators: %s: project title */
 										__('Photos: %s', 'rh-base-child'),
 										get_the_title()
 									)); ?>"
 								>
-									<div class="rh-home-projects-carousel__viewport" tabindex="0">
-										<div class="rh-home-projects-carousel__track" role="list">
-											<?php
-											foreach ($slideshow_ids as $si => $att_id) {
-												$att_id = (int) $att_id;
-												$active = 0 === $si;
-												$alt    = (string) get_post_meta($att_id, '_wp_attachment_image_alt', true);
-												if ($alt === '') {
-													$alt = get_the_title();
-												}
-												$slide_label = sprintf(
-													/* translators: 1: image number, 2: total */
-													__('Image %1$d of %2$d', 'rh-base-child'),
-													$si + 1,
-													$n_slides
-												);
-												printf(
-													'<article class="rh-single-project-gallery__card rh-bento-cell%s" role="listitem" data-rh-project-slide data-rh-project-index="%d" aria-label="%s">',
-													$active ? ' is-active' : '',
-													$si,
-													esc_attr($slide_label)
-												);
-												echo '<div class="rh-single-project-gallery__media">';
-												echo wp_get_attachment_image(
-													$att_id,
-													'large',
-													false,
-													array(
-														'class'    => 'rh-single-project-gallery__img',
-														'loading'  => 0 === $si ? 'eager' : 'lazy',
-														'decoding' => 'async',
-														'sizes'    => '(max-width: 899px) 100vw, min(1600px, 96vw)',
-														'alt'      => $alt,
-													)
-												);
-												echo '</div><span class="rh-single-project-gallery__overlay" aria-hidden="true"></span></article>';
-											}
-											?>
-										</div>
-									</div>
-									<div class="rh-home-projects-carousel__bottom-bar">
-										<?php if ($multi) : ?>
-											<button
-												type="button"
-												class="rh-home-projects-carousel__pause"
-												data-rh-project-autoplay-toggle
-												data-label-pause="<?php echo esc_attr(__('Pause automatic slideshow', 'rh-base-child')); ?>"
-												data-label-play="<?php echo esc_attr(__('Play automatic slideshow', 'rh-base-child')); ?>"
-												aria-pressed="false"
-												aria-label="<?php echo esc_attr(__('Pause automatic slideshow', 'rh-base-child')); ?>"
-											>
-												<svg class="rh-home-projects-carousel__pause-svg" viewBox="0 0 40 40" aria-hidden="true" focusable="false">
-													<circle class="rh-home-projects-carousel__pause-track" cx="20" cy="20" r="17" fill="none" stroke="rgba(255,255,255,0.22)" stroke-width="2" />
-													<circle
-														class="rh-home-projects-carousel__pause-progress"
-														cx="20"
-														cy="20"
-														r="17"
-														fill="none"
-														stroke="rgba(255,255,255,0.92)"
-														stroke-width="2"
-														stroke-dasharray="106.814"
-														stroke-dashoffset="106.814"
-														stroke-linecap="round"
-														transform="rotate(-90 20 20)"
-													/>
-												</svg>
-												<span class="rh-home-projects-carousel__pause-icon-wrap">
-													<i class="fa-solid fa-pause" aria-hidden="true"></i>
-												</span>
-											</button>
-										<?php endif; ?>
-										<div class="rh-home-projects-carousel__arrows">
-											<button
-												type="button"
-												class="rh-home-projects-carousel__arrow"
-												data-rh-project-prev
-												aria-label="<?php echo esc_attr(__('Previous project', 'rh-base-child')); ?>"
-											>
-												<i class="fa-solid fa-chevron-left" aria-hidden="true"></i>
-											</button>
-											<button
-												type="button"
-												class="rh-home-projects-carousel__arrow"
-												data-rh-project-next
-												aria-label="<?php echo esc_attr(__('Next project', 'rh-base-child')); ?>"
-											>
-												<i class="fa-solid fa-chevron-right" aria-hidden="true"></i>
-											</button>
-										</div>
-									</div>
+									<?php
+									foreach ($slideshow_ids as $si => $att_id) {
+										$att_id = (int) $att_id;
+										$alt    = (string) get_post_meta($att_id, '_wp_attachment_image_alt', true);
+										if ($alt === '') {
+											$alt = get_the_title();
+										}
+										$slide_label = sprintf(
+											/* translators: 1: image number, 2: total */
+											__('Image %1$d of %2$d', 'rh-base-child'),
+											$si + 1,
+											$n_slides
+										);
+										printf(
+											'<article class="rh-single-project-gallery__card rh-bento-cell" data-rh-project-index="%d" aria-label="%s">',
+											$si,
+											esc_attr($slide_label)
+										);
+										echo '<div class="rh-single-project-gallery__media">';
+										echo wp_get_attachment_image(
+											$att_id,
+											'large',
+											false,
+											array(
+												'class'    => 'rh-single-project-gallery__img',
+												'loading'  => $si < 2 ? 'eager' : 'lazy',
+												'decoding' => 'async',
+												'sizes'    => '(max-width: 699px) 100vw, (max-width: 1099px) 50vw, 33vw',
+												'alt'      => $alt,
+											)
+										);
+										echo '</div></article>';
+									}
+									?>
 								</div>
 							<?php endif; ?>
 						</div>
