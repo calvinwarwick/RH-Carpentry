@@ -66,7 +66,7 @@ body.rh-hero-nav-open .rh-site-top-bar__shell {
 	margin: 0;
 	padding-inline: max(var(--rh-frame-inset), env(safe-area-inset-left, 0px))
 		max(var(--rh-frame-inset), env(safe-area-inset-right, 0px));
-	padding-block: clamp(1.05rem, 2.85vw, 1.5rem);
+	padding-block: clamp(1.75rem, 4.25vw, 2.5rem);
 }
 
 /* Compact hero header row */
@@ -95,7 +95,8 @@ body.rh-hero-nav-open .rh-site-top-bar__shell {
 
 .rh-site-top-bar .rh-hero-logo__img {
 	display: block;
-	width: clamp(7.1rem, 18vw, 11.35rem);
+	/* Match the homepage hero logo scale (see .rh-hero-logo__img in home-hero.css) */
+	width: clamp(10.5rem, 25vw, 17.5rem);
 	max-width: 100%;
 	height: auto;
 }
