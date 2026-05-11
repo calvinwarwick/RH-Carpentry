@@ -324,6 +324,38 @@
 		updateEdgeState();
 	}
 
+	/**
+	 * Scroll-linked opacity: each slide's opacity tracks its distance to the
+	 * viewport centre so a manual scroll continuously cross-fades between
+	 * slides. Cleared once the scroll settles (clearScrollLinkedOpacity).
+	 */
+	function updateScrollLinkedOpacity() {
+		if (prefersReduced || !slides.length) {
+			return;
+		}
+		const viewRect = viewport.getBoundingClientRect();
+		const viewMid = viewRect.left + viewRect.width / 2;
+		const slideWidth = slides[0].offsetWidth || viewport.clientWidth || 1;
+		const ramp = Math.max(1, slideWidth);
+		const opacityFloor = 0.35;
+		slides.forEach((slide) => {
+			const r = slide.getBoundingClientRect();
+			const mid = r.left + r.width / 2;
+			const d = Math.abs(mid - viewMid);
+			const t = Math.min(1, d / ramp);
+			const op = 1 - t * (1 - opacityFloor);
+			slide.style.opacity = op.toFixed(3);
+		});
+	}
+
+	function clearScrollLinkedOpacity() {
+		slides.forEach((slide) => {
+			if (slide.style.opacity !== '') {
+				slide.style.opacity = '';
+			}
+		});
+	}
+
 	/** Slide whose centre is nearest the viewport centre (best match while user scrolls). */
 	function closestSlideIndex() {
 		const vr = viewport.getBoundingClientRect();
@@ -444,6 +476,9 @@
 		/* Blocks spurious closestSlideIndex() overrides from snap/settle after scrollTo; cleared on user scroll. */
 		navIntentUntil = performance.now() + 520;
 
+		/* Drop any stale inline opacities from a previous manual scroll so the CSS
+		   transition handles the programmatic active-state change cleanly. */
+		clearScrollLinkedOpacity();
 		syncActiveUi();
 
 		scrollActiveSlideIntoView();
@@ -541,8 +576,14 @@
 			if (suppressScrollSync) {
 				return;
 			}
+			/* Live cross-fade while the user is manually scrolling. */
+			updateScrollLinkedOpacity();
 			window.clearTimeout(scrollSyncTimer);
-			scrollSyncTimer = window.setTimeout(onScrollSettled, 140);
+			scrollSyncTimer = window.setTimeout(() => {
+				/* Release inline opacities so the CSS .is-active rule + transition take over. */
+				clearScrollLinkedOpacity();
+				onScrollSettled();
+			}, 140);
 		},
 		{ passive: true }
 	);
@@ -706,6 +747,42 @@
 	}
 
 	/**
+	 * Scroll-linked opacity: each slide's opacity is computed from its distance to
+	 * the viewport centre. Called during manual scroll so the active slide fades
+	 * out as the next slide fades in (instead of snapping between .is-active
+	 * states). Inline opacity is cleared by clearScrollLinkedOpacity() once the
+	 * scroll settles, so CSS rules (and the 0.58s ease transition) take back over.
+	 */
+	function updateScrollLinkedOpacity() {
+		if (prefersReduced || !slides.length) {
+			return;
+		}
+		const viewRect = viewport.getBoundingClientRect();
+		const viewMid = viewRect.left + viewRect.width / 2;
+		const slideWidth = slides[0].offsetWidth || viewport.clientWidth || 1;
+		/* Ramp distance: a full slide width — neighbours reach the faded floor
+		   as the active slide reaches centre. */
+		const ramp = Math.max(1, slideWidth);
+		const opacityFloor = 0.35;
+		slides.forEach((slide) => {
+			const r = slide.getBoundingClientRect();
+			const mid = r.left + r.width / 2;
+			const d = Math.abs(mid - viewMid);
+			const t = Math.min(1, d / ramp);
+			const op = 1 - t * (1 - opacityFloor);
+			slide.style.opacity = op.toFixed(3);
+		});
+	}
+
+	function clearScrollLinkedOpacity() {
+		slides.forEach((slide) => {
+			if (slide.style.opacity !== '') {
+				slide.style.opacity = '';
+			}
+		});
+	}
+
+	/**
 	 * Map scrollLeft to slide index: nearest ideal scroll position per slide (same math as scrollActiveSlideIntoView).
 	 * Avoids wrong picks when multiple cards are partly visible (viewport-centre vs slide-centre distance).
 	 */
@@ -838,6 +915,9 @@
 		/* Block scroll-sync until snap settles; subsumes debounce + snap after programmatic scroll. */
 		navIntentUntil = performance.now() + 2000;
 
+		/* Drop any stale inline opacities from a previous manual scroll so the CSS
+		   transition handles the programmatic active-state change cleanly. */
+		clearScrollLinkedOpacity();
 		syncActiveUi();
 
 		scrollActiveSlideIntoView();
@@ -933,13 +1013,19 @@
 		() => {
 			if (!suppressScrollSync) {
 				navIntentUntil = 0;
+				/* Live cross-fade while the user is manually scrolling. */
+				updateScrollLinkedOpacity();
 			}
 			updateEdgeState();
 			if (suppressScrollSync) {
 				return;
 			}
 			window.clearTimeout(scrollSyncTimer);
-			scrollSyncTimer = window.setTimeout(onScrollSettled, 140);
+			scrollSyncTimer = window.setTimeout(() => {
+				/* Release inline opacities so the CSS .is-active rule + transition take over. */
+				clearScrollLinkedOpacity();
+				onScrollSettled();
+			}, 140);
 		},
 		{ passive: true }
 	);
