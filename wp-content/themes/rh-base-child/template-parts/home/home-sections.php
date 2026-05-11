@@ -185,8 +185,6 @@ if (post_type_exists('rh_project')) {
 		wp_reset_postdata();
 	}
 }
-
-$home_projects = array_merge( $home_projects, rh_carpentry_home_projects_example_cards() );
 ?>
 
 <section id="about" class="rh-home-section rh-home-section--about" aria-labelledby="rh-home-about-heading">
@@ -276,9 +274,8 @@ $home_projects = array_merge( $home_projects, rh_carpentry_home_projects_example
 				aria-roledescription="<?php echo esc_attr(__('Carousel', 'rh-base-child')); ?>"
 				aria-label="<?php echo esc_attr(__('Featured projects', 'rh-base-child')); ?>"
 			>
-				<div class="rh-home-projects-carousel__viewport-shell">
-					<div class="rh-home-projects-carousel__viewport" tabindex="0">
-						<div class="rh-home-projects-carousel__track" role="list">
+				<div class="rh-home-projects-carousel__viewport" tabindex="0">
+					<div class="rh-home-projects-carousel__track" role="list">
 							<?php foreach ($home_projects as $pi => $proj) : ?>
 								<?php
 								$proj_img = '';
@@ -304,6 +301,7 @@ $home_projects = array_merge( $home_projects, rh_carpentry_home_projects_example
 									role="listitem"
 									data-rh-project-slide
 									data-rh-project-index="<?php echo (int) $pi; ?>"
+									data-rh-project-url="<?php echo esc_url( isset( $proj['url'] ) ? (string) $proj['url'] : '' ); ?>"
 									aria-label="<?php
 									echo esc_attr(
 										sprintf(
@@ -316,6 +314,10 @@ $home_projects = array_merge( $home_projects, rh_carpentry_home_projects_example
 									);
 									?>"
 								>
+									<span class="rh-home-project-card__cta" aria-hidden="true">
+										<?php esc_html_e( 'Find out more', 'rh-base-child' ); ?>
+										<i class="fa-solid fa-chevron-right rh-home-project-card__cta-icon" aria-hidden="true"></i>
+									</span>
 									<?php if ($proj_img !== '' && $proj_img !== false) : ?>
 										<span class="rh-home-project-card__bg" style="background-image: url('<?php echo esc_url($proj_img); ?>');"></span>
 									<?php else : ?>
@@ -336,7 +338,6 @@ $home_projects = array_merge( $home_projects, rh_carpentry_home_projects_example
 									</div>
 								</article>
 							<?php endforeach; ?>
-						</div>
 					</div>
 				</div>
 				<div class="rh-home-projects-carousel__bottom-bar">

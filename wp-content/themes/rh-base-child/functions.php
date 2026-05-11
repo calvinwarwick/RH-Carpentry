@@ -116,6 +116,40 @@ function rh_carpentry_hero_fallback_menu(): void {
 }
 
 /**
+ * Primary menu fallback for inner-page top bar (distinct list id from hero home).
+ */
+function rh_carpentry_site_top_fallback_menu(): void {
+	$items = array(
+		array(
+			'label' => __('About', 'rh-base-child'),
+			'url'   => rh_carpentry_home_section_url('about'),
+		),
+		array(
+			'label' => __('Services', 'rh-base-child'),
+			'url'   => rh_carpentry_home_section_url('services'),
+		),
+		array(
+			'label' => __('Projects', 'rh-base-child'),
+			'url'   => rh_carpentry_home_section_url('projects'),
+		),
+	);
+
+	printf(
+		'<ul id="rh-site-top-primary-menu" class="rh-hero-nav__menu"><li class="menu-item rh-hero-nav__home-item"><a class="rh-hero-nav__home" href="%1$s"><span class="screen-reader-text">%2$s</span><i class="fa-solid fa-house" aria-hidden="true"></i></a></li>',
+		esc_url(home_url('/')),
+		esc_html__('Home', 'rh-base-child')
+	);
+	foreach ($items as $item) {
+		printf(
+			'<li><a href="%s">%s</a></li>',
+			esc_url($item['url']),
+			esc_html($item['label'])
+		);
+	}
+	echo '</ul>';
+}
+
+/**
  * Enqueue child stylesheet after parent.
  */
 function rh_base_child_enqueue_styles(): void {
@@ -179,16 +213,25 @@ function rh_base_child_enqueue_styles(): void {
 		file_exists($site_footer_css_path) ? (string) filemtime($site_footer_css_path) : wp_get_theme()->get('Version')
 	);
 
-	if (is_front_page()) {
-		$home_hero_js_path = get_stylesheet_directory() . '/assets/js/home-hero.js';
-		wp_enqueue_script(
-			'rh-carpentry-home-hero',
-			get_stylesheet_directory_uri() . '/assets/js/home-hero.js',
-			array(),
-			file_exists($home_hero_js_path) ? (string) filemtime($home_hero_js_path) : wp_get_theme()->get('Version'),
-			true
+	if (! is_front_page()) {
+		$site_top_bar_css_path = get_stylesheet_directory() . '/assets/css/site-top-bar.css';
+		wp_enqueue_style(
+			'rh-carpentry-site-top-bar',
+			get_stylesheet_directory_uri() . '/assets/css/site-top-bar.css',
+			array('rh-base-child-style', 'rh-carpentry-fonts'),
+			file_exists($site_top_bar_css_path) ? (string) filemtime($site_top_bar_css_path) : wp_get_theme()->get('Version')
 		);
 	}
+
+	$home_hero_js_path = get_stylesheet_directory() . '/assets/js/home-hero.js';
+	wp_enqueue_script(
+		'rh-carpentry-home-hero',
+		get_stylesheet_directory_uri() . '/assets/js/home-hero.js',
+		array(),
+		file_exists($home_hero_js_path) ? (string) filemtime($home_hero_js_path) : wp_get_theme()->get('Version'),
+		true
+	);
+
 }
 add_action('wp_enqueue_scripts', 'rh_base_child_enqueue_styles', 20);
 
@@ -201,6 +244,8 @@ add_action('wp_enqueue_scripts', 'rh_base_child_enqueue_styles', 20);
 function rh_carpentry_body_class(array $classes): array {
 	if (is_front_page()) {
 		$classes[] = 'rh-carpentry-home';
+	} else {
+		$classes[] = 'rh-carpentry-inner';
 	}
 
 	return $classes;
@@ -265,104 +310,6 @@ function rh_carpentry_projects_archive_url(): string {
 		}
 	}
 	return home_url('/projects/');
-}
-
-/**
- * Example portfolio carousel cards: bundled 1200×675 JPEGs (landscape) under assets/images/home-projects/.
- *
- * Appended after real rh_project posts on the front page so the strip always has sample work to show.
- *
- * @return array<int, array{id: int, title: string, url: string, image_id: int, image_url?: string, badges: string[]}>
- */
-function rh_carpentry_home_projects_example_cards(): array {
-	$base_uri = get_stylesheet_directory_uri() . '/assets/images/home-projects/';
-	$base_dir = get_stylesheet_directory() . '/assets/images/home-projects/';
-	$archive  = rh_carpentry_projects_archive_url();
-
-	$titles = array(
-		__( 'Oak kitchen & utility fit-out', 'rh-base-child' ),
-		__( 'Loft conversion — dormers & stairs', 'rh-base-child' ),
-		__( 'Timber frame extension shell', 'rh-base-child' ),
-		__( 'Bespoke wardrobes & panelling', 'rh-base-child' ),
-		__( 'Full house renovation — phase one', 'rh-base-child' ),
-		__( 'Garden room & cedar cladding', 'rh-base-child' ),
-		__( 'Commercial shopfront & internals', 'rh-base-child' ),
-		__( 'Roof structure & velux package', 'rh-base-child' ),
-		__( 'Open-plan knock-through & steels', 'rh-base-child' ),
-		__( 'New-build second fix package', 'rh-base-child' ),
-	);
-
-	$badges_by_card = array(
-		array(
-			__( 'Joinery', 'rh-base-child' ),
-			__( 'Kitchens', 'rh-base-child' ),
-			__( 'Refurbishment', 'rh-base-child' ),
-		),
-		array(
-			__( 'Extensions', 'rh-base-child' ),
-			__( 'Roofs', 'rh-base-child' ),
-			__( 'Stairs', 'rh-base-child' ),
-		),
-		array(
-			__( 'Timber frame', 'rh-base-child' ),
-			__( 'Extensions', 'rh-base-child' ),
-			__( 'First fix', 'rh-base-child' ),
-		),
-		array(
-			__( 'Joinery', 'rh-base-child' ),
-			__( 'Fitted furniture', 'rh-base-child' ),
-			__( 'Interiors', 'rh-base-child' ),
-		),
-		array(
-			__( 'Refurbishment', 'rh-base-child' ),
-			__( 'Maintenance', 'rh-base-child' ),
-			__( 'Finishing', 'rh-base-child' ),
-		),
-		array(
-			__( 'Extensions', 'rh-base-child' ),
-			__( 'Cladding', 'rh-base-child' ),
-			__( 'Garden rooms', 'rh-base-child' ),
-		),
-		array(
-			__( 'Commercial', 'rh-base-child' ),
-			__( 'Fit-out', 'rh-base-child' ),
-			__( 'Shopfitting', 'rh-base-child' ),
-		),
-		array(
-			__( 'Roofs', 'rh-base-child' ),
-			__( 'Structural', 'rh-base-child' ),
-			__( 'Velux', 'rh-base-child' ),
-		),
-		array(
-			__( 'Refurbishment', 'rh-base-child' ),
-			__( 'Structural', 'rh-base-child' ),
-			__( 'Open plan', 'rh-base-child' ),
-		),
-		array(
-			__( 'New build', 'rh-base-child' ),
-			__( 'Second fix', 'rh-base-child' ),
-			__( 'Joinery', 'rh-base-child' ),
-		),
-	);
-
-	$out = array();
-	for ( $i = 1; $i <= 10; $i++ ) {
-		$file = 'ex-' . $i . '.jpg';
-		$path = $base_dir . $file;
-		if ( ! is_readable( $path ) ) {
-			continue;
-		}
-		$out[] = array(
-			'id'        => 0,
-			'title'     => $titles[ $i - 1 ],
-			'url'       => $archive,
-			'image_id'  => 0,
-			'image_url' => $base_uri . $file,
-			'badges'    => isset( $badges_by_card[ $i - 1 ] ) ? $badges_by_card[ $i - 1 ] : array(),
-		);
-	}
-
-	return $out;
 }
 
 /**

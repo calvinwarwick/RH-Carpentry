@@ -25,6 +25,6 @@ if (! defined('ABSPATH')) {
 		</section>
 		<main id="primary" class="site-main site-main--front">
 <?php else : ?>
-	<?php load_template(get_parent_theme_file_path('template-parts/header/site-header.php')); ?>
+	<?php get_template_part('template-parts/header/site-header'); ?>
 	<main id="primary" class="site-main">
 <?php endif; ?>

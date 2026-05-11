@@ -20,14 +20,17 @@
 	--rh-hero-icon-bg: rgba(255, 255, 255, 0.12);
 
 	margin-top: clamp(0.35rem, 1.1vw, 0.85rem);
-	/* Default (inner pages): same horizontal band as .rh-container */
-	width: min(100% - 2 * var(--rh-space-4), var(--rh-max-width));
-	margin-left: auto;
-	margin-right: auto;
-	padding: 0 0 var(--rh-space-5) 0;
 	font-family: "Poppins", var(--rh-font-sans, system-ui, sans-serif);
 	box-sizing: border-box;
 	max-width: none;
+}
+
+/* Inner pages: full-bleed band (align with top bar), content padded inside */
+body:not(.rh-carpentry-home) .rh-site-footer {
+	width: 100%;
+	margin-left: 0;
+	margin-right: 0;
+	padding: 0 var(--rh-frame-inset) var(--rh-space-5) var(--rh-frame-inset);
 }
 
 @supports (width: 100svw) {
@@ -105,15 +108,6 @@ body.rh-carpentry-home .rh-site-footer {
 	max-width: none;
 	margin: 0 auto;
 	padding: var(--rh-hero-pad) var(--rh-hero-pad-x-end) var(--rh-hero-pad) var(--rh-hero-pad-x);
-}
-
-/*
- * Inner pages: footer is already width-limited like .rh-container — don’t add a second horizontal inset
- * (page content runs full width inside that box).
- */
-body:not(.rh-carpentry-home) .rh-site-footer__surface-inner {
-	padding-left: 0;
-	padding-right: 0;
 }
 
 .rh-site-footer a {
