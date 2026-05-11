@@ -62,7 +62,7 @@ function rh_carpentry_primary_menu_home_sections(array $sorted_menu_items, $args
 		$proj_path = (string) wp_parse_url($projects, PHP_URL_PATH);
 		$proj_path = '/' . trim($proj_path, '/') . '/';
 		if ($path === $proj_path || $path === '/projects/') {
-			$item->url = rh_carpentry_home_section_url('projects');
+			$item->url = rh_carpentry_projects_archive_url();
 			continue;
 		}
 
@@ -70,13 +70,15 @@ function rh_carpentry_primary_menu_home_sections(array $sorted_menu_items, $args
 		$legacy_sections = array(
 			'rh-home-section-about'    => 'about',
 			'rh-home-section-services' => 'services',
-			'rh-home-section-projects' => 'projects',
 			'rh-home-about-heading'    => 'about',
 			'rh-home-work-heading'     => 'services',
-			'rh-home-projects-heading' => 'projects',
 		);
 		if (isset($legacy_sections[ $frag ])) {
 			$item->url = rh_carpentry_home_section_url($legacy_sections[ $frag ]);
+			continue;
+		}
+		if ($frag === 'rh-home-section-projects' || $frag === 'rh-home-projects-heading' || $frag === 'projects') {
+			$item->url = rh_carpentry_projects_archive_url();
 			continue;
 		}
 	}
@@ -100,7 +102,7 @@ function rh_carpentry_hero_fallback_menu(): void {
 		),
 		array(
 			'label' => __('Projects', 'rh-base-child'),
-			'url'   => rh_carpentry_home_section_url('projects'),
+			'url'   => rh_carpentry_projects_archive_url(),
 		),
 	);
 
@@ -130,7 +132,7 @@ function rh_carpentry_site_top_fallback_menu(): void {
 		),
 		array(
 			'label' => __('Projects', 'rh-base-child'),
-			'url'   => rh_carpentry_home_section_url('projects'),
+			'url'   => rh_carpentry_projects_archive_url(),
 		),
 	);
 
@@ -438,7 +440,7 @@ function rh_carpentry_footer_menu_fallback(): void {
 		),
 		array(
 			'label' => __('Projects', 'rh-base-child'),
-			'url'   => rh_carpentry_home_section_url('projects'),
+			'url'   => rh_carpentry_projects_archive_url(),
 		),
 		array(
 			'label' => __('Contact', 'rh-base-child'),
