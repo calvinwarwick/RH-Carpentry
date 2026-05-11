@@ -95,8 +95,8 @@ body.rh-hero-nav-open .rh-site-top-bar__shell {
 
 .rh-site-top-bar .rh-hero-logo__img {
 	display: block;
-	/* Match the homepage hero logo scale (see .rh-hero-logo__img in home-hero.css) */
-	width: clamp(10.5rem, 25vw, 17.5rem);
+	/* 70% of the homepage hero logo scale (see .rh-hero-logo__img in home-hero.css) */
+	width: clamp(7.35rem, 17.5vw, 12.25rem);
 	max-width: 100%;
 	height: auto;
 }
