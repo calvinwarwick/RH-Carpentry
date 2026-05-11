@@ -4296,13 +4296,21 @@ body.rh-carpentry-home .site-main--front > #projects.rh-home-section--projects {
 .rh-home-section--projects {
 	display: flex;
 	flex-direction: column;
-	height: 100vh;
-	min-height: 100vh;
-	max-height: 100vh;
+	height: min(100vh, 500px);
+	min-height: 0;
+	max-height: 500px;
 	box-sizing: border-box;
 	background: transparent;
 	padding: 0;
 	overflow: hidden;
+}
+
+/* Desktop: pull in from the page edges; mobile keeps the band edge-to-edge */
+@media (min-width: 769px) {
+	.rh-home-section--projects#projects,
+	.rh-home-section--projects {
+		padding-inline: var(--rh-frame-inset);
+	}
 }
 
 @media (min-width: 769px) {
