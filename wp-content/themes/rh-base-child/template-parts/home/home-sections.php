@@ -437,7 +437,7 @@ if (post_type_exists('rh_project')) {
 			$credentials_dir  = get_stylesheet_directory() . '/assets/images/credentials/';
 			$credentials      = array(
 				array(
-					'file'    => 'uk-fire-door-training.jpg',
+					'file'    => 'uk-fire-door-training.png',
 					'alt'     => __('UK Fire Door Training — Approved Installer', 'rh-base-child'),
 					'variant' => 'uk-fire-door',
 				),
