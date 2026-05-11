@@ -5,8 +5,7 @@
 .rh-site-top-bar.site-header {
 	position: relative;
 	z-index: 10020;
-	/* Header shell extends full-width like the content shells (e.g. .rh-single-project__shell, .rh-archive-projects__inner). The X position of the logo/nav comes from the shell's inner padding-inline, so it aligns with the content X below. */
-	margin: clamp(0.5rem, 1.35vw, 0.85rem) 0 0;
+	margin: clamp(0.5rem, 1.35vw, 0.85rem) var(--rh-frame-inset, clamp(14px, 2.2vw, 28px)) 0;
 	border: none;
 	box-shadow: none;
 	background: transparent;
@@ -65,8 +64,10 @@ body.rh-hero-nav-open .rh-site-top-bar__shell {
 	z-index: 2;
 	width: 100%;
 	margin: 0;
-	padding-inline: max(var(--rh-frame-inset), env(safe-area-inset-left, 0px))
-		max(var(--rh-frame-inset), env(safe-area-inset-right, 0px));
+	/* No inner X padding — the surrounding shell already sits inset by --rh-frame-inset
+	   from the viewport, so the logo/nav line up with the content X position below.
+	   env() only kicks in on devices with notches/safe-area insets. */
+	padding-inline: env(safe-area-inset-left, 0px) env(safe-area-inset-right, 0px);
 	padding-block: clamp(1.75rem, 4.25vw, 2.5rem);
 }
 
