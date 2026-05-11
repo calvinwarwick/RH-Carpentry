@@ -4417,18 +4417,16 @@ body.rh-carpentry-home .rh-bento-page > .rh-home-section + .rh-home-section .rh-
 	pointer-events: none;
 }
 
-/* Projects band: exactly one viewport including outer padding (replaces default section gap above). */
-body.rh-carpentry-home .site-main--front > #projects.rh-home-section--projects {
-	margin-top: 0;
-}
-
+/* Projects band: capped tall band — cards stretch to fill, so doubling the
+   cap roughly doubles the card height. Inherits the standard --rh-home-section-gap
+   above (no margin-top override). */
 .rh-home-section--projects#projects,
 .rh-home-section--projects {
 	display: flex;
 	flex-direction: column;
-	height: min(100vh, 500px);
+	height: min(100vh, 1000px);
 	min-height: 0;
-	max-height: 500px;
+	max-height: 1000px;
 	box-sizing: border-box;
 	background: transparent;
 	padding: 0;
