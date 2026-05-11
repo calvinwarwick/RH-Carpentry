@@ -4444,13 +4444,9 @@ body.rh-carpentry-home .rh-bento-page > .rh-home-section + .rh-home-section .rh-
 	overflow: hidden;
 }
 
-/* Desktop: pull in from the page edges; mobile keeps the band edge-to-edge */
-@media (min-width: 769px) {
-	.rh-home-section--projects#projects,
-	.rh-home-section--projects {
-		padding-inline: var(--rh-frame-inset);
-	}
-}
+/* Projects band stays edge-to-edge of the page frame on every viewport — no
+   extra side padding beyond the global --rh-frame-inset already applied to
+   .site-main--front. */
 
 @media (min-width: 769px) {
 	.rh-home-section--projects .rh-clients-hero__inner {
