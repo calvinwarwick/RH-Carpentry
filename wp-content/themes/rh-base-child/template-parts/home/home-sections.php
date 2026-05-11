@@ -458,10 +458,6 @@ if (post_type_exists('rh_project')) {
 			?>
 			<?php if ($credentials !== array()) : ?>
 				<aside class="rh-home-services-credentials" aria-label="<?php esc_attr_e('Accreditations', 'rh-base-child'); ?>">
-					<p class="rh-home-services-credentials__label">
-						<span class="rh-home-services-credentials__label-line" aria-hidden="true"></span>
-						<?php esc_html_e('Approved & accredited', 'rh-base-child'); ?>
-					</p>
 					<ul class="rh-home-services-credentials__list">
 						<?php foreach ($credentials as $cred) : ?>
 							<li class="rh-home-services-credentials__item">
