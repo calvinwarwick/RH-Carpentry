@@ -3588,12 +3588,22 @@ body.rh-carpentry-home .rh-bento-page > .rh-home-section + .rh-home-section .rh-
 	filter: brightness(1.04) saturate(1.03);
 }
 
-/* Ken-Burns zoom while the slide is active; only inside the actual slider, not the bento grid. */
+/* Slow horizontal pan while the slide is active; only inside the actual slider, not the bento grid.
+   The image is scaled up just enough to overflow the frame, then translated across so we
+   see different parts of it over the slide's life. On deactivation the animation is removed,
+   the transform reverts, and the spring-back transition (above) handles the return. */
 [data-rh-projects-carousel] .rh-home-project-card.rh-bento-cell.is-active .rh-home-project-card__bg {
-	transform: scale(1.08);
-	transition:
-		filter 0.58s ease,
-		transform 5.6s ease-out;
+	animation: rh-home-project-card-pan 5.6s ease-out both;
+	transition: filter 0.58s ease;
+}
+
+@keyframes rh-home-project-card-pan {
+	from {
+		transform: scale(1.12) translate3d(-2.4%, 0, 0);
+	}
+	to {
+		transform: scale(1.12) translate3d(2.4%, 0, 0);
+	}
 }
 
 .rh-home-project-card__text {
@@ -3858,8 +3868,9 @@ body.rh-carpentry-home .rh-bento-page > .rh-home-section + .rh-home-section .rh-
 		transition: none;
 	}
 
-	/* Don't run the Ken-Burns zoom for reduced-motion users */
+	/* Don't run the pan animation for reduced-motion users */
 	[data-rh-projects-carousel] .rh-home-project-card.rh-bento-cell.is-active .rh-home-project-card__bg {
+		animation: none;
 		transform: none;
 		transition: none;
 	}
@@ -5548,10 +5559,17 @@ body.rh-carpentry-home .rh-bento-page > .rh-home-section + .rh-home-section .rh-
 
 .rh-single-project__shell .rh-single-project-gallery__card.is-active .rh-single-project-gallery__img {
 	filter: brightness(1.04) saturate(1.03);
-	transform: scale(1.08);
-	transition:
-		filter 0.58s ease,
-		transform 3.2s ease-out;
+	animation: rh-single-project-gallery-pan 5.6s ease-out both;
+	transition: filter 0.58s ease;
+}
+
+@keyframes rh-single-project-gallery-pan {
+	from {
+		transform: scale(1.12) translate3d(-2.4%, 0, 0);
+	}
+	to {
+		transform: scale(1.12) translate3d(2.4%, 0, 0);
+	}
 }
 
 @media (prefers-reduced-motion: reduce) {
@@ -5565,6 +5583,7 @@ body.rh-carpentry-home .rh-bento-page > .rh-home-section + .rh-home-section .rh-
 	}
 
 	.rh-single-project__shell .rh-single-project-gallery__card.is-active .rh-single-project-gallery__img {
+		animation: none;
 		transform: none;
 		transition: none;
 	}
