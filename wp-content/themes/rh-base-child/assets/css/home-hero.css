@@ -4189,6 +4189,70 @@ body.rh-carpentry-home .rh-bento-page > .rh-home-section + .rh-home-section .rh-
 	text-shadow: 0 1px 14px rgba(0, 0, 0, 0.35);
 }
 
+/* --- Services: accreditation badges below the service tiles --- */
+
+.rh-home-services-credentials {
+	margin-top: clamp(1.25rem, 3vw, 2rem);
+	padding-top: clamp(1rem, 2.4vw, 1.5rem);
+	border-top: 1px solid rgba(12, 28, 52, 0.08);
+	display: flex;
+	flex-direction: column;
+	align-items: center;
+	gap: clamp(0.85rem, 2vw, 1.25rem);
+	text-align: center;
+}
+
+.rh-home-services-credentials__label {
+	display: inline-flex;
+	align-items: center;
+	gap: 0.6rem;
+	margin: 0;
+	font-size: 0.72rem;
+	font-weight: 600;
+	letter-spacing: 0.18em;
+	text-transform: uppercase;
+	color: var(--rh-color-muted, #5c5c5c);
+}
+
+.rh-home-services-credentials__label-line {
+	display: inline-block;
+	width: clamp(1.5rem, 3vw, 2.25rem);
+	height: 1px;
+	background: rgba(12, 28, 52, 0.22);
+}
+
+.rh-home-services-credentials__list {
+	list-style: none;
+	margin: 0;
+	padding: 0;
+	display: flex;
+	flex-wrap: wrap;
+	align-items: center;
+	justify-content: center;
+	gap: clamp(1.5rem, 4vw, 3rem);
+}
+
+.rh-home-services-credentials__item {
+	margin: 0;
+	padding: 0;
+	display: inline-flex;
+	align-items: center;
+	justify-content: center;
+}
+
+.rh-home-services-credentials__img {
+	display: block;
+	width: auto;
+	max-width: 100%;
+	height: clamp(48px, 7vw, 72px);
+	object-fit: contain;
+	mix-blend-mode: multiply;
+}
+
+.rh-home-services-credentials__img--uk-fire-door {
+	height: clamp(60px, 9vw, 96px);
+}
+
 .rh-home-section--sectors {
 	background: var(--rh-color-bg, #f5f4f0);
 	border-top: 1px solid rgba(12, 28, 52, 0.06);

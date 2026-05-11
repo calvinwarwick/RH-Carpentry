@@ -422,6 +422,51 @@ if (post_type_exists('rh_project')) {
 					</article>
 				<?php endforeach; ?>
 			</div>
+			<?php
+			$credentials_base = get_stylesheet_directory_uri() . '/assets/images/credentials/';
+			$credentials_dir  = get_stylesheet_directory() . '/assets/images/credentials/';
+			$credentials      = array(
+				array(
+					'file'    => 'uk-fire-door-training.jpg',
+					'alt'     => __('UK Fire Door Training — Approved Installer', 'rh-base-child'),
+					'variant' => 'uk-fire-door',
+				),
+				array(
+					'file'    => 'firequal.jpg',
+					'alt'     => __('FireQual Approved Training Centre', 'rh-base-child'),
+					'variant' => 'firequal',
+				),
+			);
+			$credentials = array_values(
+				array_filter(
+					$credentials,
+					static function ($row) use ($credentials_dir) {
+						return is_readable($credentials_dir . $row['file']);
+					}
+				)
+			);
+			?>
+			<?php if ($credentials !== array()) : ?>
+				<aside class="rh-home-services-credentials" aria-label="<?php esc_attr_e('Accreditations', 'rh-base-child'); ?>">
+					<p class="rh-home-services-credentials__label">
+						<span class="rh-home-services-credentials__label-line" aria-hidden="true"></span>
+						<?php esc_html_e('Approved & accredited', 'rh-base-child'); ?>
+					</p>
+					<ul class="rh-home-services-credentials__list">
+						<?php foreach ($credentials as $cred) : ?>
+							<li class="rh-home-services-credentials__item">
+								<img
+									class="rh-home-services-credentials__img rh-home-services-credentials__img--<?php echo esc_attr($cred['variant']); ?>"
+									src="<?php echo esc_url($credentials_base . $cred['file']); ?>"
+									alt="<?php echo esc_attr($cred['alt']); ?>"
+									loading="lazy"
+									decoding="async"
+								/>
+							</li>
+						<?php endforeach; ?>
+					</ul>
+				</aside>
+			<?php endif; ?>
 		</div>
 	</section>
 </div>
