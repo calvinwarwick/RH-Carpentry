@@ -4364,8 +4364,9 @@ body.rh-carpentry-home .site-main--front > #projects.rh-home-section--projects {
 
 .rh-home-project-card__cta {
 	position: absolute;
-	top: clamp(0.65rem, 1.8vw, 1rem);
-	right: clamp(0.65rem, 1.8vw, 1rem);
+	/* Align with the title's baseline inside .rh-home-project-card__text padding */
+	bottom: clamp(1rem, 2.6vw, 1.4rem);
+	right: clamp(1rem, 2.4vw, 1.25rem);
 	z-index: 4;
 	display: inline-flex;
 	align-items: center;
@@ -4378,7 +4379,7 @@ body.rh-carpentry-home .site-main--front > #projects.rh-home-section--projects {
 	color: #fff;
 	text-shadow: 0 1px 8px rgba(0, 0, 0, 0.45);
 	opacity: 0;
-	transform: translateY(-4px);
+	transform: translateY(4px);
 	pointer-events: none;
 	transition:
 		opacity 0.35s ease,
