@@ -11,22 +11,6 @@ if (! defined('ABSPATH')) {
 
 $bg_url = rh_carpentry_get_hero_background_url();
 $notice = isset($_GET['contact']) ? sanitize_key(wp_unslash($_GET['contact'])) : '';
-
-$overlay_phone_label = (string) get_theme_mod('rh_contact_phone', '');
-$overlay_phone_href  = rh_carpentry_tel_href_from_display($overlay_phone_label);
-if ($overlay_phone_href === '') {
-	$overlay_phone_label = (string) get_theme_mod('rh_contact_mobile', '');
-	$overlay_phone_href  = rh_carpentry_tel_href_from_display($overlay_phone_label);
-}
-
-$overlay_social_items = array();
-foreach (rh_carpentry_get_footer_contact_icon_items() as $item) {
-	if (! empty($item['external'])) {
-		$overlay_social_items[] = $item;
-	}
-}
-
-$overlay_show_alt = ($overlay_phone_href !== '' || $overlay_social_items !== array());
 ?>
 <div
 	id="contact"
@@ -104,58 +88,6 @@ $overlay_show_alt = ($overlay_phone_href !== '' || $overlay_social_items !== arr
 						<button type="submit" class="rh-hero-btn rh-hero-btn--accent rh-contact-overlay__submit"><?php esc_html_e('Send message', 'rh-base-child'); ?></button>
 					</p>
 				</form>
-
-				<?php if ($overlay_show_alt) : ?>
-					<div class="rh-contact-overlay__after-form">
-						<?php if ($overlay_phone_href !== '' || $overlay_social_items !== array()) : ?>
-							<div class="rh-contact-overlay__social-wrap">
-								<?php if ($overlay_phone_href !== '') : ?>
-									<div class="rh-contact-overlay__alt-col rh-contact-overlay__alt-col--phone">
-										<p class="rh-hero-kicker rh-contact-overlay__call-kicker-title">
-											<span class="rh-hero-kicker__line" aria-hidden="true"></span>
-											<?php esc_html_e('Give us a call', 'rh-base-child'); ?>
-										</p>
-										<a
-											class="rh-hero-btn rh-hero-btn--muted rh-contact-overlay__call-btn"
-											href="<?php echo esc_url($overlay_phone_href); ?>"
-										>
-											<i class="fa-solid fa-phone rh-contact-overlay__call-icon" aria-hidden="true"></i>
-											<span class="rh-contact-overlay__call-inner">
-												<span class="rh-contact-overlay__call-number"><?php echo esc_html($overlay_phone_label); ?></span>
-											</span>
-										</a>
-									</div>
-								<?php endif; ?>
-
-								<?php if ($overlay_social_items !== array()) : ?>
-									<div class="rh-contact-overlay__alt-col rh-contact-overlay__alt-col--social">
-										<p class="rh-hero-kicker rh-contact-overlay__social-kicker">
-											<span class="rh-hero-kicker__line" aria-hidden="true"></span>
-											<?php esc_html_e('Socials', 'rh-base-child'); ?>
-										</p>
-										<nav class="rh-contact-overlay__social rh-hero-social" aria-label="<?php esc_attr_e('Social media', 'rh-base-child'); ?>">
-										<?php
-										foreach ($overlay_social_items as $item) {
-											$rel_target   = ! empty($item['external']) ? ' rel="noopener noreferrer" target="_blank"' : '';
-											$title_attr   = ($item['title'] ?? '') !== '' ? ' title="' . esc_attr((string) $item['title']) . '"' : '';
-											$icon_classes = isset($item['icon']) ? (string) $item['icon'] : 'fa-solid fa-link';
-											printf(
-												'<a class="rh-hero-icon-btn" href="%s"%s%s><span class="screen-reader-text">%s</span><i class="%s" aria-hidden="true"></i></a>',
-												esc_url($item['href']),
-												$title_attr,
-												$rel_target,
-												esc_html($item['label']),
-												esc_attr($icon_classes)
-											);
-										}
-										?>
-										</nav>
-									</div>
-								<?php endif; ?>
-							</div>
-						<?php endif; ?>
-					</div>
-				<?php endif; ?>
 			</div>
 		</div>
 	</div>
