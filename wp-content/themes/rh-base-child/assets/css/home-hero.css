@@ -4232,12 +4232,12 @@ body.rh-carpentry-home .site-main--front > #projects.rh-home-section--projects {
 .rh-home-section--projects {
 	display: flex;
 	flex-direction: column;
-	height: 100dvh;
-	min-height: 100dvh;
-	max-height: 100dvh;
+	height: 100vh;
+	min-height: 100vh;
+	max-height: 100vh;
 	box-sizing: border-box;
-	padding: var(--rh-home-section-gap) var(--rh-frame-inset) var(--rh-frame-inset);
-	background: rgba(255, 255, 255, 0.35);
+	background: transparent;
+	padding: 0;
 	overflow: hidden;
 }
 
