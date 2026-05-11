@@ -5687,59 +5687,46 @@ body.rh-carpentry-home .rh-bento-page > .rh-home-section + .rh-home-section .rh-
 	}
 }
 
-/* --- Remove the navy/blue hero background from single project pages
-       (lead band + content band + More projects band). Card-design backgrounds
-       on the More projects' individual project cards are kept — that's the card,
-       not the section background. --- */
+/* --- Remove the navy/blue hero background from the MAIN single project
+       content shell (lead band + content band) only. The More projects
+       band (.rh-single-related--band) keeps its navy hero by design, so
+       every rule below is scoped to .rh-single-project__article (the
+       wrapper used only on the main article, not on .rh-single-related). --- */
 
-.rh-single-project__shell > .rh-single-project-hero.rh-clients-hero .rh-clients-hero__bg,
-.rh-single-project__shell > .rh-single-project-hero.rh-clients-hero .rh-clients-hero__overlay,
-.rh-single-related--band .rh-clients-hero__bg,
-.rh-single-related--band .rh-clients-hero__overlay {
+.rh-single-project__article > .rh-single-project__shell .rh-clients-hero__bg,
+.rh-single-project__article > .rh-single-project__shell .rh-clients-hero__overlay {
 	background: transparent;
 	background-image: none;
 }
 
-.rh-single-project__shell .rh-clients-hero {
+.rh-single-project__article > .rh-single-project__shell .rh-clients-hero {
 	color: var(--rh-color-text, #1a1a1a);
 }
 
-.rh-single-project__shell .rh-single-project__sectors,
-.rh-single-project__shell .rh-single-project__sectors a {
+.rh-single-project__article > .rh-single-project__shell .rh-single-project__sectors,
+.rh-single-project__article > .rh-single-project__shell .rh-single-project__sectors a {
 	color: var(--rh-color-muted, #5c5c5c);
 }
 
-.rh-single-project__shell .rh-single-project__sectors .rh-home-kicker__line {
+.rh-single-project__article > .rh-single-project__shell .rh-single-project__sectors .rh-home-kicker__line {
 	background: rgba(12, 28, 52, 0.2);
 }
 
-.rh-single-project__shell .rh-single-project__sectors a {
+.rh-single-project__article > .rh-single-project__shell .rh-single-project__sectors a {
 	color: var(--rh-hero-accent, #0e396e);
 }
 
-.rh-single-project__shell .rh-single-project__sectors a:hover,
-.rh-single-project__shell .rh-single-project__sectors a:focus-visible {
+.rh-single-project__article > .rh-single-project__shell .rh-single-project__sectors a:hover,
+.rh-single-project__article > .rh-single-project__shell .rh-single-project__sectors a:focus-visible {
 	color: var(--rh-hero-accent-hover, #082a55);
 }
 
-.rh-single-project__shell .rh-single-project__title {
+.rh-single-project__article > .rh-single-project__shell .rh-single-project__title {
 	color: var(--rh-heading-color);
 }
 
-.rh-single-project__band--content {
+.rh-single-project__article > .rh-single-project__shell .rh-single-project__band--content {
 	border-top: 1px solid rgba(12, 28, 52, 0.08);
-}
-
-.rh-single-related--band .rh-single-related__intro .rh-home-kicker {
-	color: var(--rh-color-muted, #5c5c5c);
-}
-
-.rh-single-related--band .rh-single-related__intro .rh-home-kicker__line {
-	background: rgba(12, 28, 52, 0.2);
-}
-
-.rh-single-related--band .rh-single-related__intro .rh-home-heading--section {
-	color: var(--rh-heading-color);
 }
 
 .rh-single-project__content {
