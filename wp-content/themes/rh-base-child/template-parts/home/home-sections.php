@@ -460,10 +460,16 @@ if (post_type_exists('rh_project')) {
 				<aside class="rh-home-services-credentials" aria-label="<?php esc_attr_e('Accreditations', 'rh-base-child'); ?>">
 					<ul class="rh-home-services-credentials__list">
 						<?php foreach ($credentials as $cred) : ?>
+							<?php
+							$cred_path  = $credentials_dir . $cred['file'];
+							$cred_url   = $credentials_base . $cred['file'];
+							$cred_ver   = file_exists($cred_path) ? (string) filemtime($cred_path) : '';
+							$cred_src   = $cred_ver !== '' ? add_query_arg('v', $cred_ver, $cred_url) : $cred_url;
+							?>
 							<li class="rh-home-services-credentials__item">
 								<img
 									class="rh-home-services-credentials__img rh-home-services-credentials__img--<?php echo esc_attr($cred['variant']); ?>"
-									src="<?php echo esc_url($credentials_base . $cred['file']); ?>"
+									src="<?php echo esc_url($cred_src); ?>"
 									alt="<?php echo esc_attr($cred['alt']); ?>"
 									loading="lazy"
 									decoding="async"
