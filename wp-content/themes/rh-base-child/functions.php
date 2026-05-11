@@ -354,6 +354,8 @@ function rh_carpentry_client_logos_bundled_defaults(): array {
 		array( 'file' => 'about-marden.png', 'alt' => __( 'Marden', 'rh-base-child' ) ),
 		array( 'file' => 'about-salvation-army.png', 'alt' => __( 'Salvation Army', 'rh-base-child' ) ),
 		array( 'file' => 'about-shipp.jpg', 'alt' => __( 'Shipp', 'rh-base-child' ) ),
+		array( 'file' => 'about-tgl.jpg', 'alt' => __( 'TGL Properties Ltd', 'rh-base-child' ) ),
+		array( 'file' => 'about-french-seh.png', 'alt' => __( 'French SEH Construction', 'rh-base-child' ) ),
 	);
 	$out = array();
 	foreach ( $set as $row ) {
