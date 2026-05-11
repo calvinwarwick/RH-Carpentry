@@ -64,10 +64,11 @@ body.rh-hero-nav-open .rh-site-top-bar__shell {
 	z-index: 2;
 	width: 100%;
 	margin: 0;
-	/* No inner X padding — the surrounding shell already sits inset by --rh-frame-inset
-	   from the viewport, so the logo/nav line up with the content X position below.
-	   env() only kicks in on devices with notches/safe-area insets. */
-	padding-inline: env(safe-area-inset-left, 0px) env(safe-area-inset-right, 0px);
+	/* X padding inside the navy shell — matches the inner X padding used by the
+	   content shells on inner pages (var(--rh-frame-inset)), so the heading
+	   container has the same internal X rhythm as the content below. */
+	padding-inline: max(var(--rh-frame-inset), env(safe-area-inset-left, 0px))
+		max(var(--rh-frame-inset), env(safe-area-inset-right, 0px));
 	padding-block: clamp(1.75rem, 4.25vw, 2.5rem);
 }
 
