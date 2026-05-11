@@ -9,9 +9,15 @@ get_header();
 ?>
 
 <div class="rh-archive-projects">
-	<div class="rh-archive-projects__inner rh-container">
-		<header class="rh-archive-projects__header page-header">
-			<h1 class="page-title"><?php post_type_archive_title(); ?></h1>
+	<div class="rh-archive-projects__inner">
+		<header class="rh-archive-projects__header">
+			<p class="rh-home-kicker rh-archive-projects__kicker">
+				<span class="rh-home-kicker__line" aria-hidden="true"></span>
+				<?php esc_html_e('Portfolio', 'rh-base-child'); ?>
+			</p>
+			<h1 class="page-title rh-home-heading rh-home-heading--section">
+				<?php post_type_archive_title(); ?>
+			</h1>
 			<p class="rh-archive-projects__intro">
 				<?php esc_html_e('A selection of our carpentry and construction work across sectors.', 'rh-base-child'); ?>
 			</p>
@@ -34,7 +40,7 @@ get_header();
 			}
 			?>
 		<?php else : ?>
-			<p><?php esc_html_e('No projects published yet.', 'rh-base-child'); ?></p>
+			<p class="rh-archive-projects__empty"><?php esc_html_e('No projects published yet.', 'rh-base-child'); ?></p>
 		<?php endif; ?>
 	</div>
 </div>

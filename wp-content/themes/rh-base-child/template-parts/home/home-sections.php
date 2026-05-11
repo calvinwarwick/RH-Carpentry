@@ -262,7 +262,13 @@ if (post_type_exists('rh_project')) {
 					</p>
 					<h2 class="rh-home-heading rh-home-heading--section" id="rh-home-projects-heading"><?php esc_html_e('Projects', 'rh-base-child'); ?></h2>
 				</div>
-				<a class="rh-hero-btn rh-hero-btn--muted" href="<?php echo esc_url($cta_contact); ?>"><?php esc_html_e('Get in touch', 'rh-base-child'); ?></a>
+				<?php
+				$rh_projects_archive_url = get_post_type_archive_link('rh_project');
+				if (! is_string($rh_projects_archive_url) || $rh_projects_archive_url === '') {
+					$rh_projects_archive_url = home_url('/projects/');
+				}
+				?>
+				<a class="rh-hero-btn rh-hero-btn--muted" href="<?php echo esc_url($rh_projects_archive_url); ?>"><?php esc_html_e('View all projects', 'rh-base-child'); ?></a>
 			</header>
 			<div
 				class="rh-home-projects-carousel"

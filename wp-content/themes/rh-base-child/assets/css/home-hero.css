@@ -4780,20 +4780,41 @@ body.rh-carpentry-home .site-main--front > #projects.rh-home-section--projects {
 	font-family: "Poppins", var(--rh-font-sans, system-ui, sans-serif);
 }
 
+.rh-archive-projects__inner {
+	width: 100%;
+	max-width: none;
+	margin: 0 auto;
+	padding-inline: max(var(--rh-frame-inset, 28px), env(safe-area-inset-left, 0px))
+		max(var(--rh-frame-inset, 28px), env(safe-area-inset-right, 0px));
+	box-sizing: border-box;
+}
+
 .rh-archive-projects__header {
 	margin-bottom: clamp(1.75rem, 4vw, 2.5rem);
 	text-align: left;
+}
+
+.rh-archive-projects__kicker {
+	margin-bottom: clamp(0.6rem, 1.4vw, 0.85rem);
+	color: var(--rh-color-muted, #5c5c5c);
+}
+
+.rh-archive-projects__kicker .rh-home-kicker__line {
+	background: rgba(12, 28, 52, 0.22);
 }
 
 .rh-archive-projects .page-title {
 	margin: 0;
 	color: var(--rh-heading-color);
 	text-align: left;
+	font-size: clamp(2rem, 5dvw, 60px);
+	line-height: 0.95;
+	letter-spacing: 0.02em;
 }
 
 .rh-archive-projects__intro {
-	margin: 0.75rem 0 0;
-	max-width: 36rem;
+	margin: clamp(0.75rem, 1.6vw, 1.05rem) 0 0;
+	max-width: 42rem;
 	font-size: 1.05rem;
 	line-height: 1.6;
 	color: var(--rh-color-muted, #5c5c5c);
