@@ -3539,7 +3539,12 @@ body.rh-carpentry-home .rh-bento-page > .rh-home-section + .rh-home-section .rh-
 	background-position: center;
 	background-repeat: no-repeat;
 	pointer-events: none;
-	transition: filter 0.58s ease;
+	transform: scale(1);
+	will-change: transform;
+	/* Default state = "pop back" with a bouncy spring when the slide loses .is-active */
+	transition:
+		filter 0.58s ease,
+		transform 0.6s cubic-bezier(0.34, 1.56, 0.64, 1);
 }
 
 .rh-home-project-card__bg--placeholder {
@@ -3581,6 +3586,14 @@ body.rh-carpentry-home .rh-bento-page > .rh-home-section + .rh-home-section .rh-
 
 :where(.rh-home-section--projects, .rh-single-related) .rh-home-project-card.rh-bento-cell.is-active .rh-home-project-card__bg {
 	filter: brightness(1.04) saturate(1.03);
+}
+
+/* Ken-Burns zoom while the slide is active; only inside the actual slider, not the bento grid. */
+[data-rh-projects-carousel] .rh-home-project-card.rh-bento-cell.is-active .rh-home-project-card__bg {
+	transform: scale(1.08);
+	transition:
+		filter 0.58s ease,
+		transform 5.6s ease-out;
 }
 
 .rh-home-project-card__text {
@@ -3842,6 +3855,12 @@ body.rh-carpentry-home .rh-bento-page > .rh-home-section + .rh-home-section .rh-
 
 	.rh-home-project-card__bg,
 	.rh-home-project-card__overlay {
+		transition: none;
+	}
+
+	/* Don't run the Ken-Burns zoom for reduced-motion users */
+	[data-rh-projects-carousel] .rh-home-project-card.rh-bento-cell.is-active .rh-home-project-card__bg {
+		transform: none;
 		transition: none;
 	}
 
@@ -5510,7 +5529,12 @@ body.rh-carpentry-home .site-main--front > #projects.rh-home-section--projects {
 	height: 100%;
 	object-fit: cover;
 	object-position: center;
-	transition: filter 0.58s ease;
+	transform: scale(1);
+	will-change: transform;
+	/* Bouncy spring back to scale(1) when the slide goes inactive */
+	transition:
+		filter 0.58s ease,
+		transform 0.6s cubic-bezier(0.34, 1.56, 0.64, 1);
 }
 
 .rh-single-project__shell .rh-single-project-gallery__overlay {
@@ -5547,6 +5571,10 @@ body.rh-carpentry-home .site-main--front > #projects.rh-home-section--projects {
 
 .rh-single-project__shell .rh-single-project-gallery__card.is-active .rh-single-project-gallery__img {
 	filter: brightness(1.04) saturate(1.03);
+	transform: scale(1.08);
+	transition:
+		filter 0.58s ease,
+		transform 3.2s ease-out;
 }
 
 @media (prefers-reduced-motion: reduce) {
@@ -5555,6 +5583,12 @@ body.rh-carpentry-home .site-main--front > #projects.rh-home-section--projects {
 	}
 
 	.rh-single-project__shell .rh-single-project-gallery__img {
+		transition: none;
+		transform: none;
+	}
+
+	.rh-single-project__shell .rh-single-project-gallery__card.is-active .rh-single-project-gallery__img {
+		transform: none;
 		transition: none;
 	}
 }
