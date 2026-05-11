@@ -147,14 +147,24 @@ if ($other_projects !== array()) :
 				<div class="rh-clients-hero__bg" aria-hidden="true"></div>
 				<div class="rh-clients-hero__overlay" aria-hidden="true"></div>
 				<div class="rh-clients-hero__inner">
-					<header class="rh-single-related__intro">
-						<p class="rh-home-kicker">
-							<span class="rh-home-kicker__line" aria-hidden="true"></span>
-							<?php esc_html_e('Browse more of our recent work', 'rh-base-child'); ?>
-						</p>
-						<h2 id="rh-single-related-heading" class="rh-home-heading rh-home-heading--section">
-							<?php esc_html_e('More projects', 'rh-base-child'); ?>
-						</h2>
+					<header class="rh-single-related__intro rh-home-section__header--row">
+						<div>
+							<p class="rh-home-kicker">
+								<span class="rh-home-kicker__line" aria-hidden="true"></span>
+								<?php esc_html_e('Browse more of our recent work', 'rh-base-child'); ?>
+							</p>
+							<h2 id="rh-single-related-heading" class="rh-home-heading rh-home-heading--section">
+								<?php esc_html_e('More projects', 'rh-base-child'); ?>
+							</h2>
+						</div>
+						<?php
+						$rh_related_archive_url = function_exists('rh_carpentry_projects_archive_url')
+							? rh_carpentry_projects_archive_url()
+							: home_url('/projects/');
+						?>
+						<a class="rh-hero-btn rh-hero-btn--muted rh-single-related__cta" href="<?php echo esc_url($rh_related_archive_url); ?>">
+							<?php esc_html_e('View all projects', 'rh-base-child'); ?>
+						</a>
 					</header>
 					<div
 						class="rh-home-projects-carousel rh-single-related-carousel<?php echo $other_is_bento ? ' rh-home-projects-carousel--bento' : ''; ?>"

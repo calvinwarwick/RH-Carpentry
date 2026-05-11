@@ -5827,6 +5827,29 @@ body.rh-carpentry-home .rh-bento-page > .rh-home-section + .rh-home-section .rh-
 	background: rgba(255, 255, 255, 0.35);
 }
 
+.rh-single-related--band .rh-single-related__intro.rh-home-section__header--row {
+	align-items: center;
+}
+
+.rh-single-related--band .rh-single-related__intro.rh-home-section__header--row > div:first-child {
+	min-width: 0;
+	flex: 1 1 auto;
+}
+
+.rh-single-related--band .rh-single-related__intro .rh-single-related__cta.rh-hero-btn--muted {
+	flex-shrink: 0;
+	background: rgba(255, 255, 255, 0.1);
+	border: 1px solid rgba(255, 255, 255, 0.22);
+	color: rgba(255, 255, 255, 0.92);
+}
+
+.rh-single-related--band .rh-single-related__intro .rh-single-related__cta.rh-hero-btn--muted:hover,
+.rh-single-related--band .rh-single-related__intro .rh-single-related__cta.rh-hero-btn--muted:focus-visible {
+	background: rgba(255, 255, 255, 0.18);
+	border-color: rgba(255, 255, 255, 0.38);
+	color: #fff;
+}
+
 .rh-single-related--band .rh-single-related__intro .rh-home-heading--section {
 	margin: 0;
 	color: #fff;
