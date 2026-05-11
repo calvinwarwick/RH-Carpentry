@@ -5,7 +5,8 @@
 .rh-site-top-bar.site-header {
 	position: relative;
 	z-index: 10020;
-	margin: clamp(0.5rem, 1.35vw, 0.85rem) var(--rh-frame-inset, clamp(14px, 2.2vw, 28px)) 0;
+	/* Header shell extends full-width like the content shells (e.g. .rh-single-project__shell, .rh-archive-projects__inner). The X position of the logo/nav comes from the shell's inner padding-inline, so it aligns with the content X below. */
+	margin: clamp(0.5rem, 1.35vw, 0.85rem) 0 0;
 	border: none;
 	box-shadow: none;
 	background: transparent;
