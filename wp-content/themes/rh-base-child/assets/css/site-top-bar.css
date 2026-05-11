@@ -72,7 +72,7 @@ body.rh-hero-nav-open .rh-site-top-bar__shell {
 /* Compact hero header row */
 .rh-site-top-bar .rh-site-top-bar__header.rh-hero-header {
 	display: grid;
-	grid-template-columns: minmax(0, 1fr) auto;
+	grid-template-columns: minmax(0, 1fr) auto auto;
 	align-items: center;
 	gap: clamp(0.75rem, 2vw, 1.25rem);
 	width: 100%;
@@ -226,11 +226,76 @@ body.rh-hero-nav-open .rh-site-top-bar__shell {
 	}
 }
 
+/* Right-aligned "Get in touch" CTA (white pill). Self-contained — site-top-bar.css loads on every inner page, while .rh-hero-btn lives in home-hero.css which only loads on brand surfaces. */
+.rh-site-top-bar .rh-site-top-bar__cta {
+	grid-column: 3;
+	grid-row: 1;
+	justify-self: end;
+	align-self: center;
+	display: inline-flex;
+	align-items: center;
+	justify-content: center;
+	gap: 0.4em;
+	padding: 0.7rem 1.15rem;
+	border-radius: 10px;
+	border: 1px solid rgba(255, 255, 255, 0.78);
+	background: #fff;
+	color: var(--rh-hero-navy-solid, #0c1c34);
+	font-family: inherit;
+	font-size: 0.72rem;
+	font-weight: 700;
+	letter-spacing: 0.14em;
+	text-transform: uppercase;
+	text-decoration: none;
+	white-space: nowrap;
+	transition:
+		background 0.2s ease,
+		border-color 0.2s ease,
+		color 0.2s ease,
+		transform 0.2s ease;
+}
+
+.rh-site-top-bar .rh-site-top-bar__cta::after {
+	content: "";
+	display: inline-block;
+	flex-shrink: 0;
+	width: max(0.58em, 0.48rem);
+	height: max(0.58em, 0.48rem);
+	margin-inline-start: 0.45em;
+	margin-inline-end: 0.04em;
+	border-top: 2.5px solid currentColor;
+	border-right: 2.5px solid currentColor;
+	transform: rotate(45deg);
+	opacity: 0.78;
+	transition: opacity 0.2s ease, border-color 0.2s ease;
+}
+
+.rh-site-top-bar .rh-site-top-bar__cta:hover,
+.rh-site-top-bar .rh-site-top-bar__cta:focus-visible {
+	background: rgba(255, 255, 255, 0.92);
+	border-color: #fff;
+	color: var(--rh-hero-accent, #0e396e);
+	outline: none;
+	transform: translateY(-1px);
+}
+
+.rh-site-top-bar .rh-site-top-bar__cta:hover::after,
+.rh-site-top-bar .rh-site-top-bar__cta:focus-visible::after {
+	opacity: 1;
+}
+
 @media (max-width: 900px) {
 	.rh-site-top-bar .rh-hero-nav-toggle {
 		display: flex;
 		position: relative;
 		z-index: 41;
+	}
+
+	/* Tighter CTA on small viewports so logo + nav-toggle + CTA fit */
+	.rh-site-top-bar .rh-site-top-bar__cta {
+		padding: 0.55rem 0.85rem;
+		font-size: 0.66rem;
+		letter-spacing: 0.1em;
 	}
 
 	.rh-site-top-bar .rh-hero-nav {
