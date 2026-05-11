@@ -5475,7 +5475,7 @@ body.rh-carpentry-home .site-main--front > #projects.rh-home-section--projects {
 .rh-single-related--band .rh-clients-hero__inner {
 	display: flex;
 	flex-direction: column;
-	min-height: min(52dvh, 560px);
+	min-height: min(100vh, 1120px);
 	row-gap: clamp(0.65rem, 2vw, 1.15rem);
 }
 
