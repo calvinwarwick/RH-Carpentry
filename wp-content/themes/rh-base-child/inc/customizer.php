@@ -11,6 +11,12 @@ if (! defined('ABSPATH')) {
 	exit;
 }
 
+/** Default Facebook profile URL (Customizer + theme_mod fallback). */
+const RH_CARPENTRY_DEFAULT_SOCIAL_FACEBOOK = 'https://www.facebook.com/profile.php?id=61587190835676#';
+
+/** Default Instagram profile URL (Customizer + theme_mod fallback). */
+const RH_CARPENTRY_DEFAULT_SOCIAL_INSTAGRAM = 'https://www.instagram.com/rhcarpentersukltd/';
+
 /**
  * Register customizer controls.
  *
@@ -84,7 +90,7 @@ function rh_carpentry_customize_register(WP_Customize_Manager $wp_customize): vo
 	$wp_customize->add_setting(
 		'rh_social_facebook',
 		array(
-			'default'           => '',
+			'default'           => RH_CARPENTRY_DEFAULT_SOCIAL_FACEBOOK,
 			'sanitize_callback' => 'esc_url_raw',
 		)
 	);
@@ -101,7 +107,7 @@ function rh_carpentry_customize_register(WP_Customize_Manager $wp_customize): vo
 	$wp_customize->add_setting(
 		'rh_social_instagram',
 		array(
-			'default'           => '',
+			'default'           => RH_CARPENTRY_DEFAULT_SOCIAL_INSTAGRAM,
 			'sanitize_callback' => 'esc_url_raw',
 		)
 	);
@@ -171,7 +177,7 @@ function rh_carpentry_customize_register(WP_Customize_Manager $wp_customize): vo
 		'rh_carpentry_service_cards',
 		array(
 			'title'       => __('Service card images', 'rh-base-child'),
-			'description' => __('Background photos for each card in the Services bento (What we offer). Optional files: child theme folder assets/images/services/ using timber.jpg, refurbishment.jpg, roofs.jpg, new-build.jpg, barn.jpg, maintenance.jpg, extensions.jpg, joinery.jpg, commercial.jpg (or .webp / .png).', 'rh-base-child'),
+			'description' => __('Background photos for each card in the Services bento (What we offer). Optional files: child theme folder assets/images/services/ using timber.jpg, refurbishment.jpg, roofs.jpg, new-build.jpg, barn.jpg, maintenance.jpg, extensions.jpg, joinery.jpg, commercial.jpg, fire-doors.jpg (or .webp / .png).', 'rh-base-child'),
 			'priority'    => 34,
 		)
 	);
@@ -186,6 +192,7 @@ function rh_carpentry_customize_register(WP_Customize_Manager $wp_customize): vo
 		'extensions'    => __('Extensions & loft conversions', 'rh-base-child'),
 		'joinery'       => __('Bespoke joinery & fitted furniture', 'rh-base-child'),
 		'commercial'    => __('Commercial fit-out & shopfitting', 'rh-base-child'),
+		'fire_doors'    => __('Fire door installation, maintenance & inspection', 'rh-base-child'),
 	);
 
 	foreach ($service_card_labels as $mod_suffix => $card_label) {

@@ -16,13 +16,13 @@ if (! defined('ABSPATH')) {
 				<span
 					class="rh-home-stats-strip__value"
 					data-rh-stat-value
-					data-target="50"
+					data-target="40"
 					data-prefix=""
 					data-suffix="+"
 					data-group="0"
 				>0+</span>
 				<span class="rh-home-stats-strip__label">
-					<span class="screen-reader-text"><?php esc_html_e('Years Experience', 'rh-base-child'); ?></span>
+					<span class="screen-reader-text"><?php esc_html_e('years experience', 'rh-base-child'); ?></span>
 					<span class="rh-home-stats-strip__label-chars" aria-hidden="true"></span>
 				</span>
 			</li>

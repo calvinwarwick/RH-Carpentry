@@ -24,7 +24,7 @@
 		rgba(10, 25, 48, 0.72) 100%
 	);
 	/* Navy wash layer over hero / about photos (gradient alphas × this opacity) */
-	--rh-hero-photo-overlay-opacity: 0.8;
+	--rh-hero-photo-overlay-opacity: 0.92;
 	--rh-hero-max: 1180px;
 	/* Hero inner: equal base inset on X and Y; sides also respect safe areas */
 	--rh-hero-pad: clamp(1.35rem, 5vw, 3.25rem);
@@ -2062,7 +2062,7 @@ body.rh-contact-overlay-open {
 	}
 
 	.rh-home-section--testimonials .rh-clients-hero__inner > .rh-home-testimonials-carousel,
-	:where(.rh-home-section--projects, .rh-single-related) .rh-clients-hero__inner > .rh-home-projects-carousel {
+	:where(.rh-home-section--projects, .rh-single-related, .rh-archive-projects) .rh-clients-hero__inner > .rh-home-projects-carousel {
 		grid-row: 2;
 		min-height: 0;
 		align-self: stretch;
@@ -2299,6 +2299,152 @@ body.rh-carpentry-home .rh-bento-page > .rh-home-section + .rh-home-section .rh-
 		animation: none;
 		transform: none;
 		filter: none;
+	}
+}
+
+/* === Generic per-element reveal system (data-rh-fx) ===
+ *
+ * A site-wide reveal vocabulary that any page can opt into. Triggered when
+ * the element (or its [data-rh-fx-group] ancestor) enters the viewport
+ * (see home-hero.js). Sits alongside the existing [data-rh-reveal] block
+ * which fades whole sections — they layer cleanly because each operates
+ * on its own DOM scope.
+ *
+ *   data-rh-fx="wipe"  – text wipe: clip-path swipe + colored overlay sweep
+ *                        (same effect as the homepage hero title reveal).
+ *   data-rh-fx="fade"  – soft fade-up. Default for buttons + paragraphs.
+ *   data-rh-fx="scale" – scale-in pop. Matches the bento card lazy-load.
+ *
+ *   data-rh-fx-tone="light" (default) – white overlay (dark/navy backgrounds)
+ *   data-rh-fx-tone="dark"            – navy overlay (light backgrounds)
+ *
+ * Stagger: an ancestor with [data-rh-fx-group] causes the JS to assign
+ * each descendant [data-rh-fx] a cascading --rh-fx-delay (default 80ms
+ * between items, overridable via data-rh-fx-stagger="120"). Explicit
+ * inline --rh-fx-delay always wins.
+ */
+
+@keyframes rh-fx-wipe-clip {
+	0%,
+	22% {
+		opacity: 0;
+		clip-path: inset(0 100% 0 0);
+	}
+	50% {
+		opacity: 1;
+		clip-path: inset(0 0 0 0);
+	}
+	100% {
+		opacity: 1;
+		clip-path: inset(0 0 0 0);
+	}
+}
+
+@keyframes rh-fx-wipe-sweep {
+	0% {
+		transform: translate3d(-115%, 0, 0);
+	}
+	46% {
+		transform: translate3d(0, 0, 0);
+	}
+	100% {
+		transform: translate3d(112%, 0, 0);
+	}
+}
+
+@keyframes rh-fx-fade-up {
+	from {
+		opacity: 0;
+		transform: translate3d(0, 0.55rem, 0);
+	}
+	to {
+		opacity: 1;
+		transform: translate3d(0, 0, 0);
+	}
+}
+
+@keyframes rh-fx-scale-in {
+	0% {
+		opacity: 0;
+		transform: scale(0.88) translateY(10px);
+	}
+	60% {
+		opacity: 1;
+	}
+	100% {
+		opacity: 1;
+		transform: scale(1) translateY(0);
+	}
+}
+
+/* CSS variables apply unconditionally so anyone can read --rh-fx-wipe-color. */
+[data-rh-fx] {
+	--rh-fx-wipe-color: #fff;
+	--rh-fx-ease: cubic-bezier(0.2, 0.82, 0.2, 1);
+	--rh-fx-wipe-ease: cubic-bezier(0.65, 0.02, 0.35, 1);
+	--rh-fx-scale-ease: cubic-bezier(0.34, 1.32, 0.5, 1);
+}
+
+[data-rh-fx-tone="dark"] {
+	--rh-fx-wipe-color: var(--rh-hero-accent, #0e396e);
+}
+
+/* Only hide elements when the JS reveal observer has booted (the .rh-fx-js
+   flag is set on <html> by home-hero.js). Without JS, elements remain
+   visible at their natural opacity so the page is still readable. */
+@media (prefers-reduced-motion: no-preference) {
+	.rh-fx-js [data-rh-fx] {
+		opacity: 0;
+		will-change: opacity, transform;
+	}
+
+	.rh-fx-js [data-rh-fx="wipe"] {
+		position: relative;
+		overflow: hidden;
+		clip-path: inset(0 100% 0 0);
+	}
+
+	.rh-fx-js [data-rh-fx="wipe"]::after {
+		content: "";
+		position: absolute;
+		inset: -0.08em -0.2em;
+		background: var(--rh-fx-wipe-color);
+		transform: translate3d(-115%, 0, 0);
+		pointer-events: none;
+		z-index: 2;
+	}
+
+	.rh-fx-js [data-rh-fx="wipe"].is-inview {
+		animation: rh-fx-wipe-clip 0.94s var(--rh-fx-ease) both;
+		animation-delay: var(--rh-fx-delay, 0s);
+	}
+
+	.rh-fx-js [data-rh-fx="wipe"].is-inview::after {
+		animation: rh-fx-wipe-sweep 0.94s var(--rh-fx-wipe-ease) both;
+		animation-delay: var(--rh-fx-delay, 0s);
+	}
+
+	.rh-fx-js [data-rh-fx="fade"].is-inview {
+		animation: rh-fx-fade-up 0.52s var(--rh-fx-ease) both;
+		animation-delay: var(--rh-fx-delay, 0s);
+	}
+
+	.rh-fx-js [data-rh-fx="scale"].is-inview {
+		animation: rh-fx-scale-in 0.56s var(--rh-fx-scale-ease) both;
+		animation-delay: var(--rh-fx-delay, 0s);
+		transform-origin: center center;
+	}
+}
+
+@media (prefers-reduced-motion: reduce) {
+	.rh-fx-js [data-rh-fx] {
+		opacity: 1 !important;
+		animation: none !important;
+		transform: none !important;
+		clip-path: none !important;
+	}
+	.rh-fx-js [data-rh-fx="wipe"]::after {
+		display: none !important;
 	}
 }
 
@@ -2648,6 +2794,23 @@ body.rh-carpentry-home .rh-bento-page > .rh-home-section + .rh-home-section .rh-
 
 .rh-home-section--about .rh-home-about__actions {
 	margin-top: clamp(1.35rem, 3vw, 2rem);
+}
+
+/* Fire door accreditations (UK Fire Door Training, FireQual) — under About CTA */
+.rh-home-about__credentials-panel {
+	margin-top: clamp(1.25rem, 2.8vw, 1.85rem);
+	padding-top: clamp(1.1rem, 2.4vw, 1.5rem);
+	border-top: 1px solid rgba(12, 28, 52, 0.1);
+}
+
+.rh-home-about__credentials-panel .rh-home-feature__credentials-list {
+	justify-content: flex-start;
+}
+
+@media (max-width: 520px) {
+	.rh-home-about__credentials-panel .rh-home-feature__credentials-list {
+		justify-content: center;
+	}
 }
 
 /* --- Client logos: full-width infinite marquee --- */
@@ -3212,7 +3375,8 @@ body.rh-carpentry-home .rh-bento-page > .rh-home-section + .rh-home-section .rh-
 }
 
 /* Freeze mid-cycle without resetting stroke-dashoffset (see home-hero.js pause/resume). */
-.rh-home-testimonials-carousel__pause.is-timing.is-paused .rh-home-testimonials-carousel__pause-progress {
+.rh-home-testimonials-carousel__pause.is-timing.is-paused .rh-home-testimonials-carousel__pause-progress,
+.rh-home-testimonials-carousel__pause.is-timing.is-hover-paused .rh-home-testimonials-carousel__pause-progress {
 	animation-play-state: paused;
 }
 
@@ -3383,7 +3547,7 @@ body.rh-carpentry-home .rh-bento-page > .rh-home-section + .rh-home-section .rh-
 		--rh-project-slide-w: 100cqw;
 	}
 
-	:where(.rh-home-section--projects, .rh-single-related) .rh-home-projects-carousel .rh-home-projects-carousel__viewport {
+	:where(.rh-home-section--projects, .rh-single-related, .rh-archive-projects) .rh-home-projects-carousel .rh-home-projects-carousel__viewport {
 		mask-image: none !important;
 		-webkit-mask-image: none !important;
 	}
@@ -3394,7 +3558,7 @@ body.rh-carpentry-home .rh-bento-page > .rh-home-section + .rh-home-section .rh-
 		padding-inline: 0;
 	}
 
-	:where(.rh-home-section--projects, .rh-single-related) .rh-home-project-card.rh-bento-cell {
+	:where(.rh-home-section--projects, .rh-single-related, .rh-archive-projects) .rh-home-project-card.rh-bento-cell {
 		scroll-snap-align: center;
 	}
 }
@@ -3421,7 +3585,7 @@ body.rh-carpentry-home .rh-bento-page > .rh-home-section + .rh-home-section .rh-
 	box-sizing: border-box;
 }
 
-:where(.rh-home-section--projects, .rh-single-related) .rh-home-project-card.rh-bento-cell {
+:where(.rh-home-section--projects, .rh-single-related, .rh-archive-projects) .rh-home-project-card.rh-bento-cell {
 	position: relative;
 	display: flex;
 	flex-direction: column;
@@ -3441,24 +3605,26 @@ body.rh-carpentry-home .rh-bento-page > .rh-home-section + .rh-home-section .rh-
 	text-decoration: none;
 	color: inherit;
 	background: rgba(12, 28, 52, 0.35);
-	border: 1px solid rgba(255, 255, 255, 0.16);
-	box-shadow: 0 10px 32px rgba(12, 28, 52, 0.2);
+	/* Border colour and box-shadow are interpolated from --rh-card-active so
+	   they cross-fade with the BG zoom + opacity as the slider scrolls. The
+	   transitions below are only for hover/focus and any non-scroll state
+	   changes — the var itself is what drives the scroll-linked motion. */
+	border: 1px solid rgba(255, 255, 255, calc(0.16 + 0.12 * var(--rh-card-active, 0)));
+	box-shadow:
+		0 calc(10px + 4px * var(--rh-card-active, 0)) calc(32px + 12px * var(--rh-card-active, 0))
+			rgba(12, 28, 52, calc(0.2 + 0.08 * var(--rh-card-active, 0)));
 	opacity: 0.4;
 	cursor: pointer;
 	transition:
 		opacity 0.58s ease,
-		border-color 0.48s ease,
-		box-shadow 0.48s ease,
 		transform 0.48s ease;
 }
 
-:where(.rh-home-section--projects, .rh-single-related) .rh-home-project-card.rh-bento-cell.is-active {
+:where(.rh-home-section--projects, .rh-single-related, .rh-archive-projects) .rh-home-project-card.rh-bento-cell.is-active {
 	opacity: 1;
-	border-color: rgba(255, 255, 255, 0.28);
-	box-shadow: 0 14px 44px rgba(12, 28, 52, 0.28);
 }
 
-:where(.rh-home-section--projects, .rh-single-related) .rh-home-project-card.rh-bento-cell:focus-visible {
+:where(.rh-home-section--projects, .rh-single-related, .rh-archive-projects) .rh-home-project-card.rh-bento-cell:focus-visible {
 	outline: none;
 	box-shadow:
 		0 0 0 2px rgba(255, 255, 255, 0.55),
@@ -3485,18 +3651,18 @@ body.rh-carpentry-home .rh-bento-page > .rh-home-section + .rh-home-section .rh-
 		}
 	}
 
-	:where(.rh-home-section--projects, .rh-single-related) .rh-home-projects-carousel {
+	:where(.rh-home-section--projects, .rh-single-related, .rh-archive-projects) .rh-home-projects-carousel {
 		--rh-project-slide-w: min(92vw, 600px);
 	}
 
 	@media (min-width: 900px) {
-		:where(.rh-home-section--projects, .rh-single-related) .rh-home-projects-carousel {
+		:where(.rh-home-section--projects, .rh-single-related, .rh-archive-projects) .rh-home-projects-carousel {
 			--rh-project-slide-w: min(88vw, 600px);
 		}
 	}
 
 	@media (min-width: 1200px) {
-		:where(.rh-home-section--projects, .rh-single-related) .rh-home-projects-carousel {
+		:where(.rh-home-section--projects, .rh-single-related, .rh-archive-projects) .rh-home-projects-carousel {
 			--rh-project-slide-w: min(80vw, 560px);
 		}
 	}
@@ -3515,20 +3681,46 @@ body.rh-carpentry-home .rh-bento-page > .rh-home-section + .rh-home-section .rh-
 }
 
 /* Home #projects: card width — height follows carousel viewport (flex stretch, no fixed aspect-ratio). */
-:where(.rh-home-section--projects, .rh-single-related) .rh-home-projects-carousel {
+:where(.rh-home-section--projects, .rh-single-related, .rh-archive-projects) .rh-home-projects-carousel {
 	--rh-project-slide-w: min(min(156cqw, 92vw), 600px);
 }
 
 @media (min-width: 900px) {
-	:where(.rh-home-section--projects, .rh-single-related) .rh-home-projects-carousel {
+	:where(.rh-home-section--projects, .rh-single-related, .rh-archive-projects) .rh-home-projects-carousel {
 		--rh-project-slide-w: min(min(48cqw, 88vw), 600px);
 	}
 }
 
 @media (min-width: 1200px) {
-	:where(.rh-home-section--projects, .rh-single-related) .rh-home-projects-carousel {
+	:where(.rh-home-section--projects, .rh-single-related, .rh-archive-projects) .rh-home-projects-carousel {
 		--rh-project-slide-w: min(min(40cqw, 80vw), 560px);
 	}
+}
+
+/* Scroll-linked "active intensity" for project cards.
+   --rh-card-active is a 0..1 number that drives the card's BG zoom. JS sets
+   it inline continuously from each card's distance to the viewport centre
+   during BOTH manual and programmatic (autoplay / button) scrolls, so the
+   BG zoom tracks scroll position 1:1.
+
+   Registered via @property so the value type is known and a short transition
+   smooths over the very brief moment between a class toggle and the first
+   scroll event (otherwise the BG would snap from scale 1 to 1.12 before the
+   per-frame inline updates start). The duration is intentionally tiny so it
+   does not lag behind the per-frame inline writes during scroll. */
+@property --rh-card-active {
+	syntax: "<number>";
+	inherits: true;
+	initial-value: 0;
+}
+
+:where(.rh-home-section--projects, .rh-single-related, .rh-archive-projects) .rh-home-project-card.rh-bento-cell {
+	--rh-card-active: 0;
+	transition: --rh-card-active 0.12s linear;
+}
+
+:where(.rh-home-section--projects, .rh-single-related, .rh-archive-projects) .rh-home-project-card.rh-bento-cell.is-active {
+	--rh-card-active: 1;
 }
 
 .rh-home-project-card__bg {
@@ -3539,18 +3731,23 @@ body.rh-carpentry-home .rh-bento-page > .rh-home-section + .rh-home-section .rh-
 	background-position: center;
 	background-repeat: no-repeat;
 	pointer-events: none;
-	transform: scale(1);
-	will-change: transform;
-	/* Default state = "pop back" with a bouncy spring when the slide loses .is-active */
-	transition:
-		filter 0.58s ease,
-		transform 0.6s cubic-bezier(0.34, 1.56, 0.64, 1);
+	/* Transform and filter both interpolate from --rh-card-active so the zoom
+	   and the colour pop (brightness/saturation) move together with the scroll
+	   instead of the filter snapping when .is-active toggles at settle. */
+	transform: scale(calc(1 + 0.12 * var(--rh-card-active, 0)));
+	filter:
+		brightness(calc(1 + 0.04 * var(--rh-card-active, 0)))
+		saturate(calc(1 + 0.03 * var(--rh-card-active, 0)));
+	will-change: transform, filter;
 }
 
 .rh-home-project-card__bg--placeholder {
 	background: linear-gradient(135deg, rgba(20, 45, 85, 0.55) 0%, rgba(8, 20, 40, 0.9) 100%);
 }
 
+/* Inactive base overlay sits at z-index 1; the active wash (::after, below)
+   layers on top and its opacity is tied to --rh-card-active so the two
+   gradients cross-fade with the scroll instead of swapping at .is-active. */
 .rh-home-project-card__overlay {
 	position: absolute;
 	inset: 0;
@@ -3565,8 +3762,12 @@ body.rh-carpentry-home .rh-bento-page > .rh-home-section + .rh-home-section .rh-
 	);
 }
 
-/* Active slide: blue wash + blue bottom scrim so title/badges stay readable */
-:where(.rh-home-section--projects, .rh-single-related) .rh-home-project-card.rh-bento-cell.is-active .rh-home-project-card__overlay {
+.rh-home-project-card__overlay::after {
+	content: "";
+	position: absolute;
+	inset: 0;
+	border-radius: inherit;
+	pointer-events: none;
 	background:
 		linear-gradient(
 			to top,
@@ -3582,29 +3783,13 @@ body.rh-carpentry-home .rh-bento-page > .rh-home-section + .rh-home-section .rh-
 			rgba(20, 45, 85, 0.38) 45%,
 			rgba(10, 28, 55, 0.32) 100%
 		);
+	opacity: var(--rh-card-active, 0);
 }
 
-:where(.rh-home-section--projects, .rh-single-related) .rh-home-project-card.rh-bento-cell.is-active .rh-home-project-card__bg {
-	filter: brightness(1.04) saturate(1.03);
-}
-
-/* Slow horizontal pan while the slide is active; only inside the actual slider, not the bento grid.
-   The image is scaled up just enough to overflow the frame, then translated across so we
-   see different parts of it over the slide's life. On deactivation the animation is removed,
-   the transform reverts, and the spring-back transition (above) handles the return. */
-[data-rh-projects-carousel] .rh-home-project-card.rh-bento-cell.is-active .rh-home-project-card__bg {
-	animation: rh-home-project-card-pan 5.6s ease-out both;
-	transition: filter 0.58s ease;
-}
-
-@keyframes rh-home-project-card-pan {
-	from {
-		transform: scale(1.12) translate3d(-2.4%, 0, 0);
-	}
-	to {
-		transform: scale(1.12) translate3d(2.4%, 0, 0);
-	}
-}
+/* No horizontal pan animation — the BG was visibly nudging when a card
+   became active because the keyframe started at a position different from
+   the inactive default. The scroll-linked zoom on .rh-home-project-card__bg
+   already provides enough motion on its own. */
 
 .rh-home-project-card__text {
 	position: relative;
@@ -3623,7 +3808,13 @@ body.rh-carpentry-home .rh-bento-page > .rh-home-section + .rh-home-section .rh-
 	box-sizing: border-box;
 }
 
-:where(.rh-home-section--projects, .rh-single-related) .rh-home-project-card.rh-bento-cell .rh-home-project-card__title {
+/* Title / badges are also driven by --rh-card-active so they cross-fade in
+   sync with the BG zoom + overlay rather than snapping when .is-active
+   toggles at scroll settle. No explicit transitions on the dependent
+   properties — that would re-introduce per-frame retarget lag while the JS
+   updates the var. The var's own 0.12s transition (declared above) handles
+   any non-scroll state changes. */
+:where(.rh-home-section--projects, .rh-single-related, .rh-archive-projects) .rh-home-project-card.rh-bento-cell .rh-home-project-card__title {
 	margin: 0;
 	padding: 0;
 	font-size: clamp(0.95rem, 2.1vw, 1.08rem);
@@ -3632,17 +3823,10 @@ body.rh-carpentry-home .rh-bento-page > .rh-home-section + .rh-home-section .rh-
 	line-height: 1.25;
 	color: #ffffff;
 	text-shadow: 0 2px 14px rgba(0, 0, 0, 0.4);
-	transform: translate3d(0, 0.45rem, 0);
-	transition: transform 0.72s cubic-bezier(0.33, 1, 0.32, 1);
-	transition-delay: 0s;
+	transform: translate3d(0, calc(0.45rem * (1 - var(--rh-card-active, 0))), 0);
 }
 
-:where(.rh-home-section--projects, .rh-single-related) .rh-home-project-card.rh-bento-cell.is-active .rh-home-project-card__title {
-	transform: translate3d(0, 0, 0);
-	transition-delay: 0.08s;
-}
-
-:where(.rh-home-section--projects, .rh-single-related) .rh-home-project-card.rh-bento-cell .rh-home-project-card__badges {
+:where(.rh-home-section--projects, .rh-single-related, .rh-archive-projects) .rh-home-project-card.rh-bento-cell .rh-home-project-card__badges {
 	list-style: none;
 	margin: 0;
 	padding: 0;
@@ -3650,31 +3834,19 @@ body.rh-carpentry-home .rh-bento-page > .rh-home-section + .rh-home-section .rh-
 	flex-wrap: wrap;
 	gap: 0.35rem 0.45rem;
 	max-width: 100%;
-	max-height: 0;
+	max-height: calc(6.75rem * var(--rh-card-active, 0));
+	margin-bottom: calc(clamp(0.35rem, 1.2vw, 0.55rem) * var(--rh-card-active, 0));
 	overflow: hidden;
-	opacity: 0;
-	transform: translateY(0);
-	transition:
-		max-height 0.72s cubic-bezier(0.33, 1, 0.32, 1),
-		opacity 0.62s cubic-bezier(0.33, 1, 0.32, 1),
-		margin 0.72s cubic-bezier(0.33, 1, 0.32, 1),
-		transform 0.72s cubic-bezier(0.33, 1, 0.32, 1);
+	opacity: var(--rh-card-active, 0);
+	transform: translateY(calc(clamp(0.15rem, 0.6vw, 0.3rem) * var(--rh-card-active, 0)));
 }
 
-:where(.rh-home-section--projects, .rh-single-related) .rh-home-project-card.rh-bento-cell.is-active .rh-home-project-card__badges {
-	max-height: 6.75rem;
-	margin-bottom: clamp(0.35rem, 1.2vw, 0.55rem);
-	opacity: 1;
-	/* Keep badges near title without clipping their top edge */
-	transform: translateY(clamp(0.15rem, 0.6vw, 0.3rem));
-}
-
-:where(.rh-home-section--projects, .rh-single-related) .rh-home-project-card.rh-bento-cell .rh-home-project-card__badges li {
+:where(.rh-home-section--projects, .rh-single-related, .rh-archive-projects) .rh-home-project-card.rh-bento-cell .rh-home-project-card__badges li {
 	margin: 0;
 	padding: 0;
 }
 
-:where(.rh-home-section--projects, .rh-single-related) .rh-home-project-card.rh-bento-cell .rh-home-project-card__badge {
+:where(.rh-home-section--projects, .rh-single-related, .rh-archive-projects) .rh-home-project-card.rh-bento-cell .rh-home-project-card__badge {
 	display: inline-block;
 	padding: 0.22rem 0.55rem;
 	border-radius: 999px;
@@ -3689,46 +3861,18 @@ body.rh-carpentry-home .rh-bento-page > .rh-home-section + .rh-home-section .rh-
 	backdrop-filter: blur(8px);
 	-webkit-backdrop-filter: blur(8px);
 	box-shadow: 0 2px 10px rgba(0, 0, 0, 0.2);
-	opacity: 0;
-	transform: translate3d(0, -0.18rem, 0);
-	transition:
-		opacity 0.62s cubic-bezier(0.33, 1, 0.32, 1),
-		transform 0.65s cubic-bezier(0.33, 1, 0.32, 1);
-}
-
-:where(.rh-home-section--projects, .rh-single-related) .rh-home-project-card.rh-bento-cell.is-active .rh-home-project-card__badge {
-	opacity: 1;
-	transform: translate3d(0, 0, 0);
-}
-
-:where(.rh-home-section--projects, .rh-single-related) .rh-home-project-card.rh-bento-cell.is-active .rh-home-project-card__badges li:nth-child(1) .rh-home-project-card__badge {
-	transition-delay: 0.26s;
-}
-
-:where(.rh-home-section--projects, .rh-single-related) .rh-home-project-card.rh-bento-cell.is-active .rh-home-project-card__badges li:nth-child(2) .rh-home-project-card__badge {
-	transition-delay: 0.34s;
-}
-
-:where(.rh-home-section--projects, .rh-single-related) .rh-home-project-card.rh-bento-cell.is-active .rh-home-project-card__badges li:nth-child(3) .rh-home-project-card__badge {
-	transition-delay: 0.42s;
-}
-
-:where(.rh-home-section--projects, .rh-single-related) .rh-home-project-card.rh-bento-cell.is-active .rh-home-project-card__badges li:nth-child(4) .rh-home-project-card__badge {
-	transition-delay: 0.5s;
-}
-
-:where(.rh-home-section--projects, .rh-single-related) .rh-home-project-card.rh-bento-cell:not(.is-active) .rh-home-project-card__badges li .rh-home-project-card__badge {
-	transition-delay: 0s;
+	opacity: var(--rh-card-active, 0);
+	transform: translate3d(0, calc(-0.18rem * (1 - var(--rh-card-active, 0))), 0);
 }
 
 /* Keep card text white (was scoped to <a> when slides were links). */
-:where(.rh-home-section--projects, .rh-single-related) .rh-home-project-card.rh-bento-cell,
-:where(.rh-home-section--projects, .rh-single-related) .rh-home-project-card.rh-bento-cell:hover,
-:where(.rh-home-section--projects, .rh-single-related) .rh-home-project-card.rh-bento-cell:focus-visible {
+:where(.rh-home-section--projects, .rh-single-related, .rh-archive-projects) .rh-home-project-card.rh-bento-cell,
+:where(.rh-home-section--projects, .rh-single-related, .rh-archive-projects) .rh-home-project-card.rh-bento-cell:hover,
+:where(.rh-home-section--projects, .rh-single-related, .rh-archive-projects) .rh-home-project-card.rh-bento-cell:focus-visible {
 	color: #ffffff;
 }
 
-:where(.rh-home-section--projects, .rh-single-related) .rh-home-project-card.rh-bento-cell .rh-home-project-card__title {
+:where(.rh-home-section--projects, .rh-single-related, .rh-archive-projects) .rh-home-project-card.rh-bento-cell .rh-home-project-card__title {
 	color: #ffffff;
 }
 
@@ -3804,7 +3948,8 @@ body.rh-carpentry-home .rh-bento-page > .rh-home-section + .rh-home-section .rh-
 	animation: rh-project-pause-ring var(--rh-project-interval, 5s) linear forwards;
 }
 
-.rh-home-projects-carousel__pause.is-timing.is-paused .rh-home-projects-carousel__pause-progress {
+.rh-home-projects-carousel__pause.is-timing.is-paused .rh-home-projects-carousel__pause-progress,
+.rh-home-projects-carousel__pause.is-timing.is-hover-paused .rh-home-projects-carousel__pause-progress {
 	animation-play-state: paused;
 }
 
@@ -3859,7 +4004,7 @@ body.rh-carpentry-home .rh-bento-page > .rh-home-section + .rh-home-section .rh-
 		-webkit-mask-image: none !important;
 	}
 
-	:where(.rh-home-section--projects, .rh-single-related) .rh-home-project-card.rh-bento-cell {
+	:where(.rh-home-section--projects, .rh-single-related, .rh-archive-projects) .rh-home-project-card.rh-bento-cell {
 		transition: opacity 0.2s ease;
 	}
 
@@ -3875,15 +4020,15 @@ body.rh-carpentry-home .rh-bento-page > .rh-home-section + .rh-home-section .rh-
 		transition: none;
 	}
 
-	:where(.rh-home-section--projects, .rh-single-related) .rh-home-project-card.rh-bento-cell .rh-home-project-card__badge {
+	:where(.rh-home-section--projects, .rh-single-related, .rh-archive-projects) .rh-home-project-card.rh-bento-cell .rh-home-project-card__badge {
 		transition: none;
 	}
 
-	:where(.rh-home-section--projects, .rh-single-related) .rh-home-project-card.rh-bento-cell .rh-home-project-card__badges {
+	:where(.rh-home-section--projects, .rh-single-related, .rh-archive-projects) .rh-home-project-card.rh-bento-cell .rh-home-project-card__badges {
 		transition: none;
 	}
 
-	:where(.rh-home-section--projects, .rh-single-related) .rh-home-project-card.rh-bento-cell .rh-home-project-card__title {
+	:where(.rh-home-section--projects, .rh-single-related, .rh-archive-projects) .rh-home-project-card.rh-bento-cell .rh-home-project-card__title {
 		transition: none;
 	}
 
@@ -4012,7 +4157,13 @@ body.rh-carpentry-home .rh-bento-page > .rh-home-section + .rh-home-section .rh-
 }
 
 .rh-home-service-bento--i {
-	grid-column: 1 / span 12;
+	grid-column: 1 / span 6;
+	grid-row: 6;
+}
+
+/* Tenth service tile (e.g. fire doors) — same half-width slot as former credentials card. */
+.rh-home-service-bento--j {
+	grid-column: 7 / span 6;
 	grid-row: 6;
 }
 
@@ -4091,7 +4242,12 @@ body.rh-carpentry-home .rh-bento-page > .rh-home-section + .rh-home-section .rh-
 	}
 
 	.rh-home-service-bento--i {
-		grid-column: 1 / span 6;
+		grid-column: 1 / span 3;
+		grid-row: 6;
+	}
+
+	.rh-home-service-bento--j {
+		grid-column: 4 / span 3;
 		grid-row: 6;
 	}
 }
@@ -4219,18 +4375,7 @@ body.rh-carpentry-home .rh-bento-page > .rh-home-section + .rh-home-section .rh-
 	text-shadow: 0 1px 14px rgba(0, 0, 0, 0.35);
 }
 
-/* --- Services: accreditation badges below the service tiles --- */
-
-.rh-home-services-credentials {
-	margin-top: clamp(1.25rem, 3vw, 2rem);
-	display: flex;
-	flex-direction: column;
-	align-items: center;
-	gap: clamp(0.85rem, 2vw, 1.25rem);
-	text-align: center;
-}
-
-.rh-home-services-credentials__list {
+.rh-home-feature__credentials-list {
 	list-style: none;
 	margin: 0;
 	padding: 0;
@@ -4238,10 +4383,11 @@ body.rh-carpentry-home .rh-bento-page > .rh-home-section + .rh-home-section .rh-
 	flex-wrap: wrap;
 	align-items: center;
 	justify-content: center;
-	gap: clamp(1.5rem, 4vw, 3rem);
+	gap: clamp(1rem, 2.5vw, 2.25rem);
+	width: 100%;
 }
 
-.rh-home-services-credentials__item {
+.rh-home-feature__credentials-item {
 	margin: 0;
 	padding: 0;
 	display: inline-flex;
@@ -4249,17 +4395,17 @@ body.rh-carpentry-home .rh-bento-page > .rh-home-section + .rh-home-section .rh-
 	justify-content: center;
 }
 
-.rh-home-services-credentials__img {
+.rh-home-feature__credentials-img {
 	display: block;
 	width: auto;
 	max-width: 100%;
-	height: clamp(48px, 7vw, 72px);
+	height: clamp(48px, 6vw, 78px);
 	object-fit: contain;
 	mix-blend-mode: multiply;
 }
 
-.rh-home-services-credentials__img--uk-fire-door {
-	height: clamp(60px, 9vw, 96px);
+.rh-home-feature__credentials-img--uk-fire-door {
+	height: clamp(58px, 7.5vw, 92px);
 }
 
 .rh-home-section--sectors {
@@ -4444,6 +4590,25 @@ body.rh-carpentry-home .rh-bento-page > .rh-home-section + .rh-home-section .rh-
 	overflow: hidden;
 }
 
+/* On phones, drop the band's viewport-height cap and pin the carousel
+   viewport (where cards stretch to fill) to an explicit shorter height so
+   the entire card — image, title and bottom controls — stays inside the
+   viewport. The shorter ceiling also keeps the BG image at a more natural
+   (near-square) aspect rather than a tall portrait. */
+@media (max-width: 768px) {
+	.rh-home-section--projects#projects,
+	.rh-home-section--projects {
+		height: auto;
+		max-height: none;
+	}
+
+	:where(.rh-home-section--projects) .rh-home-projects-carousel__viewport {
+		flex: 0 0 auto;
+		height: clamp(280px, 56vh, 460px);
+		max-height: clamp(280px, 56vh, 460px);
+	}
+}
+
 /* Projects band stays edge-to-edge of the page frame on every viewport — no
    extra side padding beyond the global --rh-frame-inset already applied to
    .site-main--front. */
@@ -4461,7 +4626,7 @@ body.rh-carpentry-home .rh-bento-page > .rh-home-section + .rh-home-section .rh-
 		flex: 0 0 auto;
 	}
 
-	:where(.rh-home-section--projects, .rh-single-related) .rh-clients-hero__inner > .rh-home-projects-carousel {
+	:where(.rh-home-section--projects, .rh-single-related, .rh-archive-projects) .rh-clients-hero__inner > .rh-home-projects-carousel {
 		flex: 1 1 auto;
 		min-height: 0;
 		display: flex;
@@ -4474,14 +4639,14 @@ body.rh-carpentry-home .rh-bento-page > .rh-home-section + .rh-home-section .rh-
 	}
 }
 
-:where(.rh-home-section--projects, .rh-single-related) .rh-home-projects-carousel {
+:where(.rh-home-section--projects, .rh-single-related, .rh-archive-projects) .rh-home-projects-carousel {
 	display: flex;
 	flex-direction: column;
 	flex: 1 1 auto;
 	min-height: 0;
 }
 
-:where(.rh-home-section--projects, .rh-single-related) .rh-home-projects-carousel__viewport {
+:where(.rh-home-section--projects, .rh-single-related, .rh-archive-projects) .rh-home-projects-carousel__viewport {
 	flex: 1 1 auto;
 	min-height: 0;
 	display: flex;
@@ -4490,7 +4655,7 @@ body.rh-carpentry-home .rh-bento-page > .rh-home-section + .rh-home-section .rh-
 	height: auto;
 }
 
-:where(.rh-home-section--projects, .rh-single-related) .rh-home-projects-carousel__track {
+:where(.rh-home-section--projects, .rh-single-related, .rh-archive-projects) .rh-home-projects-carousel__track {
 	flex: 1 1 auto;
 	min-height: 0;
 	width: 100%;
@@ -4560,21 +4725,21 @@ body.rh-carpentry-home .rh-bento-page > .rh-home-section + .rh-home-section .rh-
 	}
 }
 
-:where(.rh-home-section--projects, .rh-single-related) .rh-home-project-card.rh-bento-cell.is-active:hover .rh-home-project-card__cta {
+:where(.rh-home-section--projects, .rh-single-related, .rh-archive-projects) .rh-home-project-card.rh-bento-cell.is-active:hover .rh-home-project-card__cta {
 	opacity: 1;
 	transform: translateY(0);
 }
 
-:where(.rh-home-section--projects, .rh-single-related) .rh-home-project-card.rh-bento-cell.is-active:hover .rh-home-project-card__cta-icon {
+:where(.rh-home-section--projects, .rh-single-related, .rh-archive-projects) .rh-home-project-card.rh-bento-cell.is-active:hover .rh-home-project-card__cta-icon {
 	animation: rh-project-card-find-chevron 1.15s ease-in-out forwards;
 }
 
 @media (prefers-reduced-motion: reduce) {
-	:where(.rh-home-section--projects, .rh-single-related) .rh-home-project-card.rh-bento-cell.is-active:hover .rh-home-project-card__cta {
+	:where(.rh-home-section--projects, .rh-single-related, .rh-archive-projects) .rh-home-project-card.rh-bento-cell.is-active:hover .rh-home-project-card__cta {
 		transition: none;
 	}
 
-	:where(.rh-home-section--projects, .rh-single-related) .rh-home-project-card.rh-bento-cell.is-active:hover .rh-home-project-card__cta-icon {
+	:where(.rh-home-section--projects, .rh-single-related, .rh-archive-projects) .rh-home-project-card.rh-bento-cell.is-active:hover .rh-home-project-card__cta-icon {
 		animation: none;
 		opacity: 0.92;
 	}
@@ -4920,7 +5085,7 @@ body.rh-carpentry-home .rh-bento-page > .rh-home-section + .rh-home-section .rh-
 /* --- Project archive & single --- */
 
 .rh-archive-projects {
-	padding-block: clamp(2rem, 5vw, 3.5rem);
+	padding-block: 0;
 	font-family: "Poppins", var(--rh-font-sans, system-ui, sans-serif);
 }
 
@@ -4928,8 +5093,10 @@ body.rh-carpentry-home .rh-bento-page > .rh-home-section + .rh-home-section .rh-
 	width: 100%;
 	max-width: none;
 	margin: 0 auto;
-	padding-inline: max(var(--rh-frame-inset, 28px), env(safe-area-inset-left, 0px))
-		max(var(--rh-frame-inset, 28px), env(safe-area-inset-right, 0px));
+	padding-block: clamp(3rem, 7vw, 5.5rem) var(--rh-frame-inset);
+	padding-inline:
+		calc(var(--rh-frame-inset) + var(--rh-hero-pad-x))
+		calc(var(--rh-frame-inset) + var(--rh-hero-pad-x-end));
 	box-sizing: border-box;
 }
 
@@ -4965,53 +5132,214 @@ body.rh-carpentry-home .rh-bento-page > .rh-home-section + .rh-home-section .rh-
 	text-align: left;
 }
 
+/* Archive bento: 12-col grid with a repeating 5-card pattern. */
 .rh-archive-projects__grid {
 	display: grid;
-	grid-template-columns: repeat(4, minmax(0, 1fr));
+	grid-template-columns: repeat(12, minmax(0, 1fr));
+	grid-auto-flow: dense;
 	gap: var(--rh-bento-gap);
 	list-style: none;
 	margin: 0;
 	padding: 0;
 }
 
-.rh-archive-projects__grid > li:first-child {
-	grid-column: 1 / span 2;
-	grid-row: 1 / span 2;
+.rh-archive-projects__bento > .rh-home-project-card.rh-bento-cell {
+	flex: none;
+	width: auto;
+	min-width: 0;
+	height: auto;
+	min-height: 0;
+	aspect-ratio: 4 / 3;
+	scroll-snap-align: none;
+	scroll-snap-stop: normal;
+	opacity: 1;
+	cursor: pointer;
+	transition:
+		transform 0.25s ease,
+		box-shadow 0.25s ease,
+		border-color 0.25s ease;
 }
 
-.rh-archive-projects__grid > li:first-child .rh-archive-project-card__media {
-	aspect-ratio: 1;
-	min-height: 11rem;
+/* 5n+1: wide hero (7 cols, banner aspect) */
+.rh-archive-projects__bento > .rh-home-project-card.rh-bento-cell:nth-child(5n + 1) {
+	grid-column: span 7;
+	aspect-ratio: 7 / 4;
 }
 
-.rh-archive-projects__grid > li:first-child .rh-archive-project-card__title {
-	font-size: clamp(1.05rem, 2vw, 1.2rem);
+/* 5n+2: feature square-ish (5 cols) */
+.rh-archive-projects__bento > .rh-home-project-card.rh-bento-cell:nth-child(5n + 2) {
+	grid-column: span 5;
+	aspect-ratio: 5 / 4;
 }
 
-@media (max-width: 900px) {
+/* 5n+3, 5n+4, 5n+5: triplet row (4 cols each) */
+.rh-archive-projects__bento > .rh-home-project-card.rh-bento-cell:nth-child(5n + 3),
+.rh-archive-projects__bento > .rh-home-project-card.rh-bento-cell:nth-child(5n + 4),
+.rh-archive-projects__bento > .rh-home-project-card.rh-bento-cell:nth-child(5n + 5) {
+	grid-column: span 4;
+	aspect-ratio: 4 / 3;
+}
+
+/* Hover lift */
+.rh-archive-projects__bento > .rh-home-project-card.rh-bento-cell:hover,
+.rh-archive-projects__bento > .rh-home-project-card.rh-bento-cell:focus-within {
+	transform: translateY(-3px);
+	box-shadow: 0 18px 48px rgba(12, 28, 52, 0.3);
+}
+
+/* CTA stays hidden at rest on archive cards and reveals on hover/focus
+   (the .is-active:hover rule scoped above to :where(...,.rh-archive-projects)
+   handles the reveal — no archive-specific override here). */
+
+/* Disable the slider's slow horizontal pan; use a soft hover zoom instead */
+.rh-archive-projects__bento .rh-home-project-card.rh-bento-cell .rh-home-project-card__bg {
+	animation: none;
+	transform: scale(1);
+	transition:
+		transform 0.55s cubic-bezier(0.4, 0, 0.2, 1),
+		filter 0.4s ease;
+}
+
+.rh-archive-projects__bento .rh-home-project-card.rh-bento-cell:hover .rh-home-project-card__bg {
+	transform: scale(1.04);
+}
+
+@media (prefers-reduced-motion: reduce) {
+	.rh-archive-projects__bento > .rh-home-project-card.rh-bento-cell,
+	.rh-archive-projects__bento > .rh-home-project-card.rh-bento-cell:hover,
+	.rh-archive-projects__bento .rh-home-project-card.rh-bento-cell .rh-home-project-card__bg,
+	.rh-archive-projects__bento .rh-home-project-card.rh-bento-cell:hover .rh-home-project-card__bg {
+		transform: none;
+		transition: none;
+	}
+}
+
+/* Full-card cover anchor — sits above artwork, below the CTA badge in z-order. */
+.rh-archive-project-cover-link {
+	position: absolute;
+	inset: 0;
+	z-index: 3;
+	display: block;
+	text-decoration: none;
+	color: transparent;
+	overflow: hidden;
+	text-indent: -9999px;
+	border-radius: inherit;
+}
+
+.rh-archive-project-cover-link:focus-visible {
+	outline: 2px solid rgba(255, 255, 255, 0.85);
+	outline-offset: -4px;
+}
+
+/* Lazy-loaded card scale-in for cards appended via infinite scroll.
+   Each appended card gets an inline --rh-card-stagger so they pop in
+   one after another rather than as a batch. */
+.rh-archive-projects__bento > .rh-home-project-card.rh-bento-cell.rh-is-appended {
+	animation: rh-archive-card-in 0.5s cubic-bezier(0.34, 1.32, 0.5, 1) both;
+	animation-delay: var(--rh-card-stagger, 0ms);
+	transform-origin: center center;
+}
+
+@keyframes rh-archive-card-in {
+	0% {
+		opacity: 0;
+		transform: scale(0.86) translateY(10px);
+	}
+	60% {
+		opacity: 1;
+	}
+	100% {
+		opacity: 1;
+		transform: scale(1) translateY(0);
+	}
+}
+
+@media (prefers-reduced-motion: reduce) {
+	.rh-archive-projects__bento > .rh-home-project-card.rh-bento-cell.rh-is-appended {
+		animation: none;
+	}
+}
+
+/* Tablet: drop to 2 cols, no spans, uniform aspect. */
+@media (max-width: 1099px) {
 	.rh-archive-projects__grid {
 		grid-template-columns: repeat(2, minmax(0, 1fr));
 	}
 
-	.rh-archive-projects__grid > li:first-child {
-		grid-column: 1 / span 2;
-		grid-row: auto;
-	}
-
-	.rh-archive-projects__grid > li:first-child .rh-archive-project-card__media {
+	.rh-archive-projects__bento > .rh-home-project-card.rh-bento-cell,
+	.rh-archive-projects__bento > .rh-home-project-card.rh-bento-cell:nth-child(5n + 1),
+	.rh-archive-projects__bento > .rh-home-project-card.rh-bento-cell:nth-child(5n + 2),
+	.rh-archive-projects__bento > .rh-home-project-card.rh-bento-cell:nth-child(5n + 3),
+	.rh-archive-projects__bento > .rh-home-project-card.rh-bento-cell:nth-child(5n + 4),
+	.rh-archive-projects__bento > .rh-home-project-card.rh-bento-cell:nth-child(5n + 5) {
+		grid-column: span 1;
 		aspect-ratio: 4 / 3;
-		min-height: 0;
 	}
 }
 
-@media (max-width: 520px) {
+/* Mobile: single column. */
+@media (max-width: 640px) {
 	.rh-archive-projects__grid {
-		grid-template-columns: 1fr;
+		grid-template-columns: minmax(0, 1fr);
 	}
+}
 
-	.rh-archive-projects__grid > li:first-child {
-		grid-column: 1;
+/* Infinite-scroll sentinel + status message. */
+.rh-archive-projects__sentinel {
+	height: 1px;
+	margin-top: clamp(2rem, 5vw, 3.5rem);
+}
+
+.rh-archive-projects__status {
+	display: none;
+	align-items: center;
+	justify-content: center;
+	gap: 0.65rem;
+	margin: clamp(1rem, 3vw, 1.5rem) auto 0;
+	padding: 0.5rem 1rem;
+	font-size: 0.85rem;
+	font-weight: 600;
+	letter-spacing: 0.06em;
+	text-transform: uppercase;
+	color: var(--rh-color-muted, #5c5c5c);
+}
+
+.rh-archive-projects__status.is-loading,
+.rh-archive-projects__status.is-done,
+.rh-archive-projects__status.is-error {
+	display: inline-flex;
+}
+
+.rh-archive-projects__status.is-done .rh-archive-projects__spinner,
+.rh-archive-projects__status.is-error .rh-archive-projects__spinner {
+	display: none;
+}
+
+.rh-archive-projects__spinner {
+	width: 1.1rem;
+	height: 1.1rem;
+	border-radius: 50%;
+	border: 2px solid rgba(12, 28, 52, 0.18);
+	border-top-color: var(--rh-hero-accent, #0e396e);
+	animation: rh-archive-spin 0.9s linear infinite;
+}
+
+@keyframes rh-archive-spin {
+	to {
+		transform: rotate(1turn);
 	}
+}
+
+@media (prefers-reduced-motion: reduce) {
+	.rh-archive-projects__spinner {
+		animation: none;
+		opacity: 0.7;
+	}
+}
+
+.rh-archive-projects__pagination {
+	margin-top: clamp(2rem, 4vw, 2.5rem);
 }
 
 .rh-archive-project-card {
@@ -5161,14 +5489,16 @@ body.rh-carpentry-home .rh-bento-page > .rh-home-section + .rh-home-section .rh-
 	align-items: center;
 	flex-wrap: wrap;
 	gap: 0.5rem 0.75rem;
-	margin: 0 0 0.65rem;
-	font-size: 0.75rem;
-	font-weight: 600;
-	letter-spacing: 0.1em;
+	margin: 0 0 0.55rem;
+	font-size: 0.72rem;
+	font-weight: 700;
+	font-style: italic;
+	letter-spacing: 0.2em;
 	text-transform: uppercase;
 	text-align: left;
 	width: 100%;
 	max-width: 100%;
+	color: #5a6b82;
 }
 
 .rh-single-project__sectors .rh-home-kicker__line {
@@ -5208,21 +5538,24 @@ body.rh-carpentry-home .rh-bento-page > .rh-home-section + .rh-home-section .rh-
 }
 
 .rh-single-project__title {
-	margin: 0 0 1.25rem;
-	font-size: clamp(1.75rem, 4vw, 2.25rem);
+	margin: 0 0 1rem;
+	font-size: clamp(1.5rem, 3.8vw, 2.35rem);
 	font-weight: 800;
-	line-height: 1.15;
+	line-height: 1.12;
+	letter-spacing: 0.03em;
+	text-transform: uppercase;
 	color: var(--rh-heading-color);
 	text-align: left;
 }
 
 .rh-single-project__shell .rh-single-project__title {
 	margin: 0 0 0.35rem;
-	font-size: clamp(1.75rem, 5dvw, 2.75rem);
+	font-size: clamp(1.75rem, 5dvw, 60px);
 	font-weight: 800;
-	line-height: 1.05;
+	line-height: 0.95;
 	letter-spacing: 0.02em;
-	color: #fff;
+	text-transform: uppercase;
+	color: var(--rh-heading-color);
 }
 
 /* Title + gallery span the hero inner (same horizontal rhythm as homepage projects). */
@@ -5397,7 +5730,8 @@ body.rh-carpentry-home .rh-bento-page > .rh-home-section + .rh-home-section .rh-
 	animation: rh-project-pause-ring var(--rh-project-interval, 5s) linear forwards;
 }
 
-.rh-single-project__shell .rh-home-projects-carousel__pause.is-timing.is-paused .rh-home-projects-carousel__pause-progress {
+.rh-single-project__shell .rh-home-projects-carousel__pause.is-timing.is-paused .rh-home-projects-carousel__pause-progress,
+.rh-single-project__shell .rh-home-projects-carousel__pause.is-timing.is-hover-paused .rh-home-projects-carousel__pause-progress {
 	animation-play-state: paused;
 }
 
@@ -5560,10 +5894,13 @@ body.rh-carpentry-home .rh-bento-page > .rh-home-section + .rh-home-section .rh-
 }
 
 @keyframes rh-single-project-gallery-pan {
-	from {
-		transform: scale(1.12) translate3d(-2.4%, 0, 0);
+	0% {
+		transform: scale(1) translate3d(-2.4%, 0, 0);
 	}
-	to {
+	14% {
+		transform: scale(1.12) translate3d(-2.2%, 0, 0);
+	}
+	100% {
 		transform: scale(1.12) translate3d(2.4%, 0, 0);
 	}
 }
@@ -5589,46 +5926,84 @@ body.rh-carpentry-home .rh-bento-page > .rh-home-section + .rh-home-section .rh-
 
 .rh-single-project-gallery--grid {
 	display: grid;
-	grid-template-columns: 1fr;
+	grid-template-columns: repeat(12, minmax(0, 1fr));
+	grid-auto-flow: dense;
 	gap: clamp(0.5rem, 1.4vw, 0.95rem);
 	width: 100%;
 	margin-block: clamp(0.25rem, 1vw, 0.65rem);
 }
 
-@media (min-width: 700px) {
+/* Default 5-card bento cycle (used for 5+ images and as the base on desktop). */
+.rh-single-project-gallery--grid > .rh-single-project-gallery__card:nth-child(5n + 1) {
+	grid-column: span 7;
+	aspect-ratio: 7 / 4;
+}
+
+.rh-single-project-gallery--grid > .rh-single-project-gallery__card:nth-child(5n + 2) {
+	grid-column: span 5;
+	aspect-ratio: 5 / 4;
+}
+
+.rh-single-project-gallery--grid > .rh-single-project-gallery__card:nth-child(5n + 3),
+.rh-single-project-gallery--grid > .rh-single-project-gallery__card:nth-child(5n + 4),
+.rh-single-project-gallery--grid > .rh-single-project-gallery__card:nth-child(5n + 5) {
+	grid-column: span 4;
+	aspect-ratio: 4 / 3;
+}
+
+/* Small-set overrides — make 1-4 image galleries feel deliberate. */
+.rh-single-project-gallery--grid[data-count="1"] > .rh-single-project-gallery__card:first-child {
+	grid-column: 1 / -1;
+	aspect-ratio: 21 / 9;
+}
+
+.rh-single-project-gallery--grid[data-count="2"] > .rh-single-project-gallery__card {
+	grid-column: span 6;
+	aspect-ratio: 4 / 3;
+}
+
+.rh-single-project-gallery--grid[data-count="3"] > .rh-single-project-gallery__card {
+	grid-column: span 4;
+	aspect-ratio: 4 / 3;
+}
+
+.rh-single-project-gallery--grid[data-count="4"] > .rh-single-project-gallery__card {
+	grid-column: span 6;
+	aspect-ratio: 4 / 3;
+}
+
+/* Tablet: drop to 2 cols, uniform 4:3 aspect. */
+@media (max-width: 1099px) {
 	.rh-single-project-gallery--grid {
-		grid-template-columns: repeat(2, 1fr);
-	}
-}
-
-@media (min-width: 1100px) {
-	.rh-single-project-gallery--grid {
-		grid-template-columns: repeat(3, 1fr);
-	}
-}
-
-.rh-single-project-gallery--grid[data-count="1"] {
-	grid-template-columns: 1fr;
-}
-
-@media (min-width: 700px) {
-	.rh-single-project-gallery--grid[data-count="2"],
-	.rh-single-project-gallery--grid[data-count="4"] {
-		grid-template-columns: repeat(2, 1fr);
-	}
-}
-
-@media (min-width: 1100px) {
-	.rh-single-project-gallery--grid[data-count="2"],
-	.rh-single-project-gallery--grid[data-count="4"] {
-		grid-template-columns: repeat(2, 1fr);
+		grid-template-columns: repeat(2, minmax(0, 1fr));
 	}
 
-	/* Feature first image on 3-col counts where it adds visual hierarchy */
-	.rh-single-project-gallery--grid[data-count="5"] > .rh-single-project-gallery__card:first-child,
-	.rh-single-project-gallery--grid[data-count="7"] > .rh-single-project-gallery__card:first-child {
-		grid-column: span 2;
+	.rh-single-project-gallery--grid > .rh-single-project-gallery__card,
+	.rh-single-project-gallery--grid > .rh-single-project-gallery__card:nth-child(5n + 1),
+	.rh-single-project-gallery--grid > .rh-single-project-gallery__card:nth-child(5n + 2),
+	.rh-single-project-gallery--grid > .rh-single-project-gallery__card:nth-child(5n + 3),
+	.rh-single-project-gallery--grid > .rh-single-project-gallery__card:nth-child(5n + 4),
+	.rh-single-project-gallery--grid > .rh-single-project-gallery__card:nth-child(5n + 5) {
+		grid-column: span 1;
+		aspect-ratio: 4 / 3;
+	}
+
+	.rh-single-project-gallery--grid[data-count="1"] > .rh-single-project-gallery__card:first-child {
+		grid-column: 1 / -1;
 		aspect-ratio: 16 / 9;
+	}
+}
+
+/* Mobile: single column. */
+@media (max-width: 640px) {
+	.rh-single-project-gallery--grid {
+		grid-template-columns: minmax(0, 1fr);
+	}
+
+	.rh-single-project-gallery--grid > .rh-single-project-gallery__card,
+	.rh-single-project-gallery--grid[data-count="1"] > .rh-single-project-gallery__card:first-child {
+		grid-column: 1 / -1;
+		aspect-ratio: 4 / 3;
 	}
 }
 
@@ -5637,7 +6012,6 @@ body.rh-carpentry-home .rh-bento-page > .rh-home-section + .rh-home-section .rh-
 	flex: none;
 	width: auto;
 	min-width: 0;
-	aspect-ratio: 4 / 3;
 	scroll-snap-align: none;
 	scroll-snap-stop: normal;
 	opacity: 1;
@@ -5648,10 +6022,6 @@ body.rh-carpentry-home .rh-bento-page > .rh-home-section + .rh-home-section .rh-
 	transition:
 		box-shadow 0.4s ease,
 		transform 0.4s ease;
-}
-
-.rh-single-project__shell .rh-single-project-gallery--grid[data-count="1"] > .rh-single-project-gallery__card.rh-bento-cell {
-	aspect-ratio: 21 / 9;
 }
 
 .rh-single-project__shell .rh-single-project-gallery--grid .rh-single-project-gallery__card.rh-bento-cell:hover {
@@ -5701,7 +6071,7 @@ body.rh-carpentry-home .rh-bento-page > .rh-home-section + .rh-home-section .rh-
 
 .rh-single-project__article > .rh-single-project__shell .rh-single-project__sectors,
 .rh-single-project__article > .rh-single-project__shell .rh-single-project__sectors a {
-	color: var(--rh-color-muted, #5c5c5c);
+	color: #5a6b82;
 }
 
 .rh-single-project__article > .rh-single-project__shell .rh-single-project__sectors .rh-home-kicker__line {
@@ -5805,6 +6175,20 @@ body.rh-carpentry-home .rh-bento-page > .rh-home-section + .rh-home-section .rh-
 	flex-direction: column;
 	min-height: min(93vh, 810px);
 	row-gap: clamp(0.65rem, 2vw, 1.15rem);
+}
+
+/* Phones: shorten the More projects band to match the home slider so the
+   full card stays in view. */
+@media (max-width: 768px) {
+	.rh-single-related--band .rh-clients-hero__inner {
+		min-height: 0;
+	}
+
+	.rh-single-related--band .rh-single-related-carousel .rh-home-projects-carousel__viewport {
+		flex: 0 0 auto;
+		height: clamp(280px, 56vh, 460px);
+		max-height: clamp(280px, 56vh, 460px);
+	}
 }
 
 .rh-single-related--band .rh-single-related__intro {

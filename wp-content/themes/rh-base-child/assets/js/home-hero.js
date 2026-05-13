@@ -265,6 +265,8 @@
 	let pausedRemainingMs = intervalMs;
 	let isFirstGo = true;
 	let isPaused = false;
+	/** Soft pause while pointer is hovering or actively touching the carousel — resumes when the pointer leaves / touch ends. */
+	let hoverPaused = false;
 	/** Ignore debounced scroll sync while scrollTo() from goTo() is in flight (avoids wrong index mid-smooth-scroll / snap settle). */
 	let suppressScrollSync = false;
 	let scrollUnsuppressTimer = null;
@@ -278,6 +280,38 @@
 			timerId = null;
 		}
 		autoplayDeadline = null;
+	}
+
+	/**
+	 * Soft-pause the autoplay timer while a user is hovering with a mouse or
+	 * actively touching the carousel. Independent of the user-pause state so
+	 * a manually-paused slider stays paused after the pointer leaves.
+	 */
+	function setHoverPaused(paused) {
+		if (paused === hoverPaused) {
+			return;
+		}
+		if (paused) {
+			if (!isPaused) {
+				pausedRemainingMs =
+					autoplayDeadline !== null
+						? Math.max(0, autoplayDeadline - performance.now())
+						: intervalMs;
+			}
+			hoverPaused = true;
+			clearSchedule();
+			if (pauseBtn) {
+				pauseBtn.classList.add('is-hover-paused');
+			}
+		} else {
+			hoverPaused = false;
+			if (pauseBtn) {
+				pauseBtn.classList.remove('is-hover-paused');
+			}
+			if (!isPaused) {
+				scheduleNext(pausedRemainingMs);
+			}
+		}
 	}
 
 	function updateEdgeState() {
@@ -490,7 +524,7 @@
 	function scheduleNext(delayMs) {
 		const delay = typeof delayMs === 'number' ? delayMs : intervalMs;
 		clearSchedule();
-		if (!multi || prefersReduced || document.hidden || isPaused) {
+		if (!multi || prefersReduced || document.hidden || isPaused || hoverPaused) {
 			return;
 		}
 		const ms = Math.max(0, delay);
@@ -507,7 +541,7 @@
 		const labelPlay = pauseBtn.getAttribute('data-label-play') || 'Play';
 
 		pauseBtn.addEventListener('click', () => {
-			if (!isPaused) {
+			if (!isPaused && !hoverPaused) {
 				pausedRemainingMs =
 					autoplayDeadline !== null ? Math.max(0, autoplayDeadline - performance.now()) : intervalMs;
 			}
@@ -522,11 +556,20 @@
 			if (isPaused) {
 				clearSchedule();
 				/* Keep .is-timing so the ring stays at the current progress (CSS animation-play-state: paused). */
-			} else {
+			} else if (!hoverPaused) {
 				scheduleNext(pausedRemainingMs);
 			}
 		});
 	}
+
+	/* Hover (mouse) and touch pause: pauses autoplay while the user is
+	   actively interacting with the carousel. Passive listeners only so
+	   vertical page scrolling on mobile is never blocked. */
+	root.addEventListener('mouseenter', () => setHoverPaused(true));
+	root.addEventListener('mouseleave', () => setHoverPaused(false));
+	root.addEventListener('touchstart', () => setHoverPaused(true), { passive: true });
+	root.addEventListener('touchend', () => setHoverPaused(false), { passive: true });
+	root.addEventListener('touchcancel', () => setHoverPaused(false), { passive: true });
 
 	const prevBtn = root.querySelector('[data-rh-testimonial-prev]');
 	const nextBtn = root.querySelector('[data-rh-testimonial-next]');
@@ -687,6 +730,8 @@
 	let pausedRemainingMs = intervalMs;
 	let isFirstGo = true;
 	let isPaused = false;
+	/** Soft pause while pointer is hovering or actively touching the carousel — resumes when the pointer leaves / touch ends. */
+	let hoverPaused = false;
 	/** Ignore debounced scroll sync while scrollTo() from goTo() is in flight (avoids wrong index mid-smooth-scroll / snap settle). */
 	let suppressScrollSync = false;
 	let scrollUnsuppressTimer = null;
@@ -700,6 +745,39 @@
 			timerId = null;
 		}
 		autoplayDeadline = null;
+	}
+
+	/**
+	 * Soft-pause the autoplay timer while a user is hovering with a mouse or
+	 * actively touching the carousel. Does not change the user-pause state set
+	 * by the pause button, so a manually-paused slider stays paused even after
+	 * the pointer leaves.
+	 */
+	function setHoverPaused(paused) {
+		if (paused === hoverPaused) {
+			return;
+		}
+		if (paused) {
+			if (!isPaused) {
+				pausedRemainingMs =
+					autoplayDeadline !== null
+						? Math.max(0, autoplayDeadline - performance.now())
+						: intervalMs;
+			}
+			hoverPaused = true;
+			clearSchedule();
+			if (pauseBtn) {
+				pauseBtn.classList.add('is-hover-paused');
+			}
+		} else {
+			hoverPaused = false;
+			if (pauseBtn) {
+				pauseBtn.classList.remove('is-hover-paused');
+			}
+			if (!isPaused) {
+				scheduleNext(pausedRemainingMs);
+			}
+		}
 	}
 
 	function updateEdgeState() {
@@ -747,11 +825,13 @@
 	}
 
 	/**
-	 * Scroll-linked opacity: each slide's opacity is computed from its distance to
-	 * the viewport centre. Called during manual scroll so the active slide fades
-	 * out as the next slide fades in (instead of snapping between .is-active
-	 * states). Inline opacity is cleared by clearScrollLinkedOpacity() once the
-	 * scroll settles, so CSS rules (and the 0.58s ease transition) take back over.
+	 * Scroll-linked card state: each slide's --rh-card-active (0..1) and
+	 * opacity are computed continuously from its distance to the viewport
+	 * centre. Drives BG zoom, overlay strength and the live cross-fade so
+	 * every card animation tracks scroll position 1:1 instead of snapping
+	 * when .is-active toggles. Inline values are cleared by
+	 * clearScrollLinkedOpacity() once the scroll settles; CSS rules + @property
+	 * transition on --rh-card-active take over for programmatic state changes.
 	 */
 	function updateScrollLinkedOpacity() {
 		if (prefersReduced || !slides.length) {
@@ -770,7 +850,9 @@
 			const d = Math.abs(mid - viewMid);
 			const t = Math.min(1, d / ramp);
 			const op = 1 - t * (1 - opacityFloor);
+			const active = 1 - t;
 			slide.style.opacity = op.toFixed(3);
+			slide.style.setProperty('--rh-card-active', active.toFixed(3));
 		});
 	}
 
@@ -778,6 +860,9 @@
 		slides.forEach((slide) => {
 			if (slide.style.opacity !== '') {
 				slide.style.opacity = '';
+			}
+			if (slide.style.getPropertyValue('--rh-card-active') !== '') {
+				slide.style.removeProperty('--rh-card-active');
 			}
 		});
 	}
@@ -915,10 +1000,16 @@
 		/* Block scroll-sync until snap settles; subsumes debounce + snap after programmatic scroll. */
 		navIntentUntil = performance.now() + 2000;
 
-		/* Drop any stale inline opacities from a previous manual scroll so the CSS
-		   transition handles the programmatic active-state change cleanly. */
-		clearScrollLinkedOpacity();
 		syncActiveUi();
+
+		/* Prime --rh-card-active / opacity from current scroll position BEFORE
+		   the scrollTo() begins. This way the first paint after the class
+		   toggle shows the cards in their position-correct (pre-scroll) state
+		   rather than briefly snapping to the new class's full active/inactive
+		   values. Subsequent scroll events then continuously update inline
+		   values as the smooth scroll progresses so the BG zoom + opacity
+		   track scroll position frame-by-frame. */
+		updateScrollLinkedOpacity();
 
 		scrollActiveSlideIntoView();
 		isFirstGo = false;
@@ -929,7 +1020,7 @@
 	function scheduleNext(delayMs) {
 		const delay = typeof delayMs === 'number' ? delayMs : intervalMs;
 		clearSchedule();
-		if (!multi || prefersReduced || document.hidden || isPaused) {
+		if (!multi || prefersReduced || document.hidden || isPaused || hoverPaused) {
 			return;
 		}
 		const ms = Math.max(0, delay);
@@ -946,7 +1037,7 @@
 		const labelPlay = pauseBtn.getAttribute('data-label-play') || 'Play';
 
 		pauseBtn.addEventListener('click', () => {
-			if (!isPaused) {
+			if (!isPaused && !hoverPaused) {
 				pausedRemainingMs =
 					autoplayDeadline !== null ? Math.max(0, autoplayDeadline - performance.now()) : intervalMs;
 			}
@@ -961,11 +1052,21 @@
 			if (isPaused) {
 				clearSchedule();
 				/* Keep .is-timing so the ring stays at the current progress (CSS animation-play-state: paused). */
-			} else {
+			} else if (!hoverPaused) {
 				scheduleNext(pausedRemainingMs);
 			}
 		});
 	}
+
+	/* Hover (mouse) and touch pause: pauses autoplay while the user is
+	   actively interacting with the carousel. Uses passive listeners so
+	   vertical page scrolling on mobile is not blocked when the touch
+	   starts on a slider card. */
+	root.addEventListener('mouseenter', () => setHoverPaused(true));
+	root.addEventListener('mouseleave', () => setHoverPaused(false));
+	root.addEventListener('touchstart', () => setHoverPaused(true), { passive: true });
+	root.addEventListener('touchend', () => setHoverPaused(false), { passive: true });
+	root.addEventListener('touchcancel', () => setHoverPaused(false), { passive: true });
 
 	const prevBtn = root.querySelector('[data-rh-project-prev]');
 	const nextBtn = root.querySelector('[data-rh-project-next]');
@@ -1011,18 +1112,21 @@
 	viewport.addEventListener(
 		'scroll',
 		() => {
-			if (!suppressScrollSync) {
-				navIntentUntil = 0;
-				/* Live cross-fade while the user is manually scrolling. */
-				updateScrollLinkedOpacity();
-			}
+			/* Always run the visual update so BG zoom (--rh-card-active) and
+			   opacity track scroll position during BOTH manual scrolls and
+			   programmatic smooth scrolls triggered by goTo()/autoplay. The
+			   suppressScrollSync flag only guards the index/UI settle below,
+			   not the per-frame visual sync. */
+			updateScrollLinkedOpacity();
 			updateEdgeState();
 			if (suppressScrollSync) {
 				return;
 			}
+			navIntentUntil = 0;
 			window.clearTimeout(scrollSyncTimer);
 			scrollSyncTimer = window.setTimeout(() => {
-				/* Release inline opacities so the CSS .is-active rule + transition take over. */
+				/* Release inline opacities/--rh-card-active so the CSS
+				   .is-active rule + @property transition take over. */
 				clearScrollLinkedOpacity();
 				onScrollSettled();
 			}, 140);
@@ -1080,6 +1184,9 @@
 	});
 
 	goTo(index);
+	/* Prime --rh-card-active on first paint so the initial active card's BG
+	   is already zoomed before the user scrolls. */
+	updateScrollLinkedOpacity();
 
 	if (typeof document !== 'undefined' && document.fonts && typeof document.fonts.ready !== 'undefined') {
 		document.fonts.ready.then(() => {
@@ -1231,7 +1338,7 @@
 		document.querySelectorAll(
 			'.site-main--front > .rh-home-section, .site-main--front > .rh-bento-page, body.rh-carpentry-home .rh-site-footer'
 		)
-	);
+	).filter((el) => !el.querySelector('[data-rh-fx]'));
 	if (!targets.length) {
 		return;
 	}
@@ -1269,4 +1376,252 @@
 		}
 		observer.observe(el);
 	});
+})();
+
+/**
+ * Generic [data-rh-fx] reveal observer.
+ *
+ * Adds entry animations to titles, subtitles, paragraphs, buttons and lists
+ * across all pages. Pairs with the CSS in home-hero.css (search "data-rh-fx").
+ *
+ * - For every element with [data-rh-fx], the observer adds `.is-inview` when
+ *   the element scrolls into the viewport, which triggers its keyframe.
+ * - When a parent has [data-rh-fx-group], all descendant [data-rh-fx] items
+ *   are revealed together when the group enters the viewport, each with a
+ *   staggered animation-delay (default 80ms between items, override via
+ *   data-rh-fx-stagger="120"). Explicit inline `--rh-fx-delay` always wins.
+ * - Respects prefers-reduced-motion (immediately marks all as in-view).
+ */
+(function () {
+	const allItems = Array.from(document.querySelectorAll('[data-rh-fx]'));
+	const groups = Array.from(document.querySelectorAll('[data-rh-fx-group]'));
+	if (!allItems.length && !groups.length) return;
+
+	/* Flag <html> so CSS knows JS booted and may apply the hidden initial
+	   state. Without this flag, elements stay at their natural opacity so
+	   pages remain readable with JS disabled. */
+	document.documentElement.classList.add('rh-fx-js');
+
+	const prefersReduced =
+		typeof window.matchMedia === 'function' &&
+		window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+	/* Assign cascading --rh-fx-delay to grouped items. Items with their own
+	   inline --rh-fx-delay are left alone so callers can override individuals. */
+	groups.forEach((group) => {
+		const stagger = Math.max(0, parseInt(group.getAttribute('data-rh-fx-stagger') || '80', 10) || 0);
+		const base = Math.max(0, parseInt(group.getAttribute('data-rh-fx-base') || '0', 10) || 0);
+		const items = group.querySelectorAll('[data-rh-fx]');
+		let idx = 0;
+		items.forEach((item) => {
+			if (item.style.getPropertyValue('--rh-fx-delay')) {
+				idx++;
+				return;
+			}
+			item.style.setProperty('--rh-fx-delay', base + idx * stagger + 'ms');
+			idx++;
+		});
+	});
+
+	if (prefersReduced || typeof IntersectionObserver === 'undefined') {
+		allItems.forEach((el) => el.classList.add('is-inview'));
+		return;
+	}
+
+	/* Items inside a [data-rh-fx-group] are revealed together when the group
+	   enters the viewport; items outside any group fire individually. */
+	const itemInGroup = new WeakSet();
+	groups.forEach((group) => {
+		group.querySelectorAll('[data-rh-fx]').forEach((el) => itemInGroup.add(el));
+	});
+
+	const standalone = allItems.filter((el) => !itemInGroup.has(el));
+
+	const observerOptions = { root: null, rootMargin: '0px 0px -8% 0px', threshold: 0.12 };
+
+	if (standalone.length) {
+		const standaloneObserver = new IntersectionObserver((entries) => {
+			entries.forEach((entry) => {
+				if (!entry.isIntersecting) return;
+				entry.target.classList.add('is-inview');
+				standaloneObserver.unobserve(entry.target);
+			});
+		}, observerOptions);
+		standalone.forEach((el) => standaloneObserver.observe(el));
+	}
+
+	if (groups.length) {
+		const groupObserver = new IntersectionObserver((entries) => {
+			entries.forEach((entry) => {
+				if (!entry.isIntersecting) return;
+				entry.target.querySelectorAll('[data-rh-fx]').forEach((el) => el.classList.add('is-inview'));
+				groupObserver.unobserve(entry.target);
+			});
+		}, observerOptions);
+		groups.forEach((group) => groupObserver.observe(group));
+	}
+})();
+
+/**
+ * Inner-page header intro animation cleanup.
+ *
+ * The header shell uses an animated `clip-path` to sweep open from the
+ * top-left. With CSS `animation-fill-mode: both` the end-state clip-path
+ * persists, which would also clip the absolutely-positioned mobile
+ * dropdown (it lives inside the shell but sits below it). After the
+ * animation ends, clear the inline clip-path so the dropdown can render.
+ */
+(function () {
+	if (
+		typeof window.matchMedia === 'function' &&
+		window.matchMedia('(prefers-reduced-motion: reduce)').matches
+	) {
+		return;
+	}
+	const shell = document.querySelector('.rh-site-top-bar__shell');
+	if (!shell) return;
+	const handle = (e) => {
+		if (e.animationName !== 'rh-site-top-bar-shell-reveal') return;
+		shell.style.clipPath = 'none';
+		shell.removeEventListener('animationend', handle);
+	};
+	shell.addEventListener('animationend', handle);
+	/* Safety net: if the animationend event is missed (e.g. throttled tab),
+	   still clear the clip-path after a generous timeout matching the CSS
+	   shell animation duration. */
+	setTimeout(() => {
+		if (shell.style.clipPath !== 'none') {
+			shell.style.clipPath = 'none';
+		}
+	}, 2200);
+})();
+
+/**
+ * Projects archive infinite scroll.
+ *
+ * Fetches subsequent pages from the rh/v1/projects REST endpoint when the
+ * sentinel approaches the viewport, then appends the returned cards into
+ * the bento grid. Status messages live in [data-rh-archive-status].
+ */
+(function () {
+	const grid = document.querySelector('[data-rh-archive-loader]');
+	const sentinel = document.querySelector('[data-rh-archive-sentinel]');
+	const statusEl = document.querySelector('[data-rh-archive-status]');
+	if (
+		!grid ||
+		!sentinel ||
+		typeof window.IntersectionObserver !== 'function' ||
+		typeof window.fetch !== 'function'
+	) {
+		return;
+	}
+
+	let page = parseInt(grid.getAttribute('data-page') || '1', 10) || 1;
+	let totalPages = parseInt(grid.getAttribute('data-total-pages') || '1', 10) || 1;
+	const perPage = parseInt(grid.getAttribute('data-per-page') || '0', 10) || 0;
+	const restUrl = grid.getAttribute('data-rest-url') || '';
+	if (!restUrl || page >= totalPages) {
+		return;
+	}
+
+	let loading = false;
+	let done = false;
+	let observer = null;
+
+	const setStatus = (state, text) => {
+		if (!statusEl) return;
+		statusEl.classList.remove('is-loading', 'is-done', 'is-error');
+		if (state) statusEl.classList.add(state);
+		const textEl = statusEl.querySelector('.rh-archive-projects__status-text');
+		if (textEl && typeof text === 'string') {
+			textEl.textContent = text;
+		}
+	};
+
+	/* Per-card stagger so appended cards pop in one after another. */
+	const STAGGER_MS = 110;
+
+	const hideStatus = () => {
+		if (!statusEl) return;
+		statusEl.classList.remove('is-loading', 'is-done', 'is-error');
+		statusEl.style.display = 'none';
+	};
+
+	const fetchNext = () => {
+		if (loading || done) return;
+		loading = true;
+		setStatus('is-loading', 'Loading more projects…');
+
+		const nextPage = page + 1;
+		let url;
+		try {
+			url = new URL(restUrl, window.location.origin);
+		} catch (e) {
+			url = null;
+		}
+		const fetchUrl = url
+			? (() => {
+					url.searchParams.set('page', String(nextPage));
+					if (perPage > 0) url.searchParams.set('per_page', String(perPage));
+					return url.toString();
+				})()
+			: restUrl +
+				(restUrl.indexOf('?') === -1 ? '?' : '&') +
+				'page=' +
+				encodeURIComponent(String(nextPage)) +
+				(perPage > 0 ? '&per_page=' + encodeURIComponent(String(perPage)) : '');
+
+		fetch(fetchUrl, {
+			credentials: 'same-origin',
+			headers: { Accept: 'application/json' },
+		})
+			.then((res) => {
+				if (!res.ok) throw new Error('HTTP ' + res.status);
+				return res.json();
+			})
+			.then((json) => {
+				const html = typeof json.html === 'string' ? json.html : '';
+				if (html.trim() !== '') {
+					const tmp = document.createElement('div');
+					tmp.innerHTML = html;
+					Array.from(tmp.children).forEach((node, i) => {
+						node.classList.add('rh-is-appended');
+						node.style.setProperty('--rh-card-stagger', i * STAGGER_MS + 'ms');
+						grid.appendChild(node);
+					});
+				}
+				page = nextPage;
+				grid.setAttribute('data-page', String(page));
+				if (typeof json.total_pages === 'number' && json.total_pages > 0) {
+					totalPages = json.total_pages;
+					grid.setAttribute('data-total-pages', String(totalPages));
+				}
+				const hasMore = !!json.has_more && page < totalPages;
+				if (!hasMore) {
+					done = true;
+					if (observer) observer.disconnect();
+					hideStatus();
+				} else {
+					hideStatus();
+				}
+			})
+			.catch(() => {
+				setStatus('is-error', 'Could not load more projects — please refresh');
+			})
+			.finally(() => {
+				loading = false;
+			});
+	};
+
+	observer = new IntersectionObserver(
+		(entries) => {
+			entries.forEach((entry) => {
+				if (entry.isIntersecting) {
+					fetchNext();
+				}
+			});
+		},
+		{ root: null, rootMargin: '0px 0px 200px 0px', threshold: 0 }
+	);
+	observer.observe(sentinel);
 })();

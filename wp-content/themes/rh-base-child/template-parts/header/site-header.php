@@ -67,10 +67,16 @@ $hero_logo_src  = add_query_arg('v', $hero_logo_ver, $hero_logo_url);
 						)
 					);
 					?>
+					<a
+						class="rh-hero-btn rh-hero-btn--light rh-site-top-bar__cta rh-site-top-bar__cta--menu"
+						href="<?php echo esc_url(rh_carpentry_home_section_url('contact')); ?>"
+					>
+						<span class="rh-site-top-bar__cta-text"><?php esc_html_e('Get in touch', 'rh-base-child'); ?></span>
+					</a>
 				</nav>
 
 				<a
-					class="rh-hero-btn rh-hero-btn--light rh-site-top-bar__cta"
+					class="rh-hero-btn rh-hero-btn--light rh-site-top-bar__cta rh-site-top-bar__cta--bar"
 					href="<?php echo esc_url(rh_carpentry_home_section_url('contact')); ?>"
 				>
 					<span class="rh-site-top-bar__cta-text"><?php esc_html_e('Get in touch', 'rh-base-child'); ?></span>

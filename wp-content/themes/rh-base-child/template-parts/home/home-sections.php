@@ -18,6 +18,29 @@ $marquee_secs = count($client_logos) > 0
 	? max(48, min(220, count($client_logos) * 5.25))
 	: 80;
 
+$rh_fire_credentials_dir  = get_stylesheet_directory() . '/assets/images/credentials/';
+$rh_fire_credentials_base = get_stylesheet_directory_uri() . '/assets/images/credentials/';
+$rh_fire_credentials       = array(
+	array(
+		'file'    => 'uk-fire-door-training.png',
+		'alt'     => __('UK Fire Door Training — Approved Installer', 'rh-base-child'),
+		'variant' => 'uk-fire-door',
+	),
+	array(
+		'file'    => 'firequal.jpg',
+		'alt'     => __('FireQual Approved Training Centre', 'rh-base-child'),
+		'variant' => 'firequal',
+	),
+);
+$rh_fire_credentials = array_values(
+	array_filter(
+		$rh_fire_credentials,
+		static function ($row) use ($rh_fire_credentials_dir) {
+			return is_array($row) && isset($row['file']) && is_readable($rh_fire_credentials_dir . $row['file']);
+		}
+	)
+);
+
 $testimonials = array(
 	array(
 		'quote'   => __('R H Carpenters kept the programme moving and delivered a first-class finish. The site ran cleanly and communication stayed clear throughout.', 'rh-base-child'),
@@ -120,6 +143,11 @@ $home_services = array(
 		'slug'  => 'commercial',
 		'bento' => 'i',
 	),
+	array(
+		'label' => __('Fire door installation, maintenance & inspection', 'rh-base-child'),
+		'slug'  => 'fire-doors',
+		'bento' => 'j',
+	),
 );
 
 $home_projects = array();
@@ -190,26 +218,49 @@ if (post_type_exists('rh_project')) {
 <section id="about" class="rh-home-section rh-home-section--about" aria-labelledby="rh-home-about-heading">
 	<div class="rh-home-about-container">
 		<div class="rh-home-about__grid">
-			<div class="rh-home-about__text-card">
+			<div class="rh-home-about__text-card" data-rh-fx-group data-rh-fx-stagger="140">
 				<div class="rh-home-about__text-content">
 					<header class="rh-home-section__header rh-home-section__header--about">
-						<p class="rh-home-kicker">
+						<p class="rh-home-kicker" data-rh-fx="wipe" data-rh-fx-tone="dark">
 							<span class="rh-home-kicker__line" aria-hidden="true"></span>
 							<?php esc_html_e('Who we are', 'rh-base-child'); ?>
 						</p>
-						<h2 class="rh-home-heading rh-home-heading--section" id="rh-home-about-heading"><?php esc_html_e('About us', 'rh-base-child'); ?></h2>
+						<h2 class="rh-home-heading rh-home-heading--section" id="rh-home-about-heading" data-rh-fx="wipe" data-rh-fx-tone="dark"><?php esc_html_e('About us', 'rh-base-child'); ?></h2>
 					</header>
 					<div class="rh-home-about__body">
-						<p class="rh-home-lede">
+						<p class="rh-home-lede" data-rh-fx="wipe" data-rh-fx-tone="dark">
 							<?php esc_html_e('We work closely with homeowners, developers and contractors to deliver reliable workmanship, attention to detail and projects completed to a high professional standard.', 'rh-base-child'); ?>
 						</p>
-						<p class="rh-home-lede">
+						<p class="rh-home-lede" data-rh-fx="wipe" data-rh-fx-tone="dark">
 							<?php esc_html_e('From full roof structures and timber framing to kitchen installations and complete property renovations, we take pride in every job we undertake.', 'rh-base-child'); ?>
 						</p>
 					</div>
 					<div class="rh-home-about__actions rh-hero-actions">
-						<a class="rh-hero-btn rh-hero-btn--accent" href="<?php echo esc_url($cta_contact); ?>"><?php esc_html_e('Get in touch', 'rh-base-child'); ?></a>
+						<a class="rh-hero-btn rh-hero-btn--accent" href="<?php echo esc_url($cta_contact); ?>" data-rh-fx="fade"><?php esc_html_e('Get in touch', 'rh-base-child'); ?></a>
 					</div>
+					<?php if ($rh_fire_credentials !== array()) : ?>
+						<div class="rh-home-about__credentials-panel" role="region" aria-label="<?php esc_attr_e('Fire door accreditations', 'rh-base-child'); ?>" data-rh-fx="fade">
+							<ul class="rh-home-feature__credentials-list">
+								<?php foreach ($rh_fire_credentials as $cred) : ?>
+									<?php
+									$cred_path = $rh_fire_credentials_dir . $cred['file'];
+									$cred_url   = $rh_fire_credentials_base . $cred['file'];
+									$cred_ver   = file_exists($cred_path) ? (string) filemtime($cred_path) : '';
+									$cred_src   = $cred_ver !== '' ? add_query_arg('v', $cred_ver, $cred_url) : $cred_url;
+									?>
+									<li class="rh-home-feature__credentials-item">
+										<img
+											class="rh-home-feature__credentials-img rh-home-feature__credentials-img--<?php echo esc_attr($cred['variant']); ?>"
+											src="<?php echo esc_url($cred_src); ?>"
+											alt="<?php echo esc_attr($cred['alt']); ?>"
+											loading="lazy"
+											decoding="async"
+										/>
+									</li>
+								<?php endforeach; ?>
+							</ul>
+						</div>
+					<?php endif; ?>
 				</div>
 			</div>
 			<div class="rh-home-about__media-card">
@@ -255,13 +306,13 @@ if (post_type_exists('rh_project')) {
 		<div class="rh-clients-hero__bg" aria-hidden="true"></div>
 		<div class="rh-clients-hero__overlay" aria-hidden="true"></div>
 		<div class="rh-clients-hero__inner">
-			<header class="rh-home-section__header rh-home-section__header--clients rh-home-section__header--projects rh-home-section__header--row">
+			<header class="rh-home-section__header rh-home-section__header--clients rh-home-section__header--projects rh-home-section__header--row" data-rh-fx-group data-rh-fx-stagger="140">
 				<div>
-					<p class="rh-home-kicker">
+					<p class="rh-home-kicker" data-rh-fx="wipe" data-rh-fx-tone="light">
 						<span class="rh-home-kicker__line" aria-hidden="true"></span>
 						<?php esc_html_e('Portfolio', 'rh-base-child'); ?>
 					</p>
-					<h2 class="rh-home-heading rh-home-heading--section" id="rh-home-projects-heading"><?php esc_html_e('Projects', 'rh-base-child'); ?></h2>
+					<h2 class="rh-home-heading rh-home-heading--section" id="rh-home-projects-heading" data-rh-fx="wipe" data-rh-fx-tone="light"><?php esc_html_e('Projects', 'rh-base-child'); ?></h2>
 				</div>
 				<?php
 				$rh_projects_archive_url = get_post_type_archive_link('rh_project');
@@ -269,7 +320,7 @@ if (post_type_exists('rh_project')) {
 					$rh_projects_archive_url = home_url('/projects/');
 				}
 				?>
-				<a class="rh-hero-btn rh-hero-btn--muted" href="<?php echo esc_url($rh_projects_archive_url); ?>"><?php esc_html_e('View all projects', 'rh-base-child'); ?></a>
+				<a class="rh-hero-btn rh-hero-btn--muted" href="<?php echo esc_url($rh_projects_archive_url); ?>" data-rh-fx="fade"><?php esc_html_e('View all projects', 'rh-base-child'); ?></a>
 			</header>
 			<div
 				class="rh-home-projects-carousel<?php echo $home_projects_is_bento ? ' rh-home-projects-carousel--bento' : ''; ?>"
@@ -410,75 +461,28 @@ if (post_type_exists('rh_project')) {
 <div class="rh-bento-page">
 	<section id="services" class="rh-home-section rh-home-section--features" aria-labelledby="rh-home-work-heading">
 		<div class="rh-home-section__inner">
-			<header class="rh-home-section__header rh-home-section__header--features rh-home-section__header--row">
+			<header class="rh-home-section__header rh-home-section__header--features rh-home-section__header--row" data-rh-fx-group data-rh-fx-stagger="140">
 				<div>
-					<p class="rh-home-kicker">
+					<p class="rh-home-kicker" data-rh-fx="wipe" data-rh-fx-tone="dark">
 						<span class="rh-home-kicker__line" aria-hidden="true"></span>
 						<?php esc_html_e('What we offer', 'rh-base-child'); ?>
 					</p>
-					<h2 class="rh-home-heading rh-home-heading--section" id="rh-home-work-heading"><?php esc_html_e('Services', 'rh-base-child'); ?></h2>
+					<h2 class="rh-home-heading rh-home-heading--section" id="rh-home-work-heading" data-rh-fx="wipe" data-rh-fx-tone="dark"><?php esc_html_e('Services', 'rh-base-child'); ?></h2>
 				</div>
-				<a class="rh-hero-btn rh-hero-btn--accent" href="<?php echo esc_url($cta_contact); ?>"><?php esc_html_e('Get in touch', 'rh-base-child'); ?></a>
+				<a class="rh-hero-btn rh-hero-btn--accent" href="<?php echo esc_url($cta_contact); ?>" data-rh-fx="fade"><?php esc_html_e('Get in touch', 'rh-base-child'); ?></a>
 			</header>
-			<div class="rh-home-features rh-home-features--services" role="list">
+			<div class="rh-home-features rh-home-features--services" role="list" data-rh-fx-group data-rh-fx-stagger="80">
 				<?php foreach ($home_services as $service) : ?>
 					<?php
 					$service_bg_url = rh_carpentry_get_service_card_image_url($service['slug']);
 					?>
-					<article class="rh-home-feature rh-home-feature--service rh-home-service-bento--<?php echo esc_attr($service['bento']); ?>" role="listitem">
+					<article class="rh-home-feature rh-home-feature--service rh-home-service-bento--<?php echo esc_attr($service['bento']); ?>" role="listitem" data-rh-fx="scale">
 						<div class="rh-home-service-card__bg" style="background-image: url('<?php echo esc_url($service_bg_url); ?>');"></div>
 						<div class="rh-home-service-card__overlay" aria-hidden="true"></div>
 						<h3 class="rh-home-feature__title"><?php echo esc_html($service['label']); ?></h3>
 					</article>
 				<?php endforeach; ?>
 			</div>
-			<?php
-			$credentials_base = get_stylesheet_directory_uri() . '/assets/images/credentials/';
-			$credentials_dir  = get_stylesheet_directory() . '/assets/images/credentials/';
-			$credentials      = array(
-				array(
-					'file'    => 'uk-fire-door-training.png',
-					'alt'     => __('UK Fire Door Training — Approved Installer', 'rh-base-child'),
-					'variant' => 'uk-fire-door',
-				),
-				array(
-					'file'    => 'firequal.jpg',
-					'alt'     => __('FireQual Approved Training Centre', 'rh-base-child'),
-					'variant' => 'firequal',
-				),
-			);
-			$credentials = array_values(
-				array_filter(
-					$credentials,
-					static function ($row) use ($credentials_dir) {
-						return is_readable($credentials_dir . $row['file']);
-					}
-				)
-			);
-			?>
-			<?php if ($credentials !== array()) : ?>
-				<aside class="rh-home-services-credentials" aria-label="<?php esc_attr_e('Accreditations', 'rh-base-child'); ?>">
-					<ul class="rh-home-services-credentials__list">
-						<?php foreach ($credentials as $cred) : ?>
-							<?php
-							$cred_path  = $credentials_dir . $cred['file'];
-							$cred_url   = $credentials_base . $cred['file'];
-							$cred_ver   = file_exists($cred_path) ? (string) filemtime($cred_path) : '';
-							$cred_src   = $cred_ver !== '' ? add_query_arg('v', $cred_ver, $cred_url) : $cred_url;
-							?>
-							<li class="rh-home-services-credentials__item">
-								<img
-									class="rh-home-services-credentials__img rh-home-services-credentials__img--<?php echo esc_attr($cred['variant']); ?>"
-									src="<?php echo esc_url($cred_src); ?>"
-									alt="<?php echo esc_attr($cred['alt']); ?>"
-									loading="lazy"
-									decoding="async"
-								/>
-							</li>
-						<?php endforeach; ?>
-					</ul>
-				</aside>
-			<?php endif; ?>
 		</div>
 	</section>
 </div>
@@ -488,15 +492,15 @@ if (post_type_exists('rh_project')) {
 		<div class="rh-clients-hero__bg" aria-hidden="true"></div>
 		<div class="rh-clients-hero__overlay" aria-hidden="true"></div>
 		<div class="rh-clients-hero__inner">
-			<header class="rh-home-section__header rh-home-section__header--clients rh-home-section__header--testimonials rh-home-section__header--row">
+			<header class="rh-home-section__header rh-home-section__header--clients rh-home-section__header--testimonials rh-home-section__header--row" data-rh-fx-group data-rh-fx-stagger="140">
 				<div>
-					<p class="rh-home-kicker">
+					<p class="rh-home-kicker" data-rh-fx="wipe" data-rh-fx-tone="light">
 						<span class="rh-home-kicker__line" aria-hidden="true"></span>
 						<?php esc_html_e('Customer feedback', 'rh-base-child'); ?>
 					</p>
-					<h2 class="rh-home-heading rh-home-heading--section" id="rh-home-testimonials-heading"><?php esc_html_e('Testimonials', 'rh-base-child'); ?></h2>
+					<h2 class="rh-home-heading rh-home-heading--section" id="rh-home-testimonials-heading" data-rh-fx="wipe" data-rh-fx-tone="light"><?php esc_html_e('Testimonials', 'rh-base-child'); ?></h2>
 				</div>
-				<a class="rh-hero-btn rh-hero-btn--muted" href="<?php echo esc_url($cta_contact); ?>"><?php esc_html_e('Get in touch', 'rh-base-child'); ?></a>
+				<a class="rh-hero-btn rh-hero-btn--muted" href="<?php echo esc_url($cta_contact); ?>" data-rh-fx="fade"><?php esc_html_e('Get in touch', 'rh-base-child'); ?></a>
 			</header>
 			<?php
 			$testimonial_count = count($testimonials);
@@ -612,15 +616,15 @@ if (post_type_exists('rh_project')) {
 <?php if ($client_logos !== array()) : ?>
 <section class="rh-home-section rh-home-section--clients" aria-labelledby="rh-home-clients-heading">
 	<div class="rh-home-clients-container">
-		<header class="rh-home-section__header rh-home-section__header--clients rh-home-section__header--row">
+		<header class="rh-home-section__header rh-home-section__header--clients rh-home-section__header--row" data-rh-fx-group data-rh-fx-stagger="140">
 			<div>
-				<p class="rh-home-kicker">
+				<p class="rh-home-kicker" data-rh-fx="wipe" data-rh-fx-tone="dark">
 					<span class="rh-home-kicker__line" aria-hidden="true"></span>
 					<?php esc_html_e('Over 1,000+ Happy customers', 'rh-base-child'); ?>
 				</p>
-				<h2 class="rh-home-heading rh-home-heading--section" id="rh-home-clients-heading"><?php esc_html_e('Our Clients', 'rh-base-child'); ?></h2>
+				<h2 class="rh-home-heading rh-home-heading--section" id="rh-home-clients-heading" data-rh-fx="wipe" data-rh-fx-tone="dark"><?php esc_html_e('Our Clients', 'rh-base-child'); ?></h2>
 			</div>
-			<a class="rh-hero-btn rh-hero-btn--accent" href="<?php echo esc_url($cta_contact); ?>"><?php esc_html_e('Get in touch', 'rh-base-child'); ?></a>
+			<a class="rh-hero-btn rh-hero-btn--accent" href="<?php echo esc_url($cta_contact); ?>" data-rh-fx="fade"><?php esc_html_e('Get in touch', 'rh-base-child'); ?></a>
 		</header>
 		<div class="rh-client-marquee-panel">
 			<div class="rh-client-marquee">
@@ -655,15 +659,15 @@ if (post_type_exists('rh_project')) {
 <?php elseif (current_user_can('edit_theme_options')) : ?>
 <section class="rh-home-section rh-home-section--clients rh-home-section--clients-empty" aria-labelledby="rh-home-clients-heading-empty">
 	<div class="rh-home-clients-container">
-		<header class="rh-home-section__header rh-home-section__header--clients rh-home-section__header--row">
+		<header class="rh-home-section__header rh-home-section__header--clients rh-home-section__header--row" data-rh-fx-group data-rh-fx-stagger="140">
 			<div>
-				<p class="rh-home-kicker">
+				<p class="rh-home-kicker" data-rh-fx="wipe" data-rh-fx-tone="dark">
 					<span class="rh-home-kicker__line" aria-hidden="true"></span>
 					<?php esc_html_e('Over 1,000+ Happy customers', 'rh-base-child'); ?>
 				</p>
-				<h2 class="rh-home-heading rh-home-heading--section" id="rh-home-clients-heading-empty"><?php esc_html_e('Our Clients', 'rh-base-child'); ?></h2>
+				<h2 class="rh-home-heading rh-home-heading--section" id="rh-home-clients-heading-empty" data-rh-fx="wipe" data-rh-fx-tone="dark"><?php esc_html_e('Our Clients', 'rh-base-child'); ?></h2>
 			</div>
-			<a class="rh-hero-btn rh-hero-btn--accent" href="<?php echo esc_url($cta_contact); ?>"><?php esc_html_e('Get in touch', 'rh-base-child'); ?></a>
+			<a class="rh-hero-btn rh-hero-btn--accent" href="<?php echo esc_url($cta_contact); ?>" data-rh-fx="fade"><?php esc_html_e('Get in touch', 'rh-base-child'); ?></a>
 		</header>
 		<div class="rh-client-marquee-panel">
 			<p class="rh-client-marquee__hint">

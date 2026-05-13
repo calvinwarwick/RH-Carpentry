@@ -25,6 +25,12 @@ function rh_carpentry_render_hero_contact_icons(string $extra_classes = ''): voi
 
 	$facebook  = (string) get_theme_mod('rh_social_facebook', '');
 	$instagram = (string) get_theme_mod('rh_social_instagram', '');
+	if ($facebook === '') {
+		$facebook = RH_CARPENTRY_DEFAULT_SOCIAL_FACEBOOK;
+	}
+	if ($instagram === '') {
+		$instagram = RH_CARPENTRY_DEFAULT_SOCIAL_INSTAGRAM;
+	}
 
 	$phone_item = null;
 	if ($phone_href !== '') {
@@ -123,6 +129,12 @@ function rh_carpentry_get_footer_contact_icon_items(): array {
 
 	$facebook  = (string) get_theme_mod('rh_social_facebook', '');
 	$instagram = (string) get_theme_mod('rh_social_instagram', '');
+	if ($facebook === '') {
+		$facebook = RH_CARPENTRY_DEFAULT_SOCIAL_FACEBOOK;
+	}
+	if ($instagram === '') {
+		$instagram = RH_CARPENTRY_DEFAULT_SOCIAL_INSTAGRAM;
+	}
 	$linkedin  = (string) get_theme_mod('rh_social_linkedin', '');
 
 	$items = array();

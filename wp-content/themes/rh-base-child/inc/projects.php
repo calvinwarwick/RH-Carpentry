@@ -408,3 +408,181 @@ function rh_project_get_other_projects(int $post_id): array {
 	wp_reset_postdata();
 	return $posts;
 }
+
+/**
+ * Cards per "page" on the projects archive (initial render + each infinite-scroll page).
+ */
+function rh_project_archive_per_page(): int {
+	/**
+	 * Filter the number of project cards loaded per page on the archive.
+	 *
+	 * @param int $per_page Default 10.
+	 */
+	return (int) apply_filters('rh_project_archive_per_page', 10);
+}
+
+/**
+ * Force a deterministic posts_per_page on the projects archive so the infinite-scroll
+ * REST endpoint and the initial server render stay in sync.
+ *
+ * @param WP_Query $query Main query.
+ */
+function rh_project_archive_query(WP_Query $query): void {
+	if (is_admin() || ! $query->is_main_query()) {
+		return;
+	}
+	if (! $query->is_post_type_archive('rh_project')) {
+		return;
+	}
+	$query->set('posts_per_page', rh_project_archive_per_page());
+	$query->set('orderby', 'date');
+	$query->set('order', 'DESC');
+}
+add_action('pre_get_posts', 'rh_project_archive_query');
+
+/**
+ * Render a single project bento card (matches the "More projects" slider markup).
+ *
+ * @param WP_Post|int $post  Post or ID.
+ * @param int         $index 0-based index used for the card's id attribute.
+ */
+function rh_project_render_bento_card($post, int $index = 0): string {
+	$post = get_post($post);
+	if (! $post instanceof WP_Post || $post->post_type !== 'rh_project' || $post->post_status !== 'publish') {
+		return '';
+	}
+
+	$pid       = (int) $post->ID;
+	$permalink = (string) get_permalink($post);
+	$thumb_id  = (int) get_post_thumbnail_id($pid);
+	$bg_url    = $thumb_id > 0 ? wp_get_attachment_image_url($thumb_id, 'large') : '';
+	$terms     = get_the_terms($pid, 'rh_project_sector');
+	$badges    = array();
+	if ($terms && ! is_wp_error($terms)) {
+		foreach (array_slice($terms, 0, 4) as $t) {
+			$badges[] = (string) $t->name;
+		}
+	}
+	$title       = get_the_title($post);
+	$card_id_att = 'rh-archive-project-' . $pid;
+
+	ob_start();
+	?>
+	<article
+		class="rh-home-project-card rh-bento-cell is-active rh-archive-project-card-v2"
+		id="<?php echo esc_attr($card_id_att); ?>"
+		role="listitem"
+		data-rh-project-url="<?php echo esc_url($permalink); ?>"
+		data-rh-fx="scale"
+		aria-label="<?php echo esc_attr($title); ?>"
+	>
+		<a class="rh-archive-project-cover-link" href="<?php echo esc_url($permalink); ?>" aria-label="<?php echo esc_attr(sprintf(
+			/* translators: %s: project title */
+			__('View project: %s', 'rh-base-child'),
+			$title
+		)); ?>"></a>
+		<span class="rh-home-project-card__cta" aria-hidden="true">
+			<?php esc_html_e('Find out more', 'rh-base-child'); ?>
+			<i class="fa-solid fa-chevron-right rh-home-project-card__cta-icon" aria-hidden="true"></i>
+		</span>
+		<?php if ($bg_url) : ?>
+			<span class="rh-home-project-card__bg" style="background-image: url('<?php echo esc_url($bg_url); ?>');"></span>
+		<?php else : ?>
+			<span class="rh-home-project-card__bg rh-home-project-card__bg--placeholder" aria-hidden="true"></span>
+		<?php endif; ?>
+		<span class="rh-home-project-card__overlay" aria-hidden="true"></span>
+		<div class="rh-home-project-card__text">
+			<span class="rh-home-project-card__title"><?php echo esc_html($title); ?></span>
+			<?php if ($badges !== array()) : ?>
+				<ul class="rh-home-project-card__badges">
+					<?php foreach ($badges as $badge_label) : ?>
+						<li><span class="rh-home-project-card__badge"><?php echo esc_html($badge_label); ?></span></li>
+					<?php endforeach; ?>
+				</ul>
+			<?php endif; ?>
+		</div>
+	</article>
+	<?php
+	return (string) ob_get_clean();
+}
+
+/**
+ * REST endpoint returning the next page of project cards (used by infinite scroll on the archive).
+ */
+function rh_project_register_rest_routes(): void {
+	register_rest_route(
+		'rh/v1',
+		'/projects',
+		array(
+			'methods'             => 'GET',
+			'permission_callback' => '__return_true',
+			'args'                => array(
+				'page'     => array(
+					'type'              => 'integer',
+					'default'           => 1,
+					'minimum'           => 1,
+					'sanitize_callback' => 'absint',
+				),
+				'per_page' => array(
+					'type'              => 'integer',
+					'default'           => 0,
+					'minimum'           => 0,
+					'maximum'           => 50,
+					'sanitize_callback' => 'absint',
+				),
+			),
+			'callback'            => 'rh_project_rest_archive_page',
+		)
+	);
+}
+add_action('rest_api_init', 'rh_project_register_rest_routes');
+
+/**
+ * REST callback: returns a page of bento card HTML.
+ *
+ * @param WP_REST_Request $request
+ * @return WP_REST_Response
+ */
+function rh_project_rest_archive_page(WP_REST_Request $request): WP_REST_Response {
+	$page     = max(1, (int) $request->get_param('page'));
+	$per_page = (int) $request->get_param('per_page');
+	if ($per_page <= 0) {
+		$per_page = rh_project_archive_per_page();
+	}
+
+	$q = new WP_Query(
+		array(
+			'post_type'           => 'rh_project',
+			'post_status'         => 'publish',
+			'posts_per_page'      => $per_page,
+			'paged'               => $page,
+			'orderby'             => 'date',
+			'order'               => 'DESC',
+			'ignore_sticky_posts' => true,
+		)
+	);
+
+	$html  = '';
+	$count = 0;
+	$base  = ($page - 1) * $per_page;
+	if ($q->have_posts()) {
+		while ($q->have_posts()) {
+			$q->the_post();
+			$html .= rh_project_render_bento_card(get_post(), $base + $count);
+			$count++;
+		}
+		wp_reset_postdata();
+	}
+
+	return new WP_REST_Response(
+		array(
+			'page'        => $page,
+			'per_page'    => $per_page,
+			'count'       => $count,
+			'total'       => (int) $q->found_posts,
+			'total_pages' => (int) $q->max_num_pages,
+			'has_more'    => $page < (int) $q->max_num_pages,
+			'html'        => $html,
+		)
+	);
+}

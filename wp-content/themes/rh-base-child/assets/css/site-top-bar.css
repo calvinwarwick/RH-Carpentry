@@ -5,14 +5,17 @@
 .rh-site-top-bar.site-header {
 	position: relative;
 	z-index: 10020;
-	margin: clamp(0.5rem, 1.35vw, 0.85rem) var(--rh-frame-inset, clamp(14px, 2.2vw, 28px)) 0;
+	--rh-frame-inset: clamp(14px, 2.2vw, 28px);
+	/* Top margin matches the side margins so the rounded bar sits inside an
+	   equal inset on all four sides (no bottom margin — gap to the content
+	   below comes from the page sections themselves). */
+	margin: var(--rh-frame-inset) var(--rh-frame-inset) 0;
 	border: none;
 	box-shadow: none;
 	background: transparent;
 	overflow: visible;
 	isolation: isolate;
 	font-family: "Poppins", var(--rh-font-sans, system-ui, sans-serif);
-	--rh-frame-inset: clamp(14px, 2.2vw, 28px);
 	--rh-max-width: 72rem;
 	--rh-space-4: 1.5rem;
 	--rh-top-bar-radius: clamp(10px, 1.25vw, 14px);
@@ -64,13 +67,14 @@ body.rh-hero-nav-open .rh-site-top-bar__shell {
 	z-index: 2;
 	width: 100%;
 	margin: 0;
-	/* X padding inside the navy shell — sized to match --rh-hero-pad from
-	   home-hero.css (clamp(1.35rem, 5vw, 3.25rem)) so the logo sits at the
-	   same horizontal offset from the viewport as on the homepage hero,
-	   and aligns with the wider margins of the content on inner pages. */
+	/* Padding inside the navy shell is sized off --rh-hero-pad (from
+	   home-hero.css: clamp(1.35rem, 5vw, 3.25rem)) so the logo sits at the
+	   exact same X and Y offset inside the bar as it does inside the
+	   homepage hero shell. The X padding also aligns with the page
+	   content margins on inner pages. */
 	padding-inline: max(clamp(1.35rem, 5vw, 3.25rem), env(safe-area-inset-left, 0px))
 		max(clamp(1.35rem, 5vw, 3.25rem), env(safe-area-inset-right, 0px));
-	padding-block: clamp(1.75rem, 4.25vw, 2.5rem);
+	padding-block: max(clamp(1.35rem, 5vw, 3.25rem), env(safe-area-inset-top, 0px));
 }
 
 /* Compact hero header row */
@@ -99,10 +103,16 @@ body.rh-hero-nav-open .rh-site-top-bar__shell {
 
 .rh-site-top-bar .rh-hero-logo__img {
 	display: block;
-	/* 70% of the homepage hero logo scale (see .rh-hero-logo__img in home-hero.css) */
-	width: clamp(7.35rem, 17.5vw, 12.25rem);
+	/* Matches the homepage hero logo scale (see .rh-hero-logo__img in home-hero.css) */
+	width: clamp(10.5rem, 25dvw, 17.5rem);
 	max-width: 100%;
 	height: auto;
+}
+
+@supports not (width: 1dvw) {
+	.rh-site-top-bar .rh-hero-logo__img {
+		width: clamp(10.5rem, 25vw, 17.5rem);
+	}
 }
 
 /* Nav (matches home hero) */
@@ -164,7 +174,7 @@ body.rh-hero-nav-open .rh-site-top-bar__shell {
 	flex-wrap: wrap;
 	align-items: center;
 	justify-content: flex-end;
-	gap: clamp(0.65rem, 1.8vw, 1.35rem);
+	gap: clamp(1.1rem, 2.6vw, 2rem);
 	list-style: none;
 	margin: 0;
 	padding: 0;
@@ -189,10 +199,13 @@ body.rh-hero-nav-open .rh-site-top-bar__shell {
 
 .rh-site-top-bar .rh-hero-nav__menu a {
 	position: relative;
-	display: inline-block;
+	display: inline-flex;
+	align-items: center;
+	line-height: 1;
 	color: #fff;
 	text-decoration: none;
-	padding-bottom: 4px;
+	padding-block: 0.2rem;
+	padding-bottom: calc(0.2rem + 2px);
 	transition: color 0.2s ease;
 }
 
@@ -231,12 +244,9 @@ body.rh-hero-nav-open .rh-site-top-bar__shell {
 	}
 }
 
-/* Right-aligned "Get in touch" CTA — mirrors the homepage hero's .rh-hero-btn--muted (translucent glass over the navy bar). Self-contained because home-hero.css doesn't load on every inner page. */
+/* Right-aligned "Get in touch" CTA — mirrors the homepage hero's .rh-hero-btn--muted (translucent glass over the navy bar). Self-contained because home-hero.css doesn't load on every inner page.
+   Two markup instances render the same button: --bar lives in the top-bar grid and is shown on desktop; --menu lives inside the mobile nav dropdown and is shown on mobile. Visibility is toggled in the @media block below. */
 .rh-site-top-bar .rh-site-top-bar__cta {
-	grid-column: 3;
-	grid-row: 1;
-	justify-self: end;
-	align-self: center;
 	display: inline-flex;
 	align-items: center;
 	justify-content: center;
@@ -259,6 +269,19 @@ body.rh-hero-nav-open .rh-site-top-bar__shell {
 		border-color 0.2s ease,
 		color 0.2s ease,
 		filter 0.15s ease;
+}
+
+.rh-site-top-bar .rh-site-top-bar__cta--bar {
+	grid-column: 3;
+	grid-row: 1;
+	justify-self: end;
+	align-self: center;
+	margin-inline-start: clamp(1.25rem, 3vw, 2.5rem);
+}
+
+/* Mobile menu copy: hidden on desktop, shown inside the dropdown on mobile. */
+.rh-site-top-bar .rh-site-top-bar__cta--menu {
+	display: none;
 }
 
 .rh-site-top-bar .rh-site-top-bar__cta::after {
@@ -327,6 +350,82 @@ body.rh-hero-nav-open .rh-site-top-bar__shell {
 	}
 }
 
+/* --- Intro animation. ---
+   1. The navy shell starts as a small (roughly) square box at the top-left
+      hugging the RH portion of the logo, holds briefly, then swipes open to
+      the right with a bouncy motion.
+   2. The logo image inside is pre-clipped to show only the "RH" portion;
+      while the shell holds its square shape the logo holds at "RH only",
+      then both expand together.
+   3. The menu links, hamburger and CTA do NOT animate independently —
+      they sit at their final state from page load and are revealed
+      naturally as the shell's expanding clip-path uncovers them.
+   The shell animation's lingering clip-path is removed by JS (home-hero.js)
+   after animationend so the mobile dropdown (which sits below the shell) is
+   not clipped. */
+
+/* Initial reveal window: a (roughly) square box at the bar's top-left that
+   hugs around the RH portion of the logo so RH appears centered inside it.
+   The width is computed as 2 × (bar padding + half the RH glyph width) so it
+   stays centered on RH across viewports. The shell then expands to full width. */
+.rh-site-top-bar {
+	--rh-bar-square-width: calc(
+		max(clamp(1.35rem, 5vw, 3.25rem), env(safe-area-inset-left, 0px)) * 2 +
+			clamp(10.5rem, 25vw, 17.5rem) * 0.32
+	);
+}
+
+@keyframes rh-site-top-bar-shell-reveal {
+	0%,
+	28% {
+		clip-path: inset(0 calc(100% - var(--rh-bar-square-width)) 0 0 round var(--rh-top-bar-radius));
+	}
+	100% {
+		clip-path: inset(0 0 0 0 round var(--rh-top-bar-radius));
+	}
+}
+
+@keyframes rh-site-top-bar-logo-reveal {
+	0%,
+	40% {
+		clip-path: inset(0 68% 0 0);
+	}
+	100% {
+		clip-path: inset(0 0 0 0);
+	}
+}
+
+@media (prefers-reduced-motion: no-preference) {
+	.rh-site-top-bar {
+		--rh-site-top-bar-bounce-ease: cubic-bezier(0.34, 1.46, 0.64, 1);
+		--rh-site-top-bar-ease: cubic-bezier(0.2, 0.82, 0.2, 1);
+		--rh-site-top-bar-wipe-ease: cubic-bezier(0.65, 0.02, 0.35, 1);
+	}
+
+	/* Phase 1 — navy shell starts as a small square at the top-left hugging
+	   the RH portion of the logo, holds briefly, then swipes open to the
+	   right with a bouncy motion. The 0%→28% hold inside the keyframes
+	   leaves the square visible at page load before the bar expands. */
+	.rh-site-top-bar .rh-site-top-bar__shell {
+		clip-path: inset(0 calc(100% - var(--rh-bar-square-width)) 0 0 round var(--rh-top-bar-radius));
+		animation: rh-site-top-bar-shell-reveal 1.45s var(--rh-site-top-bar-bounce-ease) both;
+		transform-origin: left center;
+	}
+
+	/* Phase 2 — logo image stays pre-clipped to "RH" only while the shell
+	   holds its square shape, then swipes to reveal the rest in sync with
+	   the shell's expansion. */
+	.rh-site-top-bar .rh-hero-logo__img {
+		clip-path: inset(0 68% 0 0);
+		animation: rh-site-top-bar-logo-reveal 1.45s var(--rh-site-top-bar-ease) both;
+	}
+
+	/* Phase 3 — menu links, hamburger, and CTA have no entry animation of
+	   their own; they sit at their final position+opacity from page load
+	   and become visible naturally as the shell's expanding clip-path
+	   reveals more of the bar. */
+}
+
 @media (max-width: 900px) {
 	.rh-site-top-bar .rh-hero-nav-toggle {
 		display: flex;
@@ -334,13 +433,31 @@ body.rh-hero-nav-open .rh-site-top-bar__shell {
 		z-index: 41;
 	}
 
-	/* Tighter CTA on small viewports so logo + nav-toggle + CTA fit */
-	.rh-site-top-bar .rh-site-top-bar__cta {
-		padding: 0.55rem 0.85rem;
-		font-size: 0.66rem;
-		letter-spacing: 0.1em;
+	/* On mobile the top-bar CTA is hidden; its mobile twin sits inside the dropdown. */
+	.rh-site-top-bar .rh-site-top-bar__cta--bar {
+		display: none;
 	}
 
+	.rh-site-top-bar .rh-site-top-bar__cta--menu {
+		display: inline-flex;
+		align-self: stretch;
+		justify-content: center;
+		margin-top: 0.5rem;
+		margin-inline-start: 0;
+		padding: 0.85rem 1.2rem;
+		font-size: 0.78rem;
+		letter-spacing: 0.14em;
+	}
+
+	/* Mobile dropdown — fade down.
+	   Closed: panel sits just above the header bar (translateY(-0.5rem)) with
+	          opacity 0 and pointer-events disabled.
+	   Open:  it slides down to its resting position below the bar and fades
+	          in, while each menu item wipes in with a stagger. Reverses on
+	          close via the base (no .is-open) state.
+	          z-index is pushed way past anything on the page (header itself
+	          is at 10020) so the panel never sits behind page content on
+	          inner pages. */
 	.rh-site-top-bar .rh-hero-nav {
 		grid-column: unset;
 		grid-row: unset;
@@ -350,22 +467,25 @@ body.rh-hero-nav-open .rh-site-top-bar__shell {
 		top: calc(100% + 0.5rem);
 		right: 0;
 		left: 0;
-		z-index: 40;
+		z-index: 60;
 		flex-direction: column;
 		align-items: flex-start;
 		gap: 1rem;
-		padding: 1.1rem 1.15rem 1.25rem;
-		background: rgba(8, 20, 40, 0.97);
+		padding-inline: 1.15rem;
+		padding-block: 1.1rem 1.25rem;
+		background: #0c1c34;
 		border: 1px solid rgba(255, 255, 255, 0.12);
 		border-radius: 12px;
-		visibility: hidden;
 		opacity: 0;
-		transform: translateY(-6px);
+		visibility: hidden;
 		pointer-events: none;
+		transform: translate3d(0, -0.5rem, 0);
+		transform-origin: top center;
+		box-shadow: 0 18px 38px rgba(8, 20, 40, 0.35);
 		transition:
-			opacity 0.2s ease,
-			transform 0.2s ease,
-			visibility 0.2s;
+			opacity 0.28s cubic-bezier(0.4, 0, 0.2, 1),
+			transform 0.36s cubic-bezier(0.4, 0, 0.2, 1),
+			visibility 0s linear 0.36s;
 	}
 
 	.rh-site-top-bar .rh-site-top-bar__header.rh-hero-header {
@@ -374,15 +494,100 @@ body.rh-hero-nav-open .rh-site-top-bar__shell {
 	}
 
 	.rh-site-top-bar .rh-hero-nav.is-open {
-		visibility: visible;
 		opacity: 1;
-		transform: translateY(0);
+		visibility: visible;
 		pointer-events: auto;
+		transform: translate3d(0, 0, 0);
+		transition:
+			opacity 0.32s cubic-bezier(0.2, 0.82, 0.2, 1),
+			transform 0.4s cubic-bezier(0.2, 0.82, 0.2, 1),
+			visibility 0s linear 0s;
 	}
 
 	.rh-site-top-bar .rh-hero-nav__menu {
 		flex-direction: column;
 		align-items: flex-start;
 		width: 100%;
+	}
+
+	/* Each menu item wipes in from the left as the panel fades down. Base
+	   delays are the reverse-stagger used when the menu closes (last items
+	   leave first, top item leaves last). .is-open overrides them with the
+	   forward stagger used when it opens. */
+	.rh-site-top-bar .rh-hero-nav__menu li {
+		opacity: 0;
+		clip-path: inset(0 100% 0 0);
+		transform: translate3d(-0.5rem, 0, 0);
+		transition:
+			opacity 0.26s ease,
+			clip-path 0.4s cubic-bezier(0.2, 0.82, 0.2, 1),
+			transform 0.4s cubic-bezier(0.2, 0.82, 0.2, 1);
+		transition-delay: 0.18s;
+	}
+
+	.rh-site-top-bar .rh-hero-nav__menu li:nth-child(1) {
+		transition-delay: 0.18s;
+	}
+	.rh-site-top-bar .rh-hero-nav__menu li:nth-child(2) {
+		transition-delay: 0.14s;
+	}
+	.rh-site-top-bar .rh-hero-nav__menu li:nth-child(3) {
+		transition-delay: 0.1s;
+	}
+	.rh-site-top-bar .rh-hero-nav__menu li:nth-child(4) {
+		transition-delay: 0.06s;
+	}
+	.rh-site-top-bar .rh-hero-nav__menu li:nth-child(n + 5) {
+		transition-delay: 0.02s;
+	}
+
+	.rh-site-top-bar .rh-hero-nav.is-open .rh-hero-nav__menu li {
+		opacity: 1;
+		clip-path: inset(0 0 0 0);
+		transform: translate3d(0, 0, 0);
+	}
+	.rh-site-top-bar .rh-hero-nav.is-open .rh-hero-nav__menu li:nth-child(1) {
+		transition-delay: 0.1s;
+	}
+	.rh-site-top-bar .rh-hero-nav.is-open .rh-hero-nav__menu li:nth-child(2) {
+		transition-delay: 0.16s;
+	}
+	.rh-site-top-bar .rh-hero-nav.is-open .rh-hero-nav__menu li:nth-child(3) {
+		transition-delay: 0.22s;
+	}
+	.rh-site-top-bar .rh-hero-nav.is-open .rh-hero-nav__menu li:nth-child(4) {
+		transition-delay: 0.28s;
+	}
+	.rh-site-top-bar .rh-hero-nav.is-open .rh-hero-nav__menu li:nth-child(n + 5) {
+		transition-delay: 0.34s;
+	}
+
+	/* CTA button: last to appear on open (after the panel + menu items), and
+	   first to leave on close (transition-delay 0 in the base state). */
+	.rh-site-top-bar .rh-site-top-bar__cta--menu {
+		opacity: 0;
+		transform: translate3d(0, 0.6rem, 0);
+		transition:
+			opacity 0.26s ease,
+			transform 0.32s cubic-bezier(0.2, 0.82, 0.2, 1);
+		transition-delay: 0s;
+	}
+
+	.rh-site-top-bar .rh-hero-nav.is-open .rh-site-top-bar__cta--menu {
+		opacity: 1;
+		transform: translate3d(0, 0, 0);
+		transition-delay: 0.38s;
+	}
+}
+
+@media (max-width: 900px) and (prefers-reduced-motion: reduce) {
+	.rh-site-top-bar .rh-hero-nav,
+	.rh-site-top-bar .rh-hero-nav.is-open,
+	.rh-site-top-bar .rh-hero-nav__menu li,
+	.rh-site-top-bar .rh-hero-nav.is-open .rh-hero-nav__menu li,
+	.rh-site-top-bar .rh-site-top-bar__cta--menu,
+	.rh-site-top-bar .rh-hero-nav.is-open .rh-site-top-bar__cta--menu {
+		transition-duration: 0.01ms !important;
+		transition-delay: 0s !important;
 	}
 }

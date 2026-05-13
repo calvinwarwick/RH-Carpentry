@@ -38,9 +38,9 @@ $footer_grid_class    = 'rh-site-footer__grid' . ( $footer_has_contact ? '' : ' 
 		<div class="rh-site-footer__surface-bg" aria-hidden="true"></div>
 		<div class="rh-site-footer__surface-overlay" aria-hidden="true"></div>
 		<div class="rh-site-footer__surface-inner">
-			<div class="<?php echo esc_attr($footer_grid_class); ?>">
+			<div class="<?php echo esc_attr($footer_grid_class); ?>" data-rh-fx-group data-rh-fx-stagger="100">
 				<div class="rh-site-footer__col rh-site-footer__col--brand">
-					<a class="rh-hero-logo rh-site-footer__hero-logo" href="<?php echo esc_url(home_url('/')); ?>">
+					<a class="rh-hero-logo rh-site-footer__hero-logo" href="<?php echo esc_url(home_url('/')); ?>" data-rh-fx="fade">
 						<img
 							class="rh-hero-logo__img"
 							src="<?php echo esc_url($hero_logo); ?>"
@@ -51,7 +51,7 @@ $footer_grid_class    = 'rh-site-footer__grid' . ( $footer_has_contact ? '' : ' 
 							decoding="async"
 						/>
 					</a>
-					<div class="rh-site-footer__badges" aria-label="<?php esc_attr_e('Accreditations and memberships', 'rh-base-child'); ?>">
+					<div class="rh-site-footer__badges" aria-label="<?php esc_attr_e('Accreditations and memberships', 'rh-base-child'); ?>" data-rh-fx="fade">
 						<img src="<?php echo esc_url($footer_uri . 'citb.png'); ?>" width="3840" height="1450" alt="<?php echo esc_attr__('CITB', 'rh-base-child'); ?>" loading="lazy" decoding="async" />
 						<img src="<?php echo esc_url($footer_uri . 'chas.png'); ?>" width="600" height="306" alt="<?php echo esc_attr__('CHAS — Accredited Contractor', 'rh-base-child'); ?>" loading="lazy" decoding="async" />
 						<img src="<?php echo esc_url($footer_uri . 'fsb.png'); ?>" width="237" height="155" alt="<?php echo esc_attr__('FSB member', 'rh-base-child'); ?>" loading="lazy" decoding="async" />
@@ -59,12 +59,12 @@ $footer_grid_class    = 'rh-site-footer__grid' . ( $footer_has_contact ? '' : ' 
 				</div>
 
 				<div class="rh-site-footer__col rh-site-footer__col--map">
-					<p class="rh-home-kicker rh-site-footer__kicker">
+					<p class="rh-home-kicker rh-site-footer__kicker" data-rh-fx="wipe" data-rh-fx-tone="light">
 						<span class="rh-home-kicker__line" aria-hidden="true"></span>
 						<?php esc_html_e('Find us', 'rh-base-child'); ?>
 					</p>
-					<address class="rh-site-footer__address"><?php echo esc_html($footer_address); ?></address>
-					<div class="rh-site-footer__map">
+					<address class="rh-site-footer__address" data-rh-fx="wipe" data-rh-fx-tone="light"><?php echo esc_html($footer_address); ?></address>
+					<div class="rh-site-footer__map" data-rh-fx="fade">
 						<iframe
 							title="<?php esc_attr_e('Map showing company location', 'rh-base-child'); ?>"
 							loading="lazy"
@@ -76,7 +76,7 @@ $footer_grid_class    = 'rh-site-footer__grid' . ( $footer_has_contact ? '' : ' 
 
 				<?php if ($footer_has_contact) : ?>
 					<div class="rh-site-footer__col rh-site-footer__col--contact">
-						<nav class="rh-site-footer__primary-nav" aria-label="<?php esc_attr_e('Primary menu', 'rh-base-child'); ?>">
+						<nav class="rh-site-footer__primary-nav" aria-label="<?php esc_attr_e('Primary menu', 'rh-base-child'); ?>" data-rh-fx="fade">
 							<?php
 							if (has_nav_menu('primary')) {
 								wp_nav_menu(
@@ -101,7 +101,7 @@ $footer_grid_class    = 'rh-site-footer__grid' . ( $footer_has_contact ? '' : ' 
 							?>
 						</nav>
 						<div class="rh-site-footer__social-row">
-							<p class="rh-home-kicker rh-site-footer__kicker">
+							<p class="rh-home-kicker rh-site-footer__kicker" data-rh-fx="wipe" data-rh-fx-tone="light">
 								<span class="rh-home-kicker__line" aria-hidden="true"></span>
 								<?php esc_html_e('Get in touch', 'rh-base-child'); ?>
 							</p>

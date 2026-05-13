@@ -47,7 +47,7 @@ $other_projects     = array();
 					<div class="rh-clients-hero__overlay" aria-hidden="true"></div>
 					<div class="rh-clients-hero__inner">
 						<div class="rh-single-project__band rh-single-project__band--lead">
-							<header class="rh-single-project__header">
+							<header class="rh-single-project__header" data-rh-fx-group data-rh-fx-stagger="160" data-rh-fx-base="500">
 								<?php
 								if ($terms && ! is_wp_error($terms)) {
 									$parts = array();
@@ -59,13 +59,13 @@ $other_projects     = array();
 										$parts[] = '<a href="' . esc_url($link) . '">' . esc_html($t->name) . '</a>';
 									}
 									if ($parts !== array()) {
-										echo '<p class="rh-single-project__sectors">';
+										echo '<p class="rh-single-project__sectors" data-rh-fx="wipe" data-rh-fx-tone="dark">';
 										echo '<span class="rh-home-kicker__line" aria-hidden="true"></span>';
 										echo '<span class="rh-single-project__sectors-text">' . implode(', ', $parts) . '</span></p>'; // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped
 									}
 								}
 								?>
-								<h1 class="rh-single-project__title"><?php the_title(); ?></h1>
+								<h1 class="rh-single-project__title" data-rh-fx="wipe" data-rh-fx-tone="dark"><?php the_title(); ?></h1>
 							</header>
 
 							<?php if ($slideshow_ids !== array()) : ?>
@@ -73,6 +73,8 @@ $other_projects     = array();
 								<div
 									class="rh-single-project-gallery rh-single-project-gallery--grid"
 									data-count="<?php echo (int) $n_slides; ?>"
+									data-rh-fx-group
+									data-rh-fx-stagger="70"
 									role="region"
 									aria-label="<?php echo esc_attr(sprintf(
 										/* translators: %s: project title */
@@ -94,7 +96,7 @@ $other_projects     = array();
 											$n_slides
 										);
 										printf(
-											'<article class="rh-single-project-gallery__card rh-bento-cell" data-rh-project-index="%d" aria-label="%s">',
+											'<article class="rh-single-project-gallery__card rh-bento-cell" data-rh-project-index="%d" data-rh-fx="scale" aria-label="%s">',
 											$si,
 											esc_attr($slide_label)
 										);
@@ -120,7 +122,7 @@ $other_projects     = array();
 
 						<?php if ($has_body) : ?>
 							<div class="rh-single-project__band rh-single-project__band--content">
-								<div class="rh-single-project__content entry-content">
+								<div class="rh-single-project__content entry-content" data-rh-fx="fade">
 									<?php echo $content_html; // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped ?>
 								</div>
 							</div>
@@ -147,14 +149,14 @@ if ($other_projects !== array()) :
 				<div class="rh-clients-hero__bg" aria-hidden="true"></div>
 				<div class="rh-clients-hero__overlay" aria-hidden="true"></div>
 				<div class="rh-clients-hero__inner">
-					<header class="rh-single-related__intro rh-home-section__header--row">
+					<header class="rh-single-related__intro rh-home-section__header--row" data-rh-fx-group data-rh-fx-stagger="140">
 						<div>
-							<p class="rh-home-kicker">
+							<p class="rh-home-kicker" data-rh-fx="wipe" data-rh-fx-tone="light">
 								<span class="rh-home-kicker__line" aria-hidden="true"></span>
-								<?php esc_html_e('Browse more of our recent work', 'rh-base-child'); ?>
+								<?php esc_html_e('More work', 'rh-base-child'); ?>
 							</p>
-							<h2 id="rh-single-related-heading" class="rh-home-heading rh-home-heading--section">
-								<?php esc_html_e('More projects', 'rh-base-child'); ?>
+							<h2 id="rh-single-related-heading" class="rh-home-heading rh-home-heading--section" data-rh-fx="wipe" data-rh-fx-tone="light">
+								<?php esc_html_e('Related', 'rh-base-child'); ?>
 							</h2>
 						</div>
 						<?php
@@ -162,7 +164,7 @@ if ($other_projects !== array()) :
 							? rh_carpentry_projects_archive_url()
 							: home_url('/projects/');
 						?>
-						<a class="rh-hero-btn rh-hero-btn--muted rh-single-related__cta" href="<?php echo esc_url($rh_related_archive_url); ?>">
+						<a class="rh-hero-btn rh-hero-btn--muted rh-single-related__cta" href="<?php echo esc_url($rh_related_archive_url); ?>" data-rh-fx="fade">
 							<?php esc_html_e('View all projects', 'rh-base-child'); ?>
 						</a>
 					</header>
