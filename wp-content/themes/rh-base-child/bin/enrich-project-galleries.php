@@ -190,7 +190,7 @@ foreach ($posts as $post_id) {
 		if ($thumb_key !== '' && rh_enrich_canonical_upload_key($img_url) === $thumb_key) {
 			continue;
 		}
-		$aid = media_sideload_image($img_url, $post_id, $title, 'id');
+		$aid = rh_project_sideload_image_unique_file($img_url, (int) $post_id, $title);
 		if (is_wp_error($aid)) {
 			continue;
 		}

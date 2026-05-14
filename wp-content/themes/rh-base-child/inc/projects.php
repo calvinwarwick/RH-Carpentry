@@ -458,13 +458,16 @@ function rh_project_render_bento_card($post, int $index = 0): string {
 	$bg_url    = $thumb_id > 0 ? wp_get_attachment_image_url($thumb_id, 'large') : '';
 	$terms     = get_the_terms($pid, 'rh_project_sector');
 	$badges    = array();
+	$slugs     = array();
 	if ($terms && ! is_wp_error($terms)) {
 		foreach (array_slice($terms, 0, 4) as $t) {
 			$badges[] = (string) $t->name;
+			$slugs[]  = (string) $t->slug;
 		}
 	}
-	$title       = get_the_title($post);
-	$card_id_att = 'rh-archive-project-' . $pid;
+	$sectors_attr = $slugs !== array() ? implode( ' ', $slugs ) : '';
+	$title        = get_the_title($post);
+	$card_id_att  = 'rh-archive-project-' . $pid;
 
 	ob_start();
 	?>
@@ -473,6 +476,9 @@ function rh_project_render_bento_card($post, int $index = 0): string {
 		id="<?php echo esc_attr($card_id_att); ?>"
 		role="listitem"
 		data-rh-project-url="<?php echo esc_url($permalink); ?>"
+		<?php if ($sectors_attr !== '') : ?>
+			data-rh-sectors="<?php echo esc_attr($sectors_attr); ?>"
+		<?php endif; ?>
 		data-rh-fx="scale"
 		aria-label="<?php echo esc_attr($title); ?>"
 	>
@@ -585,4 +591,77 @@ function rh_project_rest_archive_page(WP_REST_Request $request): WP_REST_Respons
 			'html'        => $html,
 		)
 	);
+}
+
+/**
+ * Legacy portfolio rows (source work URL + cover image URL) for import/repair scripts.
+ *
+ * @return array<int, array{title: string, sector: string, url: string, img: string}>
+ */
+function rh_project_legacy_import_rows(): array {
+	static $cache = null;
+	if ($cache !== null) {
+		return $cache;
+	}
+	$file = __DIR__ . '/project-legacy-import-rows.php';
+	if (! is_readable($file)) {
+		$cache = array();
+		return $cache;
+	}
+	$data = require $file;
+	$cache = is_array($data) ? $data : array();
+	return $cache;
+}
+
+/**
+ * Sideload a remote image with a filename scoped to the post so WordPress does not
+ * return an existing attachment reused from another project for the same source URL.
+ *
+ * @param string $url     Remote image URL.
+ * @param int    $post_id Parent post ID.
+ * @param string $desc    Attachment title / description.
+ * @return int|WP_Error Attachment ID on success.
+ */
+function rh_project_sideload_image_unique_file(string $url, int $post_id, string $desc): int|WP_Error {
+	$url = trim($url);
+	if ($url === '' || $post_id <= 0) {
+		return new WP_Error('rh_project_sideload_bad_args', __('Invalid URL or post ID.', 'rh-base-child'));
+	}
+
+	require_once ABSPATH . 'wp-admin/includes/file.php';
+	require_once ABSPATH . 'wp-admin/includes/media.php';
+	require_once ABSPATH . 'wp-admin/includes/image.php';
+
+	$tmp = download_url($url);
+	if (is_wp_error($tmp)) {
+		return $tmp;
+	}
+
+	$path_for_name = (string) wp_parse_url($url, PHP_URL_PATH);
+	$basename      = $path_for_name !== '' ? basename($path_for_name) : 'image.jpg';
+	$basename      = sanitize_file_name($basename);
+	if ($basename === '') {
+		$basename = 'image.jpg';
+	}
+	$info = pathinfo($basename);
+	$stem = isset($info['filename']) ? (string) $info['filename'] : 'image';
+	$ext  = '';
+	if (isset($info['extension']) && $info['extension'] !== '') {
+		$ext = '.' . strtolower((string) $info['extension']);
+	}
+
+	$file_array = array(
+		'name'     => 'rh-project-' . $post_id . '-' . $stem . $ext,
+		'tmp_name' => $tmp,
+	);
+
+	$att_id = media_handle_sideload($file_array, $post_id, $desc);
+	if (is_wp_error($att_id)) {
+		if (is_string($tmp) && $tmp !== '' && file_exists($tmp)) {
+			wp_delete_file($tmp);
+		}
+		return $att_id;
+	}
+
+	return (int) $att_id;
 }

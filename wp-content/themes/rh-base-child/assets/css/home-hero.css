@@ -2153,7 +2153,8 @@ body.rh-carpentry-home .site-main--front {
 	border: var(--rh-frame-inset) solid var(--rh-color-bg, #f5f4f0);
 	border-top: none;
 	border-radius: 0;
-	background: var(--rh-bento-page-bg, var(--rh-color-bg, #f5f4f0));
+	/* Transparent so `body.rh-carpentry-home` (--rh-color-bg) shows through; avoid a second fill that reads grey against the body. */
+	background: transparent;
 	overflow-x: hidden;
 	overflow-y: visible;
 	isolation: isolate;
@@ -2631,6 +2632,7 @@ body.rh-carpentry-home .rh-bento-page > .rh-home-section + .rh-home-section .rh-
 	margin: 0;
 	padding: 0;
 	box-sizing: border-box;
+	background: transparent;
 }
 
 .rh-home-about__grid {
@@ -2639,6 +2641,7 @@ body.rh-carpentry-home .rh-bento-page > .rh-home-section + .rh-home-section .rh-
 	grid-template-rows: auto auto;
 	gap: var(--rh-bento-gap);
 	align-items: stretch;
+	background: transparent;
 }
 
 .rh-home-about__stats-wrap {
@@ -3771,19 +3774,20 @@ body.rh-carpentry-home .rh-bento-page > .rh-home-section + .rh-home-section .rh-
 	background:
 		linear-gradient(
 			to top,
-			rgba(8, 22, 48, 0.94) 0%,
-			rgba(12, 32, 68, 0.82) 28%,
-			rgba(18, 42, 88, 0.48) 52%,
-			rgba(14, 36, 72, 0.18) 72%,
+			rgba(8, 22, 48, 0.82) 0%,
+			rgba(12, 32, 68, 0.7) 28%,
+			rgba(18, 42, 88, 0.4) 52%,
+			rgba(14, 36, 72, 0.14) 72%,
 			transparent 82%
 		),
 		linear-gradient(
 			120deg,
-			rgba(8, 20, 40, 0.5) 0%,
-			rgba(20, 45, 85, 0.38) 45%,
-			rgba(10, 28, 55, 0.32) 100%
+			rgba(8, 20, 40, 0.42) 0%,
+			rgba(20, 45, 85, 0.32) 45%,
+			rgba(10, 28, 55, 0.26) 100%
 		);
-	opacity: var(--rh-card-active, 0);
+	/* Slightly lighter than full wash so the photo reads through more when active. */
+	opacity: calc(0.88 * var(--rh-card-active, 0));
 }
 
 /* No horizontal pan animation — the BG was visibly nudging when a card
@@ -3803,17 +3807,15 @@ body.rh-carpentry-home .rh-bento-page > .rh-home-section + .rh-home-section .rh-
 	width: 100%;
 	min-height: 0;
 	margin-top: auto;
+	gap: clamp(0.35rem, 1.2vw, 0.55rem);
 	padding: clamp(1rem, 2.6vw, 1.4rem) clamp(1rem, 2.4vw, 1.25rem);
 	padding-top: clamp(2rem, 6vw, 3.25rem);
 	box-sizing: border-box;
 }
 
-/* Title / badges are also driven by --rh-card-active so they cross-fade in
-   sync with the BG zoom + overlay rather than snapping when .is-active
-   toggles at scroll settle. No explicit transitions on the dependent
-   properties — that would re-introduce per-frame retarget lag while the JS
-   updates the var. The var's own 0.12s transition (declared above) handles
-   any non-scroll state changes. */
+/* Title / badges track --rh-card-active with the BG + overlay. Slider badges use
+   --rh-card-badge (derived from --rh-card-active with a lead) so the title moves
+   first and the badge translates in just after. Other contexts: badges in flow. */
 :where(.rh-home-section--projects, .rh-single-related, .rh-archive-projects) .rh-home-project-card.rh-bento-cell .rh-home-project-card__title {
 	margin: 0;
 	padding: 0;
@@ -3823,7 +3825,24 @@ body.rh-carpentry-home .rh-bento-page > .rh-home-section + .rh-home-section .rh-
 	line-height: 1.25;
 	color: #ffffff;
 	text-shadow: 0 2px 14px rgba(0, 0, 0, 0.4);
-	transform: translate3d(0, calc(0.45rem * (1 - var(--rh-card-active, 0))), 0);
+	/* Inactive: slight drop; active: sit lower on the card (title leads the badge reveal). */
+	transform: translate3d(
+		0,
+		calc(
+			0.45rem * (1 - var(--rh-card-active, 0)) +
+				clamp(0.95rem, 2.8vw, 1.45rem) * var(--rh-card-active, 0)
+		),
+		0
+	);
+}
+
+/* Archive “all projects” grid: titles sit higher on the card. */
+.rh-archive-projects .rh-home-project-card.rh-bento-cell .rh-home-project-card__title {
+	transform: translate3d(
+		0,
+		calc(0.12rem * (1 - var(--rh-card-active, 0)) + clamp(0, 0.35vw, 0.08rem) * var(--rh-card-active, 0)),
+		0
+	);
 }
 
 :where(.rh-home-section--projects, .rh-single-related, .rh-archive-projects) .rh-home-project-card.rh-bento-cell .rh-home-project-card__badges {
@@ -3834,11 +3853,30 @@ body.rh-carpentry-home .rh-bento-page > .rh-home-section + .rh-home-section .rh-
 	flex-wrap: wrap;
 	gap: 0.35rem 0.45rem;
 	max-width: 100%;
-	max-height: calc(6.75rem * var(--rh-card-active, 0));
-	margin-bottom: calc(clamp(0.35rem, 1.2vw, 0.55rem) * var(--rh-card-active, 0));
-	overflow: hidden;
-	opacity: var(--rh-card-active, 0);
-	transform: translateY(calc(clamp(0.15rem, 0.6vw, 0.3rem) * var(--rh-card-active, 0)));
+	overflow: visible;
+}
+
+/* Slider only: badges sit on the text block baseline but start translated
+   below the card (clipped by overflow:hidden) and move up with --rh-card-active. */
+[data-rh-projects-carousel] .rh-home-project-card.rh-bento-cell .rh-home-project-card__text {
+	padding-bottom: calc(clamp(1rem, 2.6vw, 1.4rem) + var(--rh-card-active, 0) * clamp(1.85rem, 6vw, 3.25rem));
+}
+
+[data-rh-projects-carousel] .rh-home-project-card.rh-bento-cell .rh-home-project-card__badges {
+	position: absolute;
+	left: clamp(1rem, 2.4vw, 1.25rem);
+	right: clamp(1rem, 2.4vw, 1.25rem);
+	bottom: clamp(1rem, 2.6vw, 1.4rem);
+	margin: 0;
+	/* Lags behind --rh-card-active so the title settles first, then the badge eases in. */
+	--rh-card-badge: clamp(0, 1, calc((var(--rh-card-active, 0) - 0.2) / 0.8));
+	opacity: var(--rh-card-badge, 0);
+	transform: translate3d(
+		0,
+		calc((1 - var(--rh-card-badge, 0)) * (100% + clamp(0.85rem, 3.5cqw, 1.35rem))),
+		0
+	);
+	will-change: transform, opacity;
 }
 
 :where(.rh-home-section--projects, .rh-single-related, .rh-archive-projects) .rh-home-project-card.rh-bento-cell .rh-home-project-card__badges li {
@@ -3861,8 +3899,6 @@ body.rh-carpentry-home .rh-bento-page > .rh-home-section + .rh-home-section .rh-
 	backdrop-filter: blur(8px);
 	-webkit-backdrop-filter: blur(8px);
 	box-shadow: 0 2px 10px rgba(0, 0, 0, 0.2);
-	opacity: var(--rh-card-active, 0);
-	transform: translate3d(0, calc(-0.18rem * (1 - var(--rh-card-active, 0))), 0);
 }
 
 /* Keep card text white (was scoped to <a> when slides were links). */
@@ -4408,6 +4444,12 @@ body.rh-carpentry-home .rh-bento-page > .rh-home-section + .rh-home-section .rh-
 	height: clamp(58px, 7.5vw, 92px);
 }
 
+/* Official FireQual mark (PNG); avoid multiply so reds/navy stay true on light surfaces */
+.rh-home-feature__credentials-img--firequal {
+	mix-blend-mode: normal;
+	height: clamp(44px, 5.8vw, 76px);
+}
+
 .rh-home-section--sectors {
 	background: var(--rh-color-bg, #f5f4f0);
 	border-top: 1px solid rgba(12, 28, 52, 0.06);
@@ -4549,10 +4591,8 @@ body.rh-carpentry-home .rh-bento-page > .rh-home-section + .rh-home-section .rh-
 }
 
 .rh-home-projects-carousel--bento .rh-home-project-card.rh-bento-cell .rh-home-project-card__badges {
-	max-height: none;
 	opacity: 1;
 	transform: none;
-	margin-bottom: clamp(0.35rem, 1.2vw, 0.55rem);
 }
 
 .rh-home-projects-carousel--bento .rh-home-project-card.rh-bento-cell .rh-home-project-card__badge {
@@ -4590,22 +4630,15 @@ body.rh-carpentry-home .rh-bento-page > .rh-home-section + .rh-home-section .rh-
 	overflow: hidden;
 }
 
-/* On phones, drop the band's viewport-height cap and pin the carousel
-   viewport (where cards stretch to fill) to an explicit shorter height so
-   the entire card — image, title and bottom controls — stays inside the
-   viewport. The shorter ceiling also keeps the BG image at a more natural
-   (near-square) aspect rather than a tall portrait. */
+/* On phones, drop the band's viewport-height cap so the shell can grow with
+   content. Carousel viewport height is set again *after* the shared
+   .rh-home-projects-carousel__viewport flex rules — those use height: auto
+   and would otherwise win the cascade and collapse card height. */
 @media (max-width: 768px) {
 	.rh-home-section--projects#projects,
 	.rh-home-section--projects {
 		height: auto;
 		max-height: none;
-	}
-
-	:where(.rh-home-section--projects) .rh-home-projects-carousel__viewport {
-		flex: 0 0 auto;
-		height: clamp(280px, 56vh, 460px);
-		max-height: clamp(280px, 56vh, 460px);
 	}
 }
 
@@ -4653,6 +4686,20 @@ body.rh-carpentry-home .rh-bento-page > .rh-home-section + .rh-home-section .rh-
 	flex-direction: column;
 	margin-block: clamp(0.25rem, 1vw, 0.65rem);
 	height: auto;
+}
+
+/* Home #projects on small screens: explicit viewport height (must follow the
+   rule above so it is not overridden by height: auto). */
+@media (max-width: 768px) {
+	:where(.rh-home-section--projects) .rh-home-projects-carousel__viewport {
+		flex: 0 0 auto;
+		height: clamp(300px, 58vh, 500px);
+		max-height: clamp(300px, 58vh, 500px);
+		min-height: clamp(300px, 58vh, 500px);
+		height: clamp(300px, 58svh, 500px);
+		max-height: clamp(300px, 58svh, 500px);
+		min-height: clamp(300px, 58svh, 500px);
+	}
 }
 
 :where(.rh-home-section--projects, .rh-single-related, .rh-archive-projects) .rh-home-projects-carousel__track {
@@ -5130,6 +5177,15 @@ body.rh-carpentry-home .rh-bento-page > .rh-home-section + .rh-home-section .rh-
 	line-height: 1.6;
 	color: var(--rh-color-muted, #5c5c5c);
 	text-align: left;
+}
+
+/* Hold project cards for a second [data-rh-fx-group] so card scale-in runs after
+   the section title / intro wipes (see data-rh-fx-base). */
+.rh-home-section--projects__cards-fx,
+.rh-single-related__cards-fx,
+.rh-archive-projects__delayed-fx {
+	width: 100%;
+	min-width: 0;
 }
 
 /* Archive bento: 12-col grid with a repeating 5-card pattern. */

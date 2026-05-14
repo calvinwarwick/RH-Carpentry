@@ -169,6 +169,12 @@ if ($other_projects !== array()) :
 						</a>
 					</header>
 					<div
+						class="rh-single-related__cards-fx"
+						data-rh-fx-group
+						data-rh-fx-stagger="82"
+						data-rh-fx-base="1080"
+					>
+					<div
 						class="rh-home-projects-carousel rh-single-related-carousel<?php echo $other_is_bento ? ' rh-home-projects-carousel--bento' : ''; ?>"
 						<?php if (! $other_is_bento) : ?>data-rh-projects-carousel
 						data-interval="5000"
@@ -203,6 +209,7 @@ if ($other_projects !== array()) :
 										class="rh-home-project-card rh-bento-cell<?php echo $is_active ? ' is-active' : ''; ?>"
 										id="<?php echo esc_attr('rh-single-related-project-' . $oi); ?>"
 										role="listitem"
+										data-rh-fx="scale"
 										<?php if (! $other_is_bento) : ?>data-rh-project-slide
 										data-rh-project-index="<?php echo (int) $oi; ?>"<?php endif; ?>
 										data-rh-project-url="<?php echo esc_url(is_string($rel_url) ? $rel_url : ''); ?>"
@@ -299,6 +306,7 @@ if ($other_projects !== array()) :
 							</div>
 						</div>
 						<?php endif; ?>
+					</div>
 					</div>
 				</div>
 			</div>

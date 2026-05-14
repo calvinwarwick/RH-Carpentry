@@ -339,6 +339,26 @@ function rh_carpentry_get_service_card_image_url(string $slug): string {
 		}
 	}
 
+	// Default Timber card: same imagery as Collingwood Road portfolio when present in uploads / Media Library.
+	if ($slug === 'timber') {
+		$uploads = wp_upload_dir();
+		if (empty($uploads['error'])) {
+			$rel = '2026/05/Debugh-Road-51.jpg';
+			$path = trailingslashit($uploads['basedir']) . $rel;
+			if (is_readable($path)) {
+				$direct = trailingslashit($uploads['baseurl']) . $rel;
+				$aid    = attachment_url_to_postid($direct);
+				if ($aid > 0) {
+					$from_lib = wp_get_attachment_image_url($aid, 'large');
+					if (is_string($from_lib) && $from_lib !== '') {
+						return $from_lib;
+					}
+				}
+				return $direct;
+			}
+		}
+	}
+
 	$dir = get_stylesheet_directory() . '/assets/images/services/';
 	$uri = get_stylesheet_directory_uri() . '/assets/images/services/';
 	foreach (array('webp', 'jpg', 'jpeg', 'png') as $ext) {

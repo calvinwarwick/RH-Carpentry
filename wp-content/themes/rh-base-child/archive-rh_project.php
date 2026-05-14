@@ -29,29 +29,36 @@ $rh_rest_url    = rest_url('rh/v1/projects');
 			</p>
 		</header>
 
-		<?php if (have_posts()) : ?>
+		<?php if (! have_posts()) : ?>
+			<p class="rh-archive-projects__empty"><?php esc_html_e('No projects published yet.', 'rh-base-child'); ?></p>
+		<?php else : ?>
 			<div
-				class="rh-archive-projects__grid rh-archive-projects__bento"
-				role="list"
-				data-rh-archive-loader
+				class="rh-archive-projects__delayed-fx"
 				data-rh-fx-group
-				data-rh-fx-stagger="70"
-				data-page="1"
-				data-total-pages="<?php echo (int) $rh_total_pages; ?>"
-				data-per-page="<?php echo (int) $rh_per_page; ?>"
-				data-rest-url="<?php echo esc_url($rh_rest_url); ?>"
-				data-total-found="<?php echo (int) $rh_total_found; ?>"
+				data-rh-fx-stagger="76"
+				data-rh-fx-base="1700"
 			>
-				<?php
-				$rh_idx = 0;
-				while (have_posts()) :
-					the_post();
-					if (function_exists('rh_project_render_bento_card')) {
-						echo rh_project_render_bento_card(get_post(), $rh_idx); // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped
-					}
-					$rh_idx++;
-				endwhile;
-				?>
+				<div
+					class="rh-archive-projects__grid rh-archive-projects__bento"
+					role="list"
+					data-rh-archive-loader
+					data-page="1"
+					data-total-pages="<?php echo (int) $rh_total_pages; ?>"
+					data-per-page="<?php echo (int) $rh_per_page; ?>"
+					data-rest-url="<?php echo esc_url($rh_rest_url); ?>"
+					data-total-found="<?php echo (int) $rh_total_found; ?>"
+				>
+					<?php
+					$rh_idx = 0;
+					while (have_posts()) :
+						the_post();
+						if (function_exists('rh_project_render_bento_card')) {
+							echo rh_project_render_bento_card(get_post(), $rh_idx); // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped
+						}
+						$rh_idx++;
+					endwhile;
+					?>
+				</div>
 			</div>
 
 			<?php if ($rh_total_pages > 1) : ?>
@@ -80,8 +87,6 @@ $rh_rest_url    = rest_url('rh/v1/projects');
 					</nav>
 				</noscript>
 			<?php endif; ?>
-		<?php else : ?>
-			<p class="rh-archive-projects__empty"><?php esc_html_e('No projects published yet.', 'rh-base-child'); ?></p>
 		<?php endif; ?>
 	</div>
 </div>

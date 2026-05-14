@@ -418,6 +418,7 @@
 				return;
 			}
 			index = ci;
+			setHoverPaused(false);
 			syncActiveUi();
 			scheduleNext();
 		} else {
@@ -476,6 +477,10 @@
 				window.clearTimeout(scrollEndFallbackTimer);
 				scrollEndFallbackTimer = null;
 			}
+			/* Drop inline opacity from scroll-linked cross-fade so .is-active
+			   controls the settled slide (no scroll event when scrollLeft is
+			   unchanged — without this the first slide can stay faded). */
+			clearScrollLinkedOpacity();
 			scrollUnsuppressTimer = window.setTimeout(() => {
 				scrollUnsuppressTimer = null;
 				suppressScrollSync = false;
@@ -507,6 +512,8 @@
 
 	function goTo(nextIndex) {
 		index = (nextIndex + slides.length) % slides.length;
+		/* Pointer can stay over a slide that just became inactive — clear soft pause. */
+		setHoverPaused(false);
 		/* Blocks spurious closestSlideIndex() overrides from snap/settle after scrollTo; cleared on user scroll. */
 		navIntentUntil = performance.now() + 520;
 
@@ -562,12 +569,27 @@
 		});
 	}
 
-	/* Hover (mouse) and touch pause: pauses autoplay while the user is
-	   actively interacting with the carousel. Passive listeners only so
-	   vertical page scrolling on mobile is never blocked. */
-	root.addEventListener('mouseenter', () => setHoverPaused(true));
-	root.addEventListener('mouseleave', () => setHoverPaused(false));
-	root.addEventListener('touchstart', () => setHoverPaused(true), { passive: true });
+	/* Soft pause: only while the pointer / touch is on the active slide (not
+	   the whole carousel chrome). Passive touch listeners so vertical scroll
+	   is never blocked. */
+	slides.forEach((slide) => {
+		slide.addEventListener('mouseenter', () => {
+			if (slide.classList.contains('is-active')) {
+				setHoverPaused(true);
+			}
+		});
+		slide.addEventListener('mouseleave', () => setHoverPaused(false));
+	});
+	root.addEventListener(
+		'touchstart',
+		(e) => {
+			const slide = e.target.closest('[data-rh-testimonial-slide]');
+			if (slide && root.contains(slide) && slide.classList.contains('is-active')) {
+				setHoverPaused(true);
+			}
+		},
+		{ passive: true }
+	);
 	root.addEventListener('touchend', () => setHoverPaused(false), { passive: true });
 	root.addEventListener('touchcancel', () => setHoverPaused(false), { passive: true });
 
@@ -899,6 +921,7 @@
 				return;
 			}
 			index = ci;
+			setHoverPaused(false);
 			syncActiveUi();
 			scheduleNext();
 		} else {
@@ -966,6 +989,10 @@
 				window.clearTimeout(scrollEndFallbackTimer);
 				scrollEndFallbackTimer = null;
 			}
+			/* Inline --rh-card-active / opacity override .is-active until
+			   cleared; if scrollLeft does not change (no scroll events),
+			   stale values can leave the first card looking inactive. */
+			clearScrollLinkedOpacity();
 			scrollUnsuppressTimer = window.setTimeout(() => {
 				scrollUnsuppressTimer = null;
 				suppressScrollSync = false;
@@ -997,6 +1024,8 @@
 
 	function goTo(nextIndex) {
 		index = (nextIndex + slides.length) % slides.length;
+		/* Pointer can stay over a slide that just became inactive — clear soft pause. */
+		setHoverPaused(false);
 		/* Block scroll-sync until snap settles; subsumes debounce + snap after programmatic scroll. */
 		navIntentUntil = performance.now() + 2000;
 
@@ -1058,13 +1087,27 @@
 		});
 	}
 
-	/* Hover (mouse) and touch pause: pauses autoplay while the user is
-	   actively interacting with the carousel. Uses passive listeners so
-	   vertical page scrolling on mobile is not blocked when the touch
-	   starts on a slider card. */
-	root.addEventListener('mouseenter', () => setHoverPaused(true));
-	root.addEventListener('mouseleave', () => setHoverPaused(false));
-	root.addEventListener('touchstart', () => setHoverPaused(true), { passive: true });
+	/* Soft pause: only while the pointer / touch is on the active slide (not
+	   the whole carousel chrome). Passive touch listeners so vertical page
+	   scrolling on mobile is not blocked. */
+	slides.forEach((slide) => {
+		slide.addEventListener('mouseenter', () => {
+			if (slide.classList.contains('is-active')) {
+				setHoverPaused(true);
+			}
+		});
+		slide.addEventListener('mouseleave', () => setHoverPaused(false));
+	});
+	root.addEventListener(
+		'touchstart',
+		(e) => {
+			const slide = e.target.closest('[data-rh-project-slide]');
+			if (slide && root.contains(slide) && slide.classList.contains('is-active')) {
+				setHoverPaused(true);
+			}
+		},
+		{ passive: true }
+	);
 	root.addEventListener('touchend', () => setHoverPaused(false), { passive: true });
 	root.addEventListener('touchcancel', () => setHoverPaused(false), { passive: true });
 
@@ -1184,9 +1227,6 @@
 	});
 
 	goTo(index);
-	/* Prime --rh-card-active on first paint so the initial active card's BG
-	   is already zoomed before the user scrolls. */
-	updateScrollLinkedOpacity();
 
 	if (typeof document !== 'undefined' && document.fonts && typeof document.fonts.ready !== 'undefined') {
 		document.fonts.ready.then(() => {
@@ -1587,6 +1627,9 @@
 					Array.from(tmp.children).forEach((node, i) => {
 						node.classList.add('rh-is-appended');
 						node.style.setProperty('--rh-card-stagger', i * STAGGER_MS + 'ms');
+						/* Initial cards use [data-rh-fx] in a delayed group; appended nodes miss
+						   group init and would stay opacity:0 — rely on rh-archive-card-in only. */
+						node.removeAttribute('data-rh-fx');
 						grid.appendChild(node);
 					});
 				}

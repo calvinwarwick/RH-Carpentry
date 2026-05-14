@@ -27,8 +27,8 @@ $rh_fire_credentials       = array(
 		'variant' => 'uk-fire-door',
 	),
 	array(
-		'file'    => 'firequal.jpg',
-		'alt'     => __('FireQual Approved Training Centre', 'rh-base-child'),
+		'file'    => 'firequal-logo.png',
+		'alt'     => __('FireQual', 'rh-base-child'),
 		'variant' => 'firequal',
 	),
 );
@@ -323,6 +323,12 @@ if (post_type_exists('rh_project')) {
 				<a class="rh-hero-btn rh-hero-btn--muted" href="<?php echo esc_url($rh_projects_archive_url); ?>" data-rh-fx="fade"><?php esc_html_e('View all projects', 'rh-base-child'); ?></a>
 			</header>
 			<div
+				class="rh-home-section--projects__cards-fx"
+				data-rh-fx-group
+				data-rh-fx-stagger="82"
+				data-rh-fx-base="1080"
+			>
+			<div
 				class="rh-home-projects-carousel<?php echo $home_projects_is_bento ? ' rh-home-projects-carousel--bento' : ''; ?>"
 				<?php if (! $home_projects_is_bento) : ?>data-rh-projects-carousel
 				data-interval="5000"
@@ -358,6 +364,7 @@ if (post_type_exists('rh_project')) {
 									class="rh-home-project-card rh-bento-cell<?php echo ($home_projects_is_bento || 0 === $pi) ? ' is-active' : ''; ?>"
 									id="<?php echo esc_attr('rh-home-project-' . $pi); ?>"
 									role="listitem"
+									data-rh-fx="scale"
 									<?php if (! $home_projects_is_bento) : ?>data-rh-project-slide
 									data-rh-project-index="<?php echo (int) $pi; ?>"<?php endif; ?>
 									data-rh-project-url="<?php echo esc_url( isset( $proj['url'] ) ? (string) $proj['url'] : '' ); ?>"
@@ -452,6 +459,7 @@ if (post_type_exists('rh_project')) {
 					</div>
 				</div>
 				<?php endif; ?>
+			</div>
 			</div>
 		</div>
 	</div>
