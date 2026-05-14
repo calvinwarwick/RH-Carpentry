@@ -2062,7 +2062,9 @@ body.rh-contact-overlay-open {
 	}
 
 	.rh-home-section--testimonials .rh-clients-hero__inner > .rh-home-testimonials-carousel,
-	:where(.rh-home-section--projects, .rh-single-related, .rh-archive-projects) .rh-clients-hero__inner > .rh-home-projects-carousel {
+	:where(.rh-home-section--projects, .rh-single-related, .rh-archive-projects) .rh-clients-hero__inner > .rh-home-projects-carousel,
+	.rh-home-section--projects .rh-clients-hero__inner > .rh-home-section--projects__cards-fx,
+	.rh-single-related .rh-clients-hero__inner > .rh-single-related__cards-fx {
 		grid-row: 2;
 		min-height: 0;
 		align-self: stretch;
@@ -4621,9 +4623,9 @@ body.rh-carpentry-home .rh-bento-page > .rh-home-section + .rh-home-section .rh-
 .rh-home-section--projects {
 	display: flex;
 	flex-direction: column;
-	height: min(93vh, 810px);
+	height: min(93vh, 860px);
 	min-height: 0;
-	max-height: 810px;
+	max-height: 860px;
 	box-sizing: border-box;
 	background: transparent;
 	padding: 0;
@@ -4659,7 +4661,9 @@ body.rh-carpentry-home .rh-bento-page > .rh-home-section + .rh-home-section .rh-
 		flex: 0 0 auto;
 	}
 
-	:where(.rh-home-section--projects, .rh-single-related, .rh-archive-projects) .rh-clients-hero__inner > .rh-home-projects-carousel {
+	:where(.rh-home-section--projects, .rh-single-related, .rh-archive-projects) .rh-clients-hero__inner > .rh-home-projects-carousel,
+	.rh-home-section--projects .rh-clients-hero__inner > .rh-home-section--projects__cards-fx,
+	.rh-single-related .rh-clients-hero__inner > .rh-single-related__cards-fx {
 		flex: 1 1 auto;
 		min-height: 0;
 		display: flex;
@@ -5186,6 +5190,16 @@ body.rh-carpentry-home .rh-bento-page > .rh-home-section + .rh-home-section .rh-
 .rh-archive-projects__delayed-fx {
 	width: 100%;
 	min-width: 0;
+}
+
+/* Bridge height into the carousel: markup wraps it in *-__cards-fx for FX groups,
+   so rules that targeted .inner > .rh-home-projects-carousel never matched. */
+.rh-home-section--projects__cards-fx,
+.rh-single-related__cards-fx {
+	display: flex;
+	flex-direction: column;
+	flex: 1 1 auto;
+	min-height: 0;
 }
 
 /* Archive bento: 12-col grid with a repeating 5-card pattern. */
@@ -6294,9 +6308,12 @@ body.rh-carpentry-home .rh-bento-page > .rh-home-section + .rh-home-section .rh-
 	letter-spacing: 0.02em;
 }
 
+.rh-single-related--band .rh-single-related__cards-fx,
 .rh-single-related--band .rh-single-related-carousel.rh-home-projects-carousel {
 	flex: 1 1 auto;
 	min-height: 0;
+	display: flex;
+	flex-direction: column;
 }
 
 .rh-single-related__grid {
