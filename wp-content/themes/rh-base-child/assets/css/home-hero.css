@@ -3549,7 +3549,8 @@ body.rh-carpentry-home .rh-bento-page > .rh-home-section + .rh-home-section .rh-
 
 @media (max-width: 899px) {
 	.rh-home-projects-carousel {
-		--rh-project-slide-w: 100cqw;
+		/* Narrower than the viewport so prev/next cards peek; never exceed container (92vw could clip). */
+		--rh-project-slide-w: min(86cqw, 100%);
 	}
 
 	:where(.rh-home-section--projects, .rh-single-related, .rh-archive-projects) .rh-home-projects-carousel .rh-home-projects-carousel__viewport {
@@ -3558,9 +3559,10 @@ body.rh-carpentry-home .rh-bento-page > .rh-home-section + .rh-home-section .rh-
 	}
 
 	.rh-home-projects-carousel__track {
-		gap: 0;
+		gap: clamp(0.5rem, 2vw, var(--rh-bento-gap));
 		padding: 2px 0 4px;
-		padding-inline: 0;
+		padding-inline-start: 0;
+		padding-inline-end: max(0px, calc((100cqw - var(--rh-project-slide-w)) / 2));
 	}
 
 	:where(.rh-home-section--projects, .rh-single-related, .rh-archive-projects) .rh-home-project-card.rh-bento-cell {
@@ -3647,17 +3649,18 @@ body.rh-carpentry-home .rh-bento-page > .rh-home-section + .rh-home-section .rh-
 
 	@media (max-width: 899px) {
 		.rh-home-projects-carousel {
-			--rh-project-slide-w: 100%;
+			--rh-project-slide-w: min(86%, 100%);
 		}
 
 		.rh-home-projects-carousel__track {
-			padding-inline: 0;
-			gap: 0;
+			padding-inline-start: 0;
+			padding-inline-end: max(0px, calc((100vw - var(--rh-project-slide-w)) / 2));
+			gap: clamp(0.5rem, 2vw, 0.75rem);
 		}
 	}
 
 	:where(.rh-home-section--projects, .rh-single-related, .rh-archive-projects) .rh-home-projects-carousel {
-		--rh-project-slide-w: min(92vw, 600px);
+		--rh-project-slide-w: min(86vw, 600px);
 	}
 
 	@media (min-width: 900px) {
@@ -3687,7 +3690,8 @@ body.rh-carpentry-home .rh-bento-page > .rh-home-section + .rh-home-section .rh-
 
 /* Home #projects: card width — height follows carousel viewport (flex stretch, no fixed aspect-ratio). */
 :where(.rh-home-section--projects, .rh-single-related, .rh-archive-projects) .rh-home-projects-carousel {
-	--rh-project-slide-w: min(min(156cqw, 92vw), 600px);
+	/* cqw only — 92vw can exceed the carousel container and clip side cards on mobile */
+	--rh-project-slide-w: min(86cqw, 100%);
 }
 
 @media (min-width: 900px) {
@@ -3862,6 +3866,10 @@ body.rh-carpentry-home .rh-bento-page > .rh-home-section + .rh-home-section .rh-
    below the card (clipped by overflow:hidden) and move up with --rh-card-active. */
 [data-rh-projects-carousel] .rh-home-project-card.rh-bento-cell .rh-home-project-card__text {
 	padding-bottom: calc(clamp(1rem, 2.6vw, 1.4rem) + var(--rh-card-active, 0) * clamp(1.85rem, 6vw, 3.25rem));
+}
+
+[data-rh-projects-carousel] .rh-home-project-card.rh-bento-cell .rh-home-project-card__title {
+	margin-bottom: calc(var(--rh-card-active, 0) * clamp(0.45rem, 1.5vw, 0.7rem));
 }
 
 [data-rh-projects-carousel] .rh-home-project-card.rh-bento-cell .rh-home-project-card__badges {
@@ -5651,7 +5659,7 @@ body.rh-carpentry-home .rh-bento-page > .rh-home-section + .rh-home-section .rh-
 .rh-single-project__shell .rh-home-projects-carousel {
 	width: 100%;
 	min-width: 0;
-	--rh-project-slide-w: min(min(156cqw, 92vw), 600px);
+	--rh-project-slide-w: min(86cqw, 100%);
 }
 
 @media (min-width: 900px) {
@@ -5668,7 +5676,7 @@ body.rh-carpentry-home .rh-bento-page > .rh-home-section + .rh-home-section .rh-
 
 @media (max-width: 899px) {
 	.rh-single-project__shell .rh-home-projects-carousel {
-		--rh-project-slide-w: 100cqw;
+		--rh-project-slide-w: min(86cqw, 100%);
 	}
 
 	.rh-single-project__shell .rh-home-projects-carousel .rh-home-projects-carousel__viewport {
@@ -5677,9 +5685,10 @@ body.rh-carpentry-home .rh-bento-page > .rh-home-section + .rh-home-section .rh-
 	}
 
 	.rh-single-project__shell .rh-home-projects-carousel__track {
-		gap: 0;
+		gap: clamp(0.5rem, 2vw, var(--rh-bento-gap));
 		padding: 2px 0 4px;
-		padding-inline: 0;
+		padding-inline-start: 0;
+		padding-inline-end: max(0px, calc((100cqw - var(--rh-project-slide-w)) / 2));
 	}
 
 	.rh-single-project__shell .rh-single-project-gallery__card.rh-bento-cell {
@@ -5698,12 +5707,13 @@ body.rh-carpentry-home .rh-bento-page > .rh-home-section + .rh-home-section .rh-
 
 	@media (max-width: 899px) {
 		.rh-single-project__shell .rh-home-projects-carousel {
-			--rh-project-slide-w: 100%;
+			--rh-project-slide-w: min(86%, 100%);
 		}
 
 		.rh-single-project__shell .rh-home-projects-carousel__track {
-			padding-inline: 0;
-			gap: 0;
+			padding-inline-start: 0;
+			padding-inline-end: max(0px, calc((100vw - var(--rh-project-slide-w)) / 2));
+			gap: clamp(0.5rem, 2vw, 0.75rem);
 		}
 	}
 
