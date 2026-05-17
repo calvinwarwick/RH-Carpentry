@@ -1491,14 +1491,47 @@
 	}
 
 	if (groups.length) {
+		/* Row headers on narrow viewports use display:contents so the title block,
+		   body, and CTA can be reordered in CSS grid. That removes the group's
+		   layout box, so observing the group never intersects — titles stay hidden. */
+		const resolveFxGroupObserveTarget = (group) => {
+			if (typeof window.getComputedStyle !== 'function') {
+				return group;
+			}
+			if (window.getComputedStyle(group).display !== 'contents') {
+				return group;
+			}
+			const titleBlock = group.querySelector(':scope > div');
+			if (titleBlock) {
+				return titleBlock;
+			}
+			const firstFx = group.querySelector('[data-rh-fx]');
+			if (firstFx) {
+				const parent = firstFx.parentElement;
+				if (parent && parent !== group) {
+					return parent;
+				}
+				return firstFx;
+			}
+			return group.firstElementChild || group;
+		};
+
+		const observeTargetToGroup = new Map();
+
 		const groupObserver = new IntersectionObserver((entries) => {
 			entries.forEach((entry) => {
 				if (!entry.isIntersecting) return;
-				entry.target.querySelectorAll('[data-rh-fx]').forEach((el) => el.classList.add('is-inview'));
+				const group = observeTargetToGroup.get(entry.target);
+				if (!group) return;
+				group.querySelectorAll('[data-rh-fx]').forEach((el) => el.classList.add('is-inview'));
 				groupObserver.unobserve(entry.target);
 			});
 		}, observerOptions);
-		groups.forEach((group) => groupObserver.observe(group));
+		groups.forEach((group) => {
+			const target = resolveFxGroupObserveTarget(group);
+			observeTargetToGroup.set(target, group);
+			groupObserver.observe(target);
+		});
 	}
 })();
 
