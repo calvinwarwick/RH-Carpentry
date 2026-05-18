@@ -366,6 +366,17 @@ function rh_carpentry_client_logos_items(): array {
 }
 
 /**
+ * Canonical UK Fire Door Training lockup image (bundled under assets/images/footer).
+ *
+ * @return string Absolute URL to the JPEG/PNG asset.
+ */
+function rh_carpentry_uk_fire_door_training_image_url(): string {
+	$default = get_stylesheet_directory_uri() . '/assets/images/footer/uk-fire-door-training.jpg';
+
+	return (string) apply_filters( 'rh_carpentry_uk_fire_door_training_image_url', $default );
+}
+
+/**
  * Footer primary menu when no menu is assigned to the Primary location.
  */
 function rh_carpentry_footer_menu_fallback(): void {

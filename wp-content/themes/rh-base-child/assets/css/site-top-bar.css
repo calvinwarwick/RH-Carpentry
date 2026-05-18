@@ -1,0 +1,707 @@
+/**
+ * Inner pages: top bar — navy gradient, margins, rounded shell, thicker bar.
+ */
+
+.rh-site-top-bar.site-header {
+	position: relative;
+	z-index: 10020;
+	--rh-frame-inset: clamp(14px, 2.2vw, 28px);
+	/* Top margin matches the side margins so the rounded bar sits inside an
+	   equal inset on all four sides (no bottom margin — gap to the content
+	   below comes from the page sections themselves). */
+	margin: var(--rh-frame-inset) var(--rh-frame-inset) 0;
+	border: none;
+	box-shadow: none;
+	background: transparent;
+	overflow: visible;
+	isolation: isolate;
+	font-family: "Poppins", var(--rh-font-sans, system-ui, sans-serif);
+	--rh-max-width: 72rem;
+	--rh-space-4: 1.5rem;
+	--rh-top-bar-radius: clamp(10px, 1.25vw, 14px);
+}
+
+/* Full-width rounded bar (viewport minus header margins); overflow opens when mobile nav is open. */
+.rh-site-top-bar__shell {
+	position: relative;
+	width: 100%;
+	max-width: none;
+	margin-inline: 0;
+	border-radius: var(--rh-top-bar-radius);
+	border: 1px solid rgba(255, 255, 255, 0.14);
+	overflow: hidden;
+	box-shadow: 0 14px 40px rgba(8, 20, 40, 0.28);
+}
+
+body.rh-hero-nav-open .rh-site-top-bar__shell {
+	overflow: visible;
+}
+
+.rh-site-top-bar__bg {
+	position: absolute;
+	inset: 0;
+	z-index: 0;
+	background: linear-gradient(
+		125deg,
+		rgba(8, 20, 40, 0.98) 0%,
+		rgba(20, 45, 85, 0.94) 48%,
+		rgba(10, 25, 48, 0.96) 100%
+	);
+}
+
+.rh-site-top-bar__overlay {
+	position: absolute;
+	inset: 0;
+	z-index: 1;
+	pointer-events: none;
+	background: linear-gradient(
+		120deg,
+		rgba(8, 20, 40, 0.72) 0%,
+		rgba(20, 45, 85, 0.5) 45%,
+		rgba(10, 25, 48, 0.46) 100%
+	);
+}
+
+.rh-site-top-bar__inner {
+	position: relative;
+	z-index: 2;
+	width: 100%;
+	margin: 0;
+	/* Padding inside the navy shell is sized off --rh-hero-pad (from
+	   home-hero.css: clamp(1.35rem, 5vw, 3.25rem)) so the logo sits at the
+	   exact same X and Y offset inside the bar as it does inside the
+	   homepage hero shell. The X padding also aligns with the page
+	   content margins on inner pages. */
+	padding-inline: max(clamp(1.35rem, 5vw, 3.25rem), env(safe-area-inset-left, 0px))
+		max(clamp(1.35rem, 5vw, 3.25rem), env(safe-area-inset-right, 0px));
+	padding-block: max(clamp(1.35rem, 5vw, 3.25rem), env(safe-area-inset-top, 0px));
+}
+
+/* Compact hero header row */
+.rh-site-top-bar .rh-site-top-bar__header.rh-hero-header {
+	display: grid;
+	grid-template-columns: minmax(0, 1fr) auto auto;
+	align-items: center;
+	gap: clamp(0.75rem, 2vw, 1.25rem);
+	width: 100%;
+	margin: 0;
+	padding: 0;
+}
+
+.rh-site-top-bar .rh-hero-logo {
+	display: block;
+	grid-column: 1;
+	grid-row: 1;
+	justify-self: start;
+	align-self: center;
+	line-height: 0;
+	text-decoration: none;
+	color: inherit;
+	min-width: 0;
+	max-width: 100%;
+}
+
+.rh-site-top-bar .rh-hero-logo__img {
+	display: block;
+	/* Matches the homepage hero logo scale (see .rh-hero-logo__img in home-hero.css) */
+	width: clamp(10.5rem, 25dvw, 17.5rem);
+	max-width: 100%;
+	height: auto;
+}
+
+@supports not (width: 1dvw) {
+	.rh-site-top-bar .rh-hero-logo__img {
+		width: clamp(10.5rem, 25vw, 17.5rem);
+	}
+}
+
+/* Nav (matches home hero) */
+.rh-site-top-bar .rh-hero-nav-toggle {
+	display: none;
+	flex-direction: column;
+	justify-content: center;
+	align-items: center;
+	grid-column: 2;
+	grid-row: 1;
+	justify-self: end;
+	align-self: center;
+	gap: 6px;
+	box-sizing: border-box;
+	width: auto;
+	height: auto;
+	padding: 0;
+	margin: 0;
+	border: none;
+	background: transparent;
+	cursor: pointer;
+	color: #fff;
+	line-height: 0;
+	-webkit-appearance: none;
+	appearance: none;
+}
+
+.rh-site-top-bar .rh-hero-nav-toggle:focus-visible {
+	outline: 2px solid rgba(255, 255, 255, 0.65);
+	outline-offset: 4px;
+}
+
+.rh-site-top-bar .rh-hero-nav-toggle__bar {
+	display: block;
+	width: 1.25rem;
+	height: 2px;
+	margin: 0 auto;
+	background: currentColor;
+	border-radius: 1px;
+	transform-origin: center center;
+	transition:
+		transform 0.34s cubic-bezier(0.34, 1.46, 0.64, 1),
+		opacity 0.22s ease;
+}
+
+.rh-site-top-bar .rh-hero-nav-toggle[aria-expanded="true"] .rh-hero-nav-toggle__bar:nth-child(2) {
+	transform: translateY(8px) rotate(45deg);
+}
+
+.rh-site-top-bar .rh-hero-nav-toggle[aria-expanded="true"] .rh-hero-nav-toggle__bar:nth-child(3) {
+	opacity: 0;
+	transform: scaleX(0);
+}
+
+.rh-site-top-bar .rh-hero-nav-toggle[aria-expanded="true"] .rh-hero-nav-toggle__bar:nth-child(4) {
+	transform: translateY(-8px) rotate(-45deg);
+}
+
+.rh-site-top-bar .rh-hero-nav {
+	display: flex;
+	flex-direction: column;
+	align-items: flex-end;
+	grid-column: 2;
+	grid-row: 1;
+	justify-self: end;
+	align-self: center;
+	gap: 0.45rem;
+	text-transform: uppercase;
+	font-size: clamp(0.78rem, 1.05vw, 0.92rem);
+	font-weight: 600;
+	letter-spacing: 0.12em;
+}
+
+.rh-site-top-bar .rh-hero-nav__menu {
+	display: flex;
+	flex-wrap: wrap;
+	align-items: center;
+	justify-content: flex-end;
+	gap: clamp(1.1rem, 2.6vw, 2rem);
+	list-style: none;
+	margin: 0;
+	padding: 0;
+}
+
+.rh-site-top-bar .rh-hero-nav__menu .rh-hero-nav__home-item {
+	margin-inline-end: clamp(0.15rem, 0.6vw, 0.35rem);
+}
+
+.rh-site-top-bar .rh-hero-nav__menu a.rh-hero-nav__home {
+	display: inline-flex;
+	align-items: center;
+	justify-content: center;
+	padding: 0.2rem 0.15rem;
+	line-height: 1;
+	font-size: 1.05em;
+}
+
+.rh-site-top-bar .rh-hero-nav__menu a.rh-hero-nav__home::after {
+	display: none;
+}
+
+.rh-site-top-bar .rh-hero-nav__menu a {
+	position: relative;
+	display: inline-flex;
+	align-items: center;
+	line-height: 1;
+	color: #fff;
+	text-decoration: none;
+	padding-block: 0.2rem;
+	padding-bottom: calc(0.2rem + 2px);
+	transition: color 0.2s ease;
+}
+
+.rh-site-top-bar .rh-hero-nav__menu:has(a:hover) a:not(:hover),
+.rh-site-top-bar .rh-hero-nav__menu:has(a:focus-visible) a:not(:focus-visible) {
+	color: rgba(255, 255, 255, 0.45);
+}
+
+.rh-site-top-bar .rh-hero-nav__menu a:hover,
+.rh-site-top-bar .rh-hero-nav__menu a:focus-visible {
+	color: #fff;
+}
+
+.rh-site-top-bar .rh-hero-nav__menu a::after {
+	content: "";
+	position: absolute;
+	left: 0;
+	bottom: 0;
+	width: 100%;
+	height: 2px;
+	background: currentColor;
+	transform: scaleX(0);
+	transform-origin: right center;
+	transition: transform 0.32s cubic-bezier(0.33, 1, 0.68, 1);
+}
+
+.rh-site-top-bar .rh-hero-nav__menu a:hover::after,
+.rh-site-top-bar .rh-hero-nav__menu a:focus-visible::after {
+	transform: scaleX(1);
+	transform-origin: left center;
+}
+
+@media (prefers-reduced-motion: reduce) {
+	.rh-site-top-bar .rh-hero-nav__menu a::after {
+		transition-duration: 0.01ms;
+	}
+}
+
+/* Right-aligned "Get in touch" CTA — mirrors the homepage hero's .rh-hero-btn--muted (translucent glass over the navy bar). Self-contained because home-hero.css doesn't load on every inner page.
+   Two markup instances render the same button: --bar lives in the top-bar grid and is shown on desktop; --menu lives inside the mobile nav dropdown and is shown on mobile. Visibility is toggled in the @media block below. */
+.rh-site-top-bar .rh-site-top-bar__cta {
+	display: inline-flex;
+	align-items: center;
+	justify-content: center;
+	gap: 0.5em;
+	overflow: visible;
+	padding: 0.85rem 1.35rem;
+	border-radius: 10px;
+	border: 1px solid rgba(255, 255, 255, 0.22);
+	background: rgba(255, 255, 255, 0.1);
+	color: rgba(255, 255, 255, 0.92);
+	font-family: inherit;
+	font-size: 0.72rem;
+	font-weight: 700;
+	letter-spacing: 0.14em;
+	text-transform: uppercase;
+	text-decoration: none;
+	white-space: nowrap;
+	transition:
+		background 0.2s ease,
+		border-color 0.2s ease,
+		color 0.2s ease,
+		filter 0.15s ease;
+}
+
+.rh-site-top-bar .rh-site-top-bar__cta--bar {
+	grid-column: 3;
+	grid-row: 1;
+	justify-self: end;
+	align-self: center;
+	margin-inline-start: clamp(1.25rem, 3vw, 2.5rem);
+}
+
+/* Mobile menu copy: hidden on desktop, shown inside the dropdown on mobile. */
+.rh-site-top-bar .rh-site-top-bar__cta--menu {
+	display: none;
+}
+
+.rh-site-top-bar .rh-site-top-bar__cta::after {
+	content: "";
+	display: inline-block;
+	flex-shrink: 0;
+	width: max(0.58em, 0.48rem);
+	height: max(0.58em, 0.48rem);
+	margin-inline-start: 0.4em;
+	margin-inline-end: 0.04em;
+	border-top: 2.5px solid currentColor;
+	border-right: 2.5px solid currentColor;
+	transform: translateX(0) rotate(45deg);
+	opacity: 0.4;
+	transition: opacity 0.25s ease, border-color 0.3s ease;
+}
+
+.rh-site-top-bar .rh-site-top-bar__cta:hover,
+.rh-site-top-bar .rh-site-top-bar__cta:focus-visible {
+	background: rgba(255, 255, 255, 0.18);
+	border-color: rgba(255, 255, 255, 0.38);
+	color: #fff;
+	outline: none;
+}
+
+.rh-site-top-bar .rh-site-top-bar__cta:hover::after,
+.rh-site-top-bar .rh-site-top-bar__cta:focus-visible::after {
+	border-top-color: #fff;
+	border-right-color: #fff;
+	animation: rh-site-top-bar-cta-chevron 1.15s ease-in-out forwards;
+}
+
+/* Matches the .rh-hero-btn::after slide+wrap motion from home-hero.css */
+@keyframes rh-site-top-bar-cta-chevron {
+	0%,
+	12% {
+		transform: translateX(0) rotate(45deg);
+		opacity: 0.92;
+	}
+
+	28% {
+		transform: translateX(0.72em) rotate(45deg);
+		opacity: 0;
+	}
+
+	29% {
+		transform: translateX(-0.78em) rotate(45deg);
+		opacity: 0;
+	}
+
+	52% {
+		transform: translateX(0) rotate(45deg);
+		opacity: 0.92;
+	}
+
+	100% {
+		transform: translateX(0) rotate(45deg);
+		opacity: 0.92;
+	}
+}
+
+@media (prefers-reduced-motion: reduce) {
+	.rh-site-top-bar .rh-site-top-bar__cta:hover::after,
+	.rh-site-top-bar .rh-site-top-bar__cta:focus-visible::after {
+		animation-duration: 0.01ms;
+	}
+}
+
+/* --- Intro animation. ---
+   1. The navy shell starts as a small (roughly) square box at the top-left
+      hugging the RH portion of the logo, holds briefly, then swipes open to
+      the right with a bouncy motion.
+   2. The logo image inside is pre-clipped to show only the "RH" portion;
+      while the shell holds its square shape the logo holds at "RH only",
+      then both expand together.
+   3. The menu links, hamburger and CTA do NOT animate independently —
+      they sit at their final state from page load and are revealed
+      naturally as the shell's expanding clip-path uncovers them.
+   The shell animation's lingering clip-path is removed by JS (home-hero.js)
+   after animationend so the mobile dropdown (which sits below the shell) is
+   not clipped. */
+
+/* Initial reveal window: a (roughly) square box at the bar's top-left that
+   hugs around the RH portion of the logo so RH appears centered inside it.
+   The width is computed as 2 × (bar padding + half the RH glyph width) so it
+   stays centered on RH across viewports. The shell then expands to full width. */
+.rh-site-top-bar {
+	--rh-bar-square-width: calc(
+		max(clamp(1.35rem, 5vw, 3.25rem), env(safe-area-inset-left, 0px)) * 2 +
+			clamp(10.5rem, 25vw, 17.5rem) * 0.32
+	);
+}
+
+@keyframes rh-site-top-bar-shell-reveal {
+	0%,
+	28% {
+		clip-path: inset(0 calc(100% - var(--rh-bar-square-width)) 0 0 round var(--rh-top-bar-radius));
+	}
+	100% {
+		clip-path: inset(0 0 0 0 round var(--rh-top-bar-radius));
+	}
+}
+
+@keyframes rh-site-top-bar-logo-reveal {
+	0%,
+	40% {
+		clip-path: inset(0 68% 0 0);
+	}
+	100% {
+		clip-path: inset(0 0 0 0);
+	}
+}
+
+@media (prefers-reduced-motion: no-preference) {
+	.rh-site-top-bar {
+		--rh-site-top-bar-bounce-ease: cubic-bezier(0.34, 1.46, 0.64, 1);
+		--rh-site-top-bar-ease: cubic-bezier(0.2, 0.82, 0.2, 1);
+		--rh-site-top-bar-wipe-ease: cubic-bezier(0.65, 0.02, 0.35, 1);
+	}
+
+	/* Phase 1 — navy shell starts as a small square at the top-left hugging
+	   the RH portion of the logo, holds briefly, then swipes open to the
+	   right with a bouncy motion. The 0%→28% hold inside the keyframes
+	   leaves the square visible at page load before the bar expands. */
+	.rh-site-top-bar .rh-site-top-bar__shell {
+		clip-path: inset(0 calc(100% - var(--rh-bar-square-width)) 0 0 round var(--rh-top-bar-radius));
+		animation: rh-site-top-bar-shell-reveal 1.45s var(--rh-site-top-bar-bounce-ease) both;
+		transform-origin: left center;
+	}
+
+	/* Phase 2 — logo image stays pre-clipped to "RH" only while the shell
+	   holds its square shape, then swipes to reveal the rest in sync with
+	   the shell's expansion. */
+	.rh-site-top-bar .rh-hero-logo__img {
+		clip-path: inset(0 68% 0 0);
+		animation: rh-site-top-bar-logo-reveal 1.45s var(--rh-site-top-bar-ease) both;
+	}
+
+	/* Phase 3 — menu links, hamburger, and CTA have no entry animation of
+	   their own; they sit at their final position+opacity from page load
+	   and become visible naturally as the shell's expanding clip-path
+	   reveals more of the bar. */
+}
+
+/* Shared with home-hero.css — duplicated here because inner pages do not load that file. */
+@keyframes rh-home-hero-link-reveal {
+	0%,
+	24% {
+		opacity: 0;
+		clip-path: inset(0 100% 0 0);
+	}
+	50% {
+		opacity: 1;
+		clip-path: inset(0 0 0 0);
+	}
+	100% {
+		opacity: 1;
+		clip-path: inset(0 0 0 0);
+	}
+}
+
+@keyframes rh-home-hero-link-wipe {
+	0% {
+		transform: translate3d(-115%, 0, 0);
+	}
+	46% {
+		transform: translate3d(0, 0, 0);
+	}
+	100% {
+		transform: translate3d(112%, 0, 0);
+	}
+}
+
+@keyframes rh-home-hero-item-in {
+	from {
+		opacity: 0;
+		transform: translate3d(0, 0.55rem, 0);
+	}
+	to {
+		opacity: 1;
+		transform: translate3d(0, 0, 0);
+	}
+}
+
+@media (max-width: 900px) {
+	.rh-site-top-bar .rh-hero-nav-toggle {
+		display: flex;
+		position: relative;
+		z-index: 41;
+	}
+
+	/* On mobile the top-bar CTA is hidden; its mobile twin sits inside the dropdown. */
+	.rh-site-top-bar .rh-site-top-bar__cta--bar {
+		display: none;
+	}
+
+	.rh-site-top-bar .rh-site-top-bar__cta--menu {
+		display: inline-flex;
+		align-self: stretch;
+		justify-content: center;
+		margin-top: 0.5rem;
+		margin-inline-start: 0;
+		padding: 0.85rem 1.2rem;
+		font-size: 0.78rem;
+		letter-spacing: 0.14em;
+	}
+
+	/* Mobile dropdown — height grows with a quick bounce; links use the same
+	   wipe as the homepage hero nav on page load. */
+	.rh-site-top-bar .rh-hero-nav {
+		--rh-mobile-nav-bounce: cubic-bezier(0.34, 1.46, 0.64, 1);
+		--rh-mobile-nav-reveal-ease: cubic-bezier(0.2, 0.82, 0.2, 1);
+		--rh-mobile-nav-wipe-ease: cubic-bezier(0.65, 0.02, 0.35, 1);
+		grid-column: unset;
+		grid-row: unset;
+		justify-self: unset;
+		align-self: unset;
+		position: absolute;
+		top: calc(100% + 0.5rem);
+		right: 0;
+		left: 0;
+		z-index: 60;
+		flex-direction: column;
+		align-items: flex-start;
+		gap: 0.85rem;
+		max-height: 0;
+		padding-block: 0;
+		padding-inline: 1.15rem;
+		background: #0c1c34;
+		border: 1px solid rgba(255, 255, 255, 0.12);
+		border-radius: 12px;
+		overflow: hidden;
+		opacity: 1;
+		visibility: hidden;
+		pointer-events: none;
+		transform: none;
+		box-shadow: 0 18px 38px rgba(8, 20, 40, 0.35);
+		font-size: clamp(1.35rem, 5.2vw, 1.85rem);
+		letter-spacing: 0.08em;
+		transition:
+			max-height 0.42s var(--rh-mobile-nav-bounce),
+			padding-block 0.42s var(--rh-mobile-nav-bounce),
+			visibility 0s linear 0.42s;
+	}
+
+	.rh-site-top-bar .rh-site-top-bar__header.rh-hero-header {
+		position: relative;
+		z-index: 40;
+	}
+
+	.rh-site-top-bar .rh-hero-nav.is-open {
+		max-height: min(85vh, 32rem);
+		padding-block: 1.1rem 1.25rem;
+		visibility: visible;
+		pointer-events: auto;
+		transition:
+			max-height 0.42s var(--rh-mobile-nav-bounce),
+			padding-block 0.42s var(--rh-mobile-nav-bounce),
+			visibility 0s linear 0s;
+	}
+
+	.rh-site-top-bar .rh-hero-nav__menu {
+		flex-direction: column;
+		align-items: flex-start;
+		width: 100%;
+		gap: 0.35rem;
+	}
+
+	.rh-site-top-bar .rh-hero-nav__menu a::after {
+		display: none;
+	}
+
+	.rh-site-top-bar .rh-hero-nav__menu li a {
+		position: relative;
+		overflow: hidden;
+		display: inline-flex;
+		align-items: center;
+		padding-block: 0.15rem;
+		opacity: 0;
+		clip-path: inset(0 100% 0 0);
+	}
+
+	.rh-site-top-bar .rh-hero-nav__menu li a::before {
+		content: "";
+		position: absolute;
+		inset: -0.08em -0.2em;
+		background: #fff;
+		transform: translate3d(-115%, 0, 0);
+		pointer-events: none;
+		z-index: 2;
+	}
+
+	/* Home icon: fade only (wipe ::before would cover the glyph). */
+	.rh-site-top-bar .rh-hero-nav__menu a.rh-hero-nav__home::before {
+		content: none;
+	}
+
+	.rh-site-top-bar .rh-hero-nav.is-open .rh-hero-nav__menu a.rh-hero-nav__home {
+		animation: rh-home-hero-item-in 0.46s var(--rh-mobile-nav-reveal-ease) both;
+	}
+
+	.rh-site-top-bar .rh-hero-nav.is-open .rh-hero-nav__menu a.rh-hero-nav__home::before {
+		animation: none;
+	}
+
+	.rh-site-top-bar .rh-hero-nav:not(.is-open) .rh-hero-nav__menu li a,
+	.rh-site-top-bar .rh-hero-nav:not(.is-open) .rh-hero-nav__menu li a::before {
+		animation: none !important;
+	}
+
+	.rh-site-top-bar .rh-hero-nav.is-open .rh-hero-nav__menu li a {
+		animation: rh-home-hero-link-reveal 0.72s var(--rh-mobile-nav-reveal-ease) both;
+	}
+
+	.rh-site-top-bar .rh-hero-nav.is-open .rh-hero-nav__menu li a::before {
+		animation: rh-home-hero-link-wipe 0.72s var(--rh-mobile-nav-wipe-ease) both;
+	}
+
+	.rh-site-top-bar .rh-hero-nav.is-open .rh-hero-nav__menu li:nth-child(1) a,
+	.rh-site-top-bar .rh-hero-nav.is-open .rh-hero-nav__menu li:nth-child(1) a::before {
+		animation-delay: 0.14s;
+	}
+
+	.rh-site-top-bar .rh-hero-nav.is-open .rh-hero-nav__menu li:nth-child(2) a,
+	.rh-site-top-bar .rh-hero-nav.is-open .rh-hero-nav__menu li:nth-child(2) a::before {
+		animation-delay: 0.22s;
+	}
+
+	.rh-site-top-bar .rh-hero-nav.is-open .rh-hero-nav__menu li:nth-child(3) a,
+	.rh-site-top-bar .rh-hero-nav.is-open .rh-hero-nav__menu li:nth-child(3) a::before {
+		animation-delay: 0.3s;
+	}
+
+	.rh-site-top-bar .rh-hero-nav.is-open .rh-hero-nav__menu li:nth-child(4) a,
+	.rh-site-top-bar .rh-hero-nav.is-open .rh-hero-nav__menu li:nth-child(4) a::before {
+		animation-delay: 0.38s;
+	}
+
+	.rh-site-top-bar .rh-hero-nav.is-open .rh-hero-nav__menu li:nth-child(5) a,
+	.rh-site-top-bar .rh-hero-nav.is-open .rh-hero-nav__menu li:nth-child(5) a::before {
+		animation-delay: 0.46s;
+	}
+
+	.rh-site-top-bar .rh-hero-nav.is-open .rh-hero-nav__menu li:nth-child(n + 6) a,
+	.rh-site-top-bar .rh-hero-nav.is-open .rh-hero-nav__menu li:nth-child(n + 6) a::before {
+		animation-delay: 0.54s;
+	}
+
+	.rh-site-top-bar .rh-site-top-bar__cta--menu {
+		opacity: 0;
+		transform: translate3d(0, 0.5rem, 0);
+		font-size: clamp(0.78rem, 2.8vw, 0.92rem);
+		letter-spacing: 0.14em;
+	}
+
+	.rh-site-top-bar .rh-hero-nav:not(.is-open) .rh-site-top-bar__cta--menu {
+		animation: none !important;
+	}
+
+	.rh-site-top-bar .rh-hero-nav.is-open .rh-site-top-bar__cta--menu {
+		animation: rh-home-hero-item-in 0.46s var(--rh-mobile-nav-reveal-ease) 0.58s both;
+	}
+}
+
+@media (max-width: 900px) and (prefers-reduced-motion: reduce) {
+	.rh-site-top-bar .rh-hero-nav-toggle__bar {
+		transition-duration: 0.01ms;
+	}
+
+	.rh-site-top-bar .rh-hero-nav,
+	.rh-site-top-bar .rh-hero-nav.is-open,
+	.rh-site-top-bar .rh-hero-nav__menu li a,
+	.rh-site-top-bar .rh-hero-nav.is-open .rh-hero-nav__menu li a,
+	.rh-site-top-bar .rh-hero-nav.is-open .rh-hero-nav__menu li a::before,
+	.rh-site-top-bar .rh-site-top-bar__cta--menu,
+	.rh-site-top-bar .rh-hero-nav.is-open .rh-site-top-bar__cta--menu {
+		transition-duration: 0.01ms !important;
+		transition-delay: 0s !important;
+		animation: none !important;
+	}
+
+	.rh-site-top-bar .rh-hero-nav:not(.is-open) {
+		max-height: 0;
+		visibility: hidden;
+	}
+
+	.rh-site-top-bar .rh-hero-nav.is-open {
+		max-height: none;
+		visibility: visible;
+	}
+
+	.rh-site-top-bar .rh-hero-nav__menu li a {
+		opacity: 1;
+		clip-path: none;
+	}
+
+	.rh-site-top-bar .rh-hero-nav__menu li a::before {
+		display: none;
+	}
+
+	.rh-site-top-bar .rh-site-top-bar__cta--menu,
+	.rh-site-top-bar .rh-hero-nav.is-open .rh-site-top-bar__cta--menu {
+		opacity: 1;
+		transform: none;
+	}
+}

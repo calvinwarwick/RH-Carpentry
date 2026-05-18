@@ -216,6 +216,83 @@ body:not(.rh-carpentry-home) .rh-site-footer__surface-inner {
 	-webkit-filter: grayscale(1);
 }
 
+/* UK Fire Door Training: one bundled lockup; main mark + three “APPROVED” strips from the same asset */
+.rh-site-footer__uk-fire-door {
+	display: flex;
+	flex-direction: column;
+	align-items: flex-start;
+	gap: clamp(0.35rem, 1.2vw, 0.55rem);
+	max-width: 100%;
+}
+
+.rh-site-footer__uk-fire-door-main-wrap {
+	overflow: hidden;
+	width: min(100%, 14.5rem);
+	aspect-ratio: 1024 / 436;
+	flex: 0 0 auto;
+}
+
+.rh-site-footer__uk-fire-door-main {
+	display: block;
+	width: 100%;
+	height: auto;
+	max-width: none;
+}
+
+.rh-site-footer__uk-fire-door-badges {
+	display: flex;
+	flex-direction: row;
+	flex-wrap: wrap;
+	align-items: center;
+	gap: clamp(0.3rem, 1vw, 0.45rem);
+	max-width: 100%;
+}
+
+.rh-ukfd-strip {
+	position: relative;
+	overflow: hidden;
+	flex: 0 0 auto;
+	width: clamp(5.75rem, 20vw, 10.25rem);
+	aspect-ratio: 1024 / 62;
+}
+
+.rh-ukfd-strip img {
+	position: absolute;
+	left: 0;
+	top: 0;
+	width: 100%;
+	height: auto;
+	max-width: none;
+	display: block;
+	pointer-events: none;
+}
+
+/* Native Y-offsets within uk-fire-door-training.jpg (1024×671) for each “APPROVED” row */
+.rh-ukfd-strip--1 img {
+	transform: translateY(calc(-463 / 671 * 100%));
+}
+
+.rh-ukfd-strip--2 img {
+	transform: translateY(calc(-533 / 671 * 100%));
+}
+
+.rh-ukfd-strip--3 img {
+	transform: translateY(calc(-604 / 671 * 100%));
+}
+
+@media (min-width: 768px) {
+	.rh-site-footer__uk-fire-door {
+		flex-direction: row;
+		align-items: center;
+		flex-wrap: nowrap;
+		gap: clamp(0.45rem, 1.4vw, 0.75rem);
+	}
+
+	.rh-site-footer__uk-fire-door-badges {
+		flex-wrap: nowrap;
+	}
+}
+
 .rh-site-footer__address {
 	margin: 0 0 0.85rem;
 	font-size: 0.88rem;
