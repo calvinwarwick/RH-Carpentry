@@ -122,12 +122,18 @@ function rh_landing_hero_image_url(): string {
  * @return array{pre_title: string, title: string, subtitle: string, intro: string, image_url: string, split: bool}
  */
 function rh_landing_service_hero(array $service): array {
+	$card_slug = isset($service['card_slug']) ? (string) $service['card_slug'] : '';
+	$image_url = $card_slug !== '' && function_exists('rh_carpentry_get_service_card_image_url')
+		? rh_carpentry_get_service_card_image_url($card_slug)
+		: '';
+
 	return array(
 		'pre_title' => __('Our services', 'rh-base-child'),
 		'title'     => $service['label'],
 		'subtitle'  => '',
 		'intro'     => $service['intro'],
-		'split'     => false,
+		'split'     => true,
+		'image_url' => $image_url,
 	);
 }
 

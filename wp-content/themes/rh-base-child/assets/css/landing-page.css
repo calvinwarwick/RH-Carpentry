@@ -63,10 +63,19 @@ body.rh-carpentry-inner .rh-archive-projects > .rh-archive-projects__inner:first
 	padding: 0;
 }
 
+.rh-breadcrumbs__item {
+	position: relative;
+}
+
 .rh-breadcrumbs__item:not(:last-child)::after {
 	content: '/';
 	margin-left: 0.5rem;
 	opacity: 0.45;
+}
+
+/* Wipe reveal (synced with archive subtitle via home-hero.js). */
+.rh-breadcrumbs__item[data-rh-fx='wipe'] {
+	overflow: hidden;
 }
 
 .rh-breadcrumbs a {

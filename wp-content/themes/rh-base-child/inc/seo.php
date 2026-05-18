@@ -534,11 +534,11 @@ function rh_seo_render_breadcrumbs(): void {
 	if ($crumbs === array()) {
 		return;
 	}
-	echo '<nav class="rh-breadcrumbs" aria-label="' . esc_attr__('Breadcrumb', 'rh-base-child') . '" data-rh-fx-group data-rh-fx-stagger="90" data-rh-fx-base="0">';
+	echo '<nav class="rh-breadcrumbs" aria-label="' . esc_attr__('Breadcrumb', 'rh-base-child') . '" data-rh-fx-group data-rh-fx-stagger="70" data-rh-fx-base="0" data-rh-breadcrumbs-sync-hero>';
 	echo '<ol class="rh-breadcrumbs__list">';
 	$last = count($crumbs) - 1;
 	foreach ($crumbs as $i => $crumb) {
-		echo '<li class="rh-breadcrumbs__item" data-rh-fx="fade" data-rh-fx-tone="dark">';
+		echo '<li class="rh-breadcrumbs__item" data-rh-fx="wipe" data-rh-fx-tone="dark">';
 		if ($i < $last && $crumb['url'] !== '') {
 			printf(
 				'<a href="%s">%s</a>',
