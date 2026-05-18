@@ -9,8 +9,9 @@ if (! defined('ABSPATH')) {
 	exit;
 }
 
-$bg_url = rh_carpentry_get_hero_background_url();
-$notice = isset($_GET['contact']) ? sanitize_key(wp_unslash($_GET['contact'])) : '';
+$bg_url   = rh_carpentry_get_hero_background_url();
+$notice   = isset($_GET['contact']) ? sanitize_key(wp_unslash($_GET['contact'])) : '';
+$messages = rh_carpentry_home_contact_messages();
 ?>
 <div
 	id="contact"
@@ -40,21 +41,17 @@ $notice = isset($_GET['contact']) ? sanitize_key(wp_unslash($_GET['contact'])) :
 				<h2 class="rh-hero-title rh-contact-overlay__title" id="rh-contact-heading"><?php esc_html_e('Get in touch', 'rh-base-child'); ?></h2>
 				<p class="rh-contact-overlay__intro"><?php esc_html_e('Tell us a little about your project and we will get back to you shortly.', 'rh-base-child'); ?></p>
 
-				<?php if ($notice === 'sent') : ?>
-					<p class="rh-contact-overlay__notice rh-contact-overlay__notice--success" role="status">
-						<?php esc_html_e('Thank you — your message has been sent.', 'rh-base-child'); ?>
-					</p>
-				<?php elseif ($notice === 'required') : ?>
-					<p class="rh-contact-overlay__notice rh-contact-overlay__notice--warn" role="alert">
-						<?php esc_html_e('Please fill in your name, a valid email, and a message.', 'rh-base-child'); ?>
-					</p>
-				<?php elseif ($notice === 'invalid') : ?>
-					<p class="rh-contact-overlay__notice rh-contact-overlay__notice--warn" role="alert">
-						<?php esc_html_e('Something went wrong. Please try again.', 'rh-base-child'); ?>
+				<div class="rh-contact-overlay__notice-slot" data-rh-contact-notice-slot hidden>
+					<p class="rh-contact-overlay__notice" data-rh-contact-notice role="status"></p>
+				</div>
+
+				<?php if ($notice !== '' && isset($messages[ $notice ])) : ?>
+					<p class="rh-contact-overlay__notice rh-contact-overlay__notice--<?php echo $notice === 'sent' ? 'success' : 'warn'; ?>" role="<?php echo $notice === 'sent' ? 'status' : 'alert'; ?>">
+						<?php echo esc_html($messages[ $notice ]); ?>
 					</p>
 				<?php endif; ?>
 
-				<form class="rh-contact-overlay__form" method="post" action="<?php echo esc_url(admin_url('admin-post.php')); ?>">
+				<form class="rh-contact-overlay__form" method="post" action="<?php echo esc_url(admin_url('admin-ajax.php')); ?>" data-rh-contact-form novalidate>
 					<input type="hidden" name="action" value="rh_home_contact" />
 					<?php wp_nonce_field('rh_home_contact', 'rh_home_contact_nonce'); ?>
 

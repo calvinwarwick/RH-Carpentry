@@ -88,7 +88,7 @@ add_action('init', 'rh_project_seed_sectors', 20);
  * Flush permalinks once after CPT/tax changes (covers deploy without re-saving theme).
  */
 function rh_base_child_maybe_flush_rewrites(): void {
-	$version = '2';
+	$version = '3';
 	if (get_option('rh_base_child_rewrite_version') === $version) {
 		return;
 	}
@@ -468,20 +468,18 @@ function rh_project_render_bento_card($post, int $index = 0): string {
 			$slugs[]  = (string) $t->slug;
 		}
 	}
-	$sectors_attr = $slugs !== array() ? implode( ' ', $slugs ) : '';
+	$sectors_attr = $slugs !== array() ? implode(' ', $slugs) : '';
 	$title        = get_the_title($post);
 	$card_id_att  = 'rh-archive-project-' . $pid;
 
 	ob_start();
 	?>
 	<article
-		class="rh-home-project-card rh-bento-cell is-active rh-archive-project-card-v2"
+		class="rh-home-project-card rh-bento-cell rh-archive-project-card"
 		id="<?php echo esc_attr($card_id_att); ?>"
 		role="listitem"
 		data-rh-project-url="<?php echo esc_url($permalink); ?>"
-		<?php if ($sectors_attr !== '') : ?>
-			data-rh-sectors="<?php echo esc_attr($sectors_attr); ?>"
-		<?php endif; ?>
+		data-rh-sectors="<?php echo esc_attr($sectors_attr); ?>"
 		data-rh-fx="scale"
 		aria-label="<?php echo esc_attr($title); ?>"
 	>
@@ -516,6 +514,54 @@ function rh_project_render_bento_card($post, int $index = 0): string {
 }
 
 /**
+ * Sector terms that have at least one published project (for archive filter chips).
+ *
+ * @return WP_Term[]
+ */
+function rh_project_archive_filter_terms(): array {
+	$terms = get_terms(
+		array(
+			'taxonomy'   => 'rh_project_sector',
+			'hide_empty' => true,
+		)
+	);
+	if (! is_array($terms) || $terms === array()) {
+		return array();
+	}
+
+	$out = array();
+	foreach ($terms as $term) {
+		if (! $term instanceof WP_Term) {
+			continue;
+		}
+		$q = new WP_Query(
+			array(
+				'post_type'              => 'rh_project',
+				'post_status'            => 'publish',
+				'posts_per_page'         => 1,
+				'fields'                 => 'ids',
+				'no_found_rows'          => false,
+				'update_post_meta_cache' => false,
+				'update_post_term_cache' => false,
+				'tax_query'              => array(
+					array(
+						'taxonomy' => 'rh_project_sector',
+						'field'    => 'term_id',
+						'terms'    => (int) $term->term_id,
+					),
+				),
+			)
+		);
+		if ((int) $q->found_posts > 0) {
+			$out[] = $term;
+		}
+		wp_reset_postdata();
+	}
+
+	return $out;
+}
+
+/**
  * REST endpoint returning the next page of project cards (used by infinite scroll on the archive).
  */
 function rh_project_register_rest_routes(): void {
@@ -539,6 +585,13 @@ function rh_project_register_rest_routes(): void {
 					'maximum'           => 50,
 					'sanitize_callback' => 'absint',
 				),
+				'sector'   => array(
+					'type'              => 'string',
+					'default'           => '',
+					'sanitize_callback' => static function ($value): string {
+						return sanitize_title((string) $value);
+					},
+				),
 			),
 			'callback'            => 'rh_project_rest_archive_page',
 		)
@@ -559,17 +612,29 @@ function rh_project_rest_archive_page(WP_REST_Request $request): WP_REST_Respons
 		$per_page = rh_project_archive_per_page();
 	}
 
-	$q = new WP_Query(
-		array(
-			'post_type'           => 'rh_project',
-			'post_status'         => 'publish',
-			'posts_per_page'      => $per_page,
-			'paged'               => $page,
-			'orderby'             => 'date',
-			'order'               => 'DESC',
-			'ignore_sticky_posts' => true,
-		)
+	$sector = (string) $request->get_param('sector');
+
+	$query_args = array(
+		'post_type'           => 'rh_project',
+		'post_status'         => 'publish',
+		'posts_per_page'      => $per_page,
+		'paged'               => $page,
+		'orderby'             => 'date',
+		'order'               => 'DESC',
+		'ignore_sticky_posts' => true,
 	);
+
+	if ($sector !== '') {
+		$query_args['tax_query'] = array(
+			array(
+				'taxonomy' => 'rh_project_sector',
+				'field'    => 'slug',
+				'terms'    => $sector,
+			),
+		);
+	}
+
+	$q = new WP_Query($query_args);
 
 	$html  = '';
 	$count = 0;

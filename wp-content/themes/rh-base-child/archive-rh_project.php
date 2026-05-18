@@ -16,7 +16,22 @@ $rh_rest_url    = rest_url('rh/v1/projects');
 
 <div class="rh-archive-projects">
 	<div class="rh-archive-projects__inner">
-		<header class="rh-archive-projects__header" data-rh-fx-group data-rh-fx-stagger="140" data-rh-fx-base="500">
+		<?php
+		$rh_sectors = function_exists('rh_project_archive_filter_terms')
+			? rh_project_archive_filter_terms()
+			: array();
+		/* Match header data-rh-fx-base + (3 × stagger) + wipe duration so filters follow the intro. */
+		$rh_archive_fx_base     = 500;
+		$rh_archive_fx_stagger  = 140;
+		$rh_archive_fx_wipe_ms  = 940;
+		$rh_filters_fx_delay_ms = $rh_archive_fx_base + ( 3 * $rh_archive_fx_stagger ) + $rh_archive_fx_wipe_ms;
+		?>
+		<header
+			class="rh-archive-projects__header"
+			data-rh-fx-group
+			data-rh-fx-stagger="<?php echo (int) $rh_archive_fx_stagger; ?>"
+			data-rh-fx-base="<?php echo (int) $rh_archive_fx_base; ?>"
+		>
 			<p class="rh-home-kicker rh-archive-projects__kicker" data-rh-fx="wipe" data-rh-fx-tone="dark">
 				<span class="rh-home-kicker__line" aria-hidden="true"></span>
 				<?php esc_html_e('Portfolio', 'rh-base-child'); ?>
@@ -24,10 +39,36 @@ $rh_rest_url    = rest_url('rh/v1/projects');
 			<h1 class="page-title rh-home-heading rh-home-heading--section" data-rh-fx="wipe" data-rh-fx-tone="dark">
 				<?php post_type_archive_title(); ?>
 			</h1>
+			<p class="rh-archive-projects__subtitle" data-rh-fx="wipe" data-rh-fx-tone="dark">
+				<?php esc_html_e('Residential, commercial and community builds across Essex and East Anglia.', 'rh-base-child'); ?>
+			</p>
 			<p class="rh-archive-projects__intro" data-rh-fx="wipe" data-rh-fx-tone="dark">
-				<?php esc_html_e('A selection of our carpentry and construction work across sectors.', 'rh-base-child'); ?>
+				<?php esc_html_e('Carpentry and construction projects for homeowners, developers and contractors across Essex and East Anglia — new builds, refurbishments, barn conversions, education and commercial work.', 'rh-base-child'); ?>
 			</p>
 		</header>
+
+		<?php if ($rh_sectors !== array()) : ?>
+			<div
+				class="rh-archive-projects__filters"
+				data-rh-archive-filters
+				data-rh-fx-group
+				data-rh-fx-stagger="90"
+				data-rh-fx-base="<?php echo (int) $rh_filters_fx_delay_ms; ?>"
+				role="group"
+				aria-label="<?php esc_attr_e('Filter by sector', 'rh-base-child'); ?>"
+			>
+				<button type="button" class="rh-archive-projects__filter is-active" data-rh-sector-filter="" data-rh-fx="fade" data-rh-fx-tone="dark" aria-pressed="true">
+					<?php esc_html_e('All', 'rh-base-child'); ?>
+				</button>
+				<?php foreach ($rh_sectors as $rh_term) : ?>
+					<?php if ($rh_term instanceof WP_Term) : ?>
+						<button type="button" class="rh-archive-projects__filter" data-rh-sector-filter="<?php echo esc_attr($rh_term->slug); ?>" data-rh-fx="fade" data-rh-fx-tone="dark" aria-pressed="false">
+							<?php echo esc_html($rh_term->name); ?>
+						</button>
+					<?php endif; ?>
+				<?php endforeach; ?>
+			</div>
+		<?php endif; ?>
 
 		<?php if (! have_posts()) : ?>
 			<p class="rh-archive-projects__empty"><?php esc_html_e('No projects published yet.', 'rh-base-child'); ?></p>
@@ -60,6 +101,9 @@ $rh_rest_url    = rest_url('rh/v1/projects');
 					?>
 				</div>
 			</div>
+			<p class="rh-archive-projects__filter-empty" data-rh-archive-filter-empty hidden>
+				<?php esc_html_e('No projects in this sector.', 'rh-base-child'); ?>
+			</p>
 
 			<?php if ($rh_total_pages > 1) : ?>
 				<div

@@ -142,6 +142,191 @@ body.rh-carpentry-home {
 	scroll-margin-top: clamp(0.75rem, 2.5vw, 1.5rem);
 }
 
+/* --- About / Services section overlays (#about, #services) — all pages --- */
+
+body.rh-section-overlay-open {
+	overflow: hidden;
+}
+
+.rh-section-overlay {
+	--rh-section-overlay-dur: 0.42s;
+	--rh-section-overlay-ease: cubic-bezier(0.32, 0.72, 0, 1);
+	position: fixed;
+	inset: 0;
+	z-index: 49900;
+	display: flex;
+	align-items: stretch;
+	justify-content: center;
+	box-sizing: border-box;
+	padding: max(env(safe-area-inset-top, 0px), 0.75rem) max(env(safe-area-inset-right, 0px), 0.75rem)
+		max(env(safe-area-inset-bottom, 0px), 0.75rem) max(env(safe-area-inset-left, 0px), 0.75rem);
+	visibility: hidden;
+	pointer-events: none;
+	transition: visibility 0s linear calc(var(--rh-section-overlay-dur) + 0.04s);
+}
+
+.rh-section-overlay__backdrop {
+	position: absolute;
+	inset: 0;
+	z-index: 0;
+	background: var(--rh-hero-overlay-gradient);
+	opacity: 0;
+	transition: opacity var(--rh-section-overlay-dur) var(--rh-section-overlay-ease);
+}
+
+.rh-section-overlay__panel {
+	position: relative;
+	z-index: 1;
+	display: flex;
+	flex-direction: column;
+	width: min(100%, 52rem);
+	max-height: 100%;
+	margin: auto;
+	align-self: center;
+	background: var(--rh-color-surface, #0f1f33);
+	border: 1px solid rgba(255, 255, 255, 0.12);
+	border-radius: clamp(0.5rem, 1.5vw, 0.85rem);
+	box-shadow: 0 24px 80px rgba(0, 0, 0, 0.45);
+	overflow: hidden;
+	transform: translate3d(0, 108%, 0);
+	opacity: 0;
+	transition:
+		transform var(--rh-section-overlay-dur) var(--rh-section-overlay-ease),
+		opacity calc(var(--rh-section-overlay-dur) * 0.85) var(--rh-section-overlay-ease);
+}
+
+.rh-section-overlay__panel--wide {
+	width: min(100%, 68rem);
+}
+
+.rh-section-overlay.is-open {
+	visibility: visible;
+	pointer-events: auto;
+	transition: visibility 0s;
+}
+
+.rh-section-overlay.is-open .rh-section-overlay__backdrop {
+	opacity: 0.94;
+}
+
+.rh-section-overlay.is-open .rh-section-overlay__panel {
+	transform: translate3d(0, 0, 0);
+	opacity: 1;
+}
+
+.rh-section-overlay.is-closing {
+	visibility: visible;
+	pointer-events: auto;
+	transition: none;
+}
+
+.rh-section-overlay.is-closing .rh-section-overlay__backdrop {
+	opacity: 0;
+}
+
+.rh-section-overlay.is-closing .rh-section-overlay__panel {
+	transform: translate3d(0, 108%, 0);
+	opacity: 0;
+}
+
+.rh-section-overlay__bar {
+	display: flex;
+	justify-content: flex-end;
+	align-items: center;
+	flex-shrink: 0;
+	padding: 0.65rem 0.75rem 0.35rem;
+}
+
+.rh-section-overlay__close {
+	display: inline-flex;
+	align-items: center;
+	justify-content: center;
+	width: 2.75rem;
+	height: 2.75rem;
+	padding: 0;
+	border: 1px solid rgba(255, 255, 255, 0.2);
+	border-radius: 999px;
+	background: rgba(255, 255, 255, 0.06);
+	color: inherit;
+	cursor: pointer;
+	transition:
+		background 0.2s ease,
+		border-color 0.2s ease;
+}
+
+.rh-section-overlay__close:hover,
+.rh-section-overlay__close:focus-visible {
+	background: rgba(255, 255, 255, 0.12);
+	border-color: rgba(255, 255, 255, 0.35);
+}
+
+.rh-section-overlay__close:focus-visible {
+	outline: 2px solid rgba(255, 255, 255, 0.5);
+	outline-offset: 2px;
+}
+
+.rh-section-overlay__close-icon {
+	position: relative;
+	display: block;
+	width: 1rem;
+	height: 1rem;
+}
+
+.rh-section-overlay__close-icon::before,
+.rh-section-overlay__close-icon::after {
+	content: "";
+	position: absolute;
+	top: 50%;
+	left: 50%;
+	width: 1rem;
+	height: 2px;
+	margin: -1px 0 0 -0.5rem;
+	background: currentColor;
+	border-radius: 1px;
+}
+
+.rh-section-overlay__close-icon::before {
+	transform: rotate(45deg);
+}
+
+.rh-section-overlay__close-icon::after {
+	transform: rotate(-45deg);
+}
+
+.rh-section-overlay__scroll {
+	flex: 1 1 auto;
+	min-height: 0;
+	overflow-y: auto;
+	-webkit-overflow-scrolling: touch;
+	overscroll-behavior: contain;
+	padding: 0 1rem 1.5rem;
+}
+
+.rh-section-overlay__scroll.rh-home-section {
+	padding-top: 0;
+}
+
+.rh-section-overlay--services .rh-home-section__inner {
+	padding-bottom: 0.5rem;
+}
+
+@media (prefers-reduced-motion: reduce) {
+	.rh-section-overlay,
+	.rh-section-overlay__backdrop,
+	.rh-section-overlay__panel {
+		transition: none;
+	}
+
+	.rh-section-overlay__panel {
+		transform: none;
+		opacity: 1;
+	}
+
+	.rh-section-overlay:not(.is-open) .rh-section-overlay__panel {
+		opacity: 0;
+	}
+}
+
 /* --- Full-screen contact overlay (#contact) — hero-matched shell --- */
 
 body.rh-contact-overlay-open {
@@ -581,14 +766,23 @@ body.rh-contact-overlay-open {
 	line-height: 1.55;
 }
 
-.rh-contact-overlay__notice {
+.rh-contact-overlay__notice-slot[hidden] {
+	display: none;
+}
+
+.rh-contact-overlay__notice-slot:not([hidden]) {
 	margin: 0 0 1rem;
+	width: min(40rem, 100%);
+}
+
+.rh-contact-overlay__notice {
+	margin: 0;
 	padding: 0.75rem 1rem;
 	border-radius: var(--rh-bento-radius);
 	font-size: 0.95rem;
 	font-weight: 500;
 	line-height: 1.45;
-	width: min(40rem, 100%);
+	width: 100%;
 }
 
 .rh-contact-overlay__notice--success {
@@ -629,7 +823,7 @@ body.rh-contact-overlay-open {
  * Bootstrap-style floating labels: <label> wraps control + .rh-form-floating__label-text.
  * Native <label> text is not shown as a block — only the span floats (no duplicate block labels).
  */
-.rh-contact-overlay label.rh-form-floating {
+:is(.rh-contact-overlay, .rh-contact-section-band) label.rh-form-floating {
 	position: relative;
 	display: block;
 	width: 100%;
@@ -638,7 +832,7 @@ body.rh-contact-overlay-open {
 	cursor: text;
 }
 
-.rh-contact-overlay .rh-form-floating__control {
+:is(.rh-contact-overlay, .rh-contact-section-band) .rh-form-floating__control {
 	position: relative;
 	z-index: 2;
 	display: block;
@@ -658,17 +852,17 @@ body.rh-contact-overlay-open {
 		background 0.15s ease;
 }
 
-.rh-contact-overlay .rh-form-floating__control::placeholder {
+:is(.rh-contact-overlay, .rh-contact-section-band) .rh-form-floating__control::placeholder {
 	color: transparent;
 }
 
-.rh-contact-overlay .rh-form-floating__control:focus {
+:is(.rh-contact-overlay, .rh-contact-section-band) .rh-form-floating__control:focus {
 	outline: none;
 	border-color: rgba(255, 255, 255, 0.42);
 	background: rgba(255, 255, 255, 0.14);
 }
 
-.rh-contact-overlay .rh-form-floating__label-text {
+:is(.rh-contact-overlay, .rh-contact-section-band) .rh-form-floating__label-text {
 	position: absolute;
 	top: 0;
 	left: 0;
@@ -699,8 +893,8 @@ body.rh-contact-overlay-open {
 		padding 0.2s ease;
 }
 
-.rh-contact-overlay .rh-form-floating:focus-within .rh-form-floating__label-text,
-.rh-contact-overlay .rh-form-floating__control:not(:placeholder-shown) + .rh-form-floating__label-text {
+:is(.rh-contact-overlay, .rh-contact-section-band) .rh-form-floating:focus-within .rh-form-floating__label-text,
+:is(.rh-contact-overlay, .rh-contact-section-band) .rh-form-floating__control:not(:placeholder-shown) + .rh-form-floating__label-text {
 	opacity: 0.95;
 	color: rgba(255, 255, 255, 0.92);
 	max-height: none;
@@ -708,7 +902,7 @@ body.rh-contact-overlay-open {
 	transform: scale(0.82) translateY(-0.08rem) translateX(0.04rem);
 }
 
-.rh-contact-overlay .rh-form-floating--textarea .rh-form-floating__control--textarea {
+:is(.rh-contact-overlay, .rh-contact-section-band) .rh-form-floating--textarea .rh-form-floating__control--textarea {
 	height: auto;
 	min-height: 8rem;
 	padding-top: 1.55rem;
@@ -716,7 +910,7 @@ body.rh-contact-overlay-open {
 	resize: none;
 }
 
-.rh-contact-overlay .rh-form-floating--textarea .rh-form-floating__label-text {
+:is(.rh-contact-overlay, .rh-contact-section-band) .rh-form-floating--textarea .rh-form-floating__label-text {
 	max-height: none;
 	min-height: 2.75rem;
 	height: auto;
@@ -724,20 +918,29 @@ body.rh-contact-overlay-open {
 	white-space: normal;
 }
 
-.rh-contact-overlay .rh-form-floating--textarea:focus-within .rh-form-floating__label-text,
-.rh-contact-overlay .rh-form-floating--textarea .rh-form-floating__control:not(:placeholder-shown) + .rh-form-floating__label-text {
+:is(.rh-contact-overlay, .rh-contact-section-band) .rh-form-floating--textarea:focus-within .rh-form-floating__label-text,
+:is(.rh-contact-overlay, .rh-contact-section-band) .rh-form-floating--textarea .rh-form-floating__control:not(:placeholder-shown) + .rh-form-floating__label-text {
 	padding: 0.4rem 0.85rem 0;
 	transform: scale(0.82) translateY(-0.12rem) translateX(0.04rem);
 }
 
 .rh-contact-overlay__actions {
-	margin: clamp(1rem, 3vw, 1.5rem) 0 0;
+	margin: clamp(1.75rem, 4.5vw, 2.5rem) 0 0;
+}
+
+.rh-contact-overlay__form > .rh-contact-overlay__submit,
+.rh-contact-overlay__actions .rh-contact-overlay__submit,
+:where(.rh-contact-page-form, .rh-contact-section-band__form) .rh-contact-overlay__submit {
+	display: flex;
+	width: 100%;
+	max-width: 100%;
+	margin-top: clamp(1.75rem, 4.5vw, 2.5rem);
+	box-sizing: border-box;
+	justify-content: center;
 }
 
 .rh-contact-overlay__actions .rh-contact-overlay__submit {
-	display: flex;
-	width: 100%;
-	box-sizing: border-box;
+	margin-top: 0;
 }
 
 .rh-contact-overlay__after-form {
@@ -1028,6 +1231,26 @@ body.rh-contact-overlay-open {
 	border: 1px solid rgba(255, 255, 255, 0.12);
 	border-radius: var(--rh-bento-radius);
 	box-shadow: 0 12px 36px rgba(12, 28, 52, 0.14);
+}
+
+/* Hold stat cards until the hero begins shrinking (27% of shell-in), then stagger through the shrink. */
+@media (prefers-reduced-motion: no-preference) {
+	.rh-home-stats-strip--await-hero .rh-home-stats-strip__item {
+		opacity: 0;
+		transform: translate3d(0, 1.15rem, 0);
+	}
+
+	.rh-home-stats-strip.rh-home-stats-strip--active .rh-home-stats-strip__item {
+		animation: rh-home-hero-item-in 0.52s var(--rh-home-hero-ease, cubic-bezier(0.2, 0.82, 0.2, 1)) both;
+	}
+
+	.rh-home-stats-strip.rh-home-stats-strip--active .rh-home-stats-strip__item:nth-child(2) {
+		animation-delay: 0.22s;
+	}
+
+	.rh-home-stats-strip.rh-home-stats-strip--active .rh-home-stats-strip__item:nth-child(3) {
+		animation-delay: 0.44s;
+	}
 }
 
 .rh-home-stats-strip__value {
@@ -1684,14 +1907,15 @@ body.rh-contact-overlay-open {
 		border-radius: 12px;
 		overflow: hidden;
 		visibility: hidden;
-		opacity: 1;
+		opacity: 0;
 		transform: none;
 		pointer-events: none;
 		box-shadow: 0 18px 38px rgba(8, 20, 40, 0.35);
 		transition:
-			max-height 0.42s var(--rh-mobile-nav-bounce),
-			padding-block 0.42s var(--rh-mobile-nav-bounce),
-			visibility 0s linear 0.42s;
+			max-height 0.36s var(--rh-mobile-nav-bounce),
+			padding-block 0.36s var(--rh-mobile-nav-bounce),
+			opacity 0.32s ease,
+			visibility 0s linear 0.36s;
 		font-size: clamp(1.35rem, 5.2vw, 1.85rem);
 		letter-spacing: 0.08em;
 	}
@@ -1704,11 +1928,13 @@ body.rh-contact-overlay-open {
 	.rh-hero-nav.is-open {
 		max-height: min(85vh, 32rem);
 		padding-block: 1.2rem 1.45rem;
+		opacity: 1;
 		visibility: visible;
 		pointer-events: auto;
 		transition:
 			max-height 0.42s var(--rh-mobile-nav-bounce),
 			padding-block 0.42s var(--rh-mobile-nav-bounce),
+			opacity 0.32s ease,
 			visibility 0s linear 0s;
 	}
 
@@ -2407,36 +2633,39 @@ body.rh-carpentry-home .rh-bento-page > .rh-home-section + .rh-home-section .rh-
 	color: var(--rh-color-text, #1a1a1a);
 }
 
-@keyframes rh-home-reveal-in {
+/* Section shells fade up on scroll; inner [data-rh-fx] content follows (see home-hero.js). */
+@keyframes rh-section-shell-in {
 	from {
 		opacity: 0;
-		transform: translate3d(0, 1.4rem, 0) scale(0.985);
-		filter: blur(2px);
+		transform: translate3d(0, 1.1rem, 0);
 	}
 	to {
 		opacity: 1;
-		transform: translate3d(0, 0, 0) scale(1);
-		filter: blur(0);
+		transform: translate3d(0, 0, 0);
 	}
 }
 
 @media (prefers-reduced-motion: no-preference) {
-	body.rh-carpentry-home [data-rh-reveal] {
+	body.rh-carpentry-home [data-rh-section-shell] {
 		opacity: 0;
-		will-change: transform, opacity, filter;
+		will-change: transform, opacity;
 	}
 
-	body.rh-carpentry-home [data-rh-reveal].is-inview {
-		animation: rh-home-reveal-in 0.72s cubic-bezier(0.2, 0.82, 0.2, 1) both;
+	body.rh-carpentry-home [data-rh-section-shell].is-inview {
+		animation: rh-section-shell-in 0.56s cubic-bezier(0.2, 0.82, 0.2, 1) both;
+	}
+
+	/* Keep section copy/cards hidden until the shell has entered. */
+	.rh-fx-js [data-rh-section-shell]:not(.is-inview) [data-rh-fx] {
+		opacity: 0;
 	}
 }
 
 @media (prefers-reduced-motion: reduce) {
-	body.rh-carpentry-home [data-rh-reveal] {
+	body.rh-carpentry-home [data-rh-section-shell] {
 		opacity: 1;
 		animation: none;
 		transform: none;
-		filter: none;
 	}
 }
 
@@ -2912,6 +3141,16 @@ body.rh-carpentry-home .rh-bento-page > .rh-home-section + .rh-home-section .rh-
 	margin-bottom: 0;
 }
 
+.rh-home-about__subtitle {
+	margin: clamp(0.65rem, 1.4vw, 0.9rem) 0 0;
+	max-width: 28rem;
+	text-align: left;
+}
+
+.rh-home-about__media-card[data-rh-fx] {
+	--rh-fx-delay: 720ms;
+}
+
 .rh-home-about__body {
 	text-align: justify;
 	hyphens: auto;
@@ -2933,24 +3172,30 @@ body.rh-carpentry-home .rh-bento-page > .rh-home-section + .rh-home-section .rh-
 }
 
 .rh-home-about__credentials-panel .rh-home-feature__credentials-list {
+	flex-wrap: nowrap;
+	align-items: center;
 	justify-content: flex-start;
-	gap: clamp(1.25rem, 3vw, 2.75rem);
+	gap: 1.5rem;
 }
 
-.rh-home-about__credentials-panel .rh-home-feature__credentials-img {
-	height: clamp(64px, 8vw, 104px);
+/* UK Fire Door Training logo only — half size; FireQual (second item) unchanged. */
+.rh-home-about__credentials-panel .rh-home-feature__credentials-item:first-child img {
+	display: block;
+	width: auto;
+	height: auto;
+	zoom: 0.5;
 }
 
-.rh-home-about__credentials-panel .rh-home-feature__credentials-img--uk-fire-door {
-	height: clamp(76px, 10vw, 124px);
-}
-
-.rh-home-about__credentials-panel .rh-home-feature__credentials-img--firequal {
-	height: clamp(60px, 8vw, 100px);
+@supports not (zoom: 1) {
+	.rh-home-about__credentials-panel .rh-home-feature__credentials-item:first-child img {
+		transform: scale(0.5);
+		transform-origin: left center;
+	}
 }
 
 @media (max-width: 520px) {
 	.rh-home-about__credentials-panel .rh-home-feature__credentials-list {
+		flex-wrap: wrap;
 		justify-content: center;
 	}
 }
@@ -3285,7 +3530,8 @@ body.rh-carpentry-home .rh-bento-page > .rh-home-section + .rh-home-section .rh-
 	scroll-behavior: smooth;
 	-webkit-overflow-scrolling: touch;
 	overscroll-behavior-x: contain;
-	touch-action: pan-x;
+	/* pan-x alone blocks vertical page scroll when the touch starts on the carousel */
+	touch-action: pan-x pan-y;
 	/* Edge mask when data-scroll-overflow=true (see JS + data-at-* rules below) */
 	mask-image: none;
 	-webkit-mask-image: none;
@@ -3647,7 +3893,7 @@ body.rh-carpentry-home .rh-bento-page > .rh-home-section + .rh-home-section .rh-
 	scroll-behavior: smooth;
 	-webkit-overflow-scrolling: touch;
 	overscroll-behavior-x: contain;
-	touch-action: pan-x;
+	touch-action: pan-x pan-y;
 	mask-image: none;
 	-webkit-mask-image: none;
 	mask-size: 100% 100%;
@@ -3705,6 +3951,165 @@ body.rh-carpentry-home .rh-bento-page > .rh-home-section + .rh-home-section .rh-
 	:where(.rh-home-section--projects, .rh-single-related, .rh-archive-projects) .rh-home-project-card.rh-bento-cell {
 		scroll-snap-align: center;
 	}
+
+	/* Carousel shell: controls pinned to bottom; card CTA top-right (touch has no hover). */
+	.rh-home-section--projects__cards-fx > .rh-home-projects-carousel,
+	.rh-home-section--testimonials .rh-clients-hero__inner > .rh-home-testimonials-carousel {
+		flex: 1 1 auto;
+		min-height: 0;
+	}
+
+	:where([data-rh-projects-carousel], [data-rh-testimonials-carousel]) {
+		display: flex;
+		flex-direction: column;
+		position: relative;
+		min-height: 0;
+	}
+
+	[data-rh-projects-carousel] .rh-home-projects-carousel__viewport,
+	[data-rh-testimonials-carousel] .rh-home-testimonials-carousel__viewport-shell {
+		flex: 1 1 auto;
+		min-height: 0;
+		order: 1;
+	}
+
+	[data-rh-projects-carousel] .rh-home-projects-carousel__viewport {
+		padding-bottom: 3.35rem;
+		box-sizing: border-box;
+	}
+
+	[data-rh-testimonials-carousel] .rh-home-testimonials-carousel__viewport-shell {
+		margin-block-end: 0;
+		padding-bottom: 3.35rem;
+		box-sizing: border-box;
+	}
+
+	:where([data-rh-projects-carousel]) .rh-home-projects-carousel__bottom-bar,
+	:where([data-rh-testimonials-carousel]) .rh-home-testimonials-carousel__bottom-bar {
+		position: absolute;
+		left: 0;
+		right: 0;
+		bottom: 0;
+		z-index: 6;
+		flex: 0 0 auto;
+		order: 2;
+		margin-top: 0;
+		align-self: stretch;
+		width: 100%;
+	}
+
+	[data-rh-projects-carousel] .rh-home-project-card.rh-bento-cell .rh-home-project-card__cta {
+		top: clamp(1rem, 2.6vw, 1.4rem);
+		right: clamp(1rem, 2.4vw, 1.25rem);
+		bottom: auto;
+		opacity: 0;
+		transform: translateY(0);
+		pointer-events: none;
+	}
+
+	[data-rh-projects-carousel] .rh-home-project-card.rh-bento-cell.is-active .rh-home-project-card__cta,
+	.rh-archive-projects .rh-home-project-card.rh-bento-cell.is-card-touch .rh-home-project-card__cta {
+		opacity: 1;
+		pointer-events: auto;
+	}
+}
+
+/* Projects archive bento grid: full cell width + hover-driven active state (not carousel slides). */
+.rh-archive-projects__bento > .rh-home-project-card.rh-bento-cell {
+	--rh-card-active: 0;
+	flex: none;
+	width: 100%;
+	max-width: 100%;
+	min-width: 0;
+	opacity: 1;
+	align-self: stretch;
+	scroll-snap-align: none;
+	scroll-snap-stop: normal;
+	transition:
+		--rh-card-active 0.55s cubic-bezier(0.33, 1, 0.68, 1),
+		opacity 0.48s ease,
+		transform 0.48s ease,
+		border-color 0.55s cubic-bezier(0.33, 1, 0.68, 1),
+		box-shadow 0.55s cubic-bezier(0.33, 1, 0.68, 1);
+}
+
+.rh-archive-projects__bento > .rh-home-project-card.rh-bento-cell .rh-home-project-card__bg,
+.rh-archive-projects__bento > .rh-home-project-card.rh-bento-cell .rh-home-project-card__overlay::after {
+	transition:
+		transform 0.55s cubic-bezier(0.33, 1, 0.68, 1),
+		filter 0.55s cubic-bezier(0.33, 1, 0.68, 1),
+		opacity 0.55s cubic-bezier(0.33, 1, 0.68, 1);
+}
+
+/* Title / badges follow --rh-card-active on the card (no per-element easing lag). */
+.rh-archive-projects__bento > .rh-home-project-card.rh-bento-cell .rh-home-project-card__title,
+.rh-archive-projects__bento > .rh-home-project-card.rh-bento-cell .rh-home-project-card__text,
+.rh-archive-projects__bento > .rh-home-project-card.rh-bento-cell .rh-home-project-card__badges {
+	transition: none;
+}
+
+.rh-archive-projects__bento > .rh-home-project-card.rh-bento-cell .rh-home-project-card__cta {
+	transition:
+		opacity 0.45s cubic-bezier(0.33, 1, 0.68, 1),
+		transform 0.45s cubic-bezier(0.33, 1, 0.68, 1);
+}
+
+.rh-archive-projects__bento > .rh-home-project-card.rh-bento-cell:hover,
+.rh-archive-projects__bento > .rh-home-project-card.rh-bento-cell:focus-within,
+.rh-archive-projects__bento > .rh-home-project-card.rh-bento-cell.is-card-touch {
+	--rh-card-active: 1;
+}
+
+/* Archive grid: badges sit in flow directly under the title (tight, predictable gap). */
+.rh-archive-projects__bento > .rh-home-project-card.rh-bento-cell .rh-home-project-card__text {
+	padding-bottom: var(--rh-card-pad-bottom);
+	gap: var(--rh-card-title-badge-gap);
+}
+
+.rh-archive-projects__bento > .rh-home-project-card.rh-bento-cell .rh-home-project-card__title {
+	transform: none;
+	margin-bottom: 0;
+}
+
+.rh-archive-projects__bento > .rh-home-project-card.rh-bento-cell .rh-home-project-card__badges {
+	position: static;
+	left: auto;
+	right: auto;
+	bottom: auto;
+	margin: 0;
+	max-height: calc(var(--rh-card-active, 0) * 4.5rem);
+	overflow: hidden;
+	opacity: var(--rh-card-active, 0);
+	transform: translate3d(0, calc((1 - var(--rh-card-active, 0)) * 0.2rem), 0);
+	will-change: opacity, transform;
+}
+
+.rh-archive-projects__bento > .rh-home-project-card.rh-bento-cell:hover .rh-home-project-card__cta,
+.rh-archive-projects__bento > .rh-home-project-card.rh-bento-cell:focus-within .rh-home-project-card__cta,
+.rh-archive-projects__bento > .rh-home-project-card.rh-bento-cell.is-card-touch .rh-home-project-card__cta {
+	opacity: 1;
+	transform: translateY(0);
+}
+
+.rh-archive-projects__bento > .rh-home-project-card.rh-bento-cell:hover .rh-home-project-card__cta-icon,
+.rh-archive-projects__bento > .rh-home-project-card.rh-bento-cell:focus-within .rh-home-project-card__cta-icon,
+.rh-archive-projects__bento > .rh-home-project-card.rh-bento-cell.is-card-touch .rh-home-project-card__cta-icon {
+	animation: rh-project-card-find-chevron 1.15s ease-in-out forwards;
+}
+
+@media (max-width: 899px) {
+	.rh-archive-projects__bento > .rh-home-project-card.rh-bento-cell .rh-home-project-card__cta {
+		top: clamp(1rem, 2.6vw, 1.4rem);
+		right: clamp(1rem, 2.4vw, 1.25rem);
+		bottom: auto;
+		opacity: 0;
+		transform: translateY(0);
+		pointer-events: none;
+	}
+
+	.rh-archive-projects__bento > .rh-home-project-card.rh-bento-cell.is-card-touch .rh-home-project-card__cta {
+		opacity: 1;
+	}
 }
 
 .rh-home-projects-carousel__viewport::-webkit-scrollbar {
@@ -3730,6 +4135,10 @@ body.rh-carpentry-home .rh-bento-page > .rh-home-section + .rh-home-section .rh-
 }
 
 :where(.rh-home-section--projects, .rh-single-related, .rh-archive-projects) .rh-home-project-card.rh-bento-cell {
+	--rh-card-pad-x: clamp(1rem, 2.4vw, 1.25rem);
+	--rh-card-pad-bottom: clamp(1rem, 2.6vw, 1.4rem);
+	--rh-card-title-badge-gap: clamp(0.2rem, 0.65vw, 0.35rem);
+	--rh-card-badge-row-h: clamp(1.2rem, 3vw, 1.55rem);
 	position: relative;
 	display: flex;
 	flex-direction: column;
@@ -3860,13 +4269,18 @@ body.rh-carpentry-home .rh-bento-page > .rh-home-section + .rh-home-section .rh-
 	initial-value: 0;
 }
 
-:where(.rh-home-section--projects, .rh-single-related, .rh-archive-projects) .rh-home-project-card.rh-bento-cell {
+:where(.rh-home-section--projects, .rh-single-related) .rh-home-project-card.rh-bento-cell {
 	--rh-card-active: 0;
 	transition: --rh-card-active 0.12s linear;
 }
 
-:where(.rh-home-section--projects, .rh-single-related, .rh-archive-projects) .rh-home-project-card.rh-bento-cell.is-active {
+:where(.rh-home-section--projects, .rh-single-related) .rh-home-project-card.rh-bento-cell.is-active {
 	--rh-card-active: 1;
+}
+
+/* Archive bento grid uses hover/touch (not scroll-linked). */
+.rh-archive-projects__bento > .rh-home-project-card.rh-bento-cell {
+	--rh-card-active: 0;
 }
 
 .rh-home-project-card__bg {
@@ -3950,9 +4364,8 @@ body.rh-carpentry-home .rh-bento-page > .rh-home-section + .rh-home-section .rh-
 	width: 100%;
 	min-height: 0;
 	margin-top: auto;
-	gap: clamp(0.35rem, 1.2vw, 0.55rem);
-	padding: clamp(1rem, 2.6vw, 1.4rem) clamp(1rem, 2.4vw, 1.25rem);
-	padding-top: clamp(2rem, 6vw, 3.25rem);
+	gap: var(--rh-card-title-badge-gap, clamp(0.2rem, 0.65vw, 0.35rem));
+	padding: clamp(2rem, 6vw, 3.25rem) var(--rh-card-pad-x, clamp(1rem, 2.4vw, 1.25rem)) var(--rh-card-pad-bottom, clamp(1rem, 2.6vw, 1.4rem));
 	box-sizing: border-box;
 }
 
@@ -3968,24 +4381,7 @@ body.rh-carpentry-home .rh-bento-page > .rh-home-section + .rh-home-section .rh-
 	line-height: 1.25;
 	color: #ffffff;
 	text-shadow: 0 2px 14px rgba(0, 0, 0, 0.4);
-	/* Inactive: slight drop; active: sit lower on the card (title leads the badge reveal). */
-	transform: translate3d(
-		0,
-		calc(
-			0.45rem * (1 - var(--rh-card-active, 0)) +
-				clamp(0.95rem, 2.8vw, 1.45rem) * var(--rh-card-active, 0)
-		),
-		0
-	);
-}
-
-/* Archive “all projects” grid: titles sit higher on the card. */
-.rh-archive-projects .rh-home-project-card.rh-bento-cell .rh-home-project-card__title {
-	transform: translate3d(
-		0,
-		calc(0.12rem * (1 - var(--rh-card-active, 0)) + clamp(0, 0.35vw, 0.08rem) * var(--rh-card-active, 0)),
-		0
-	);
+	transform: translate3d(0, calc(0.28rem * (1 - var(--rh-card-active, 0))), 0);
 }
 
 :where(.rh-home-section--projects, .rh-single-related, .rh-archive-projects) .rh-home-project-card.rh-bento-cell .rh-home-project-card__badges {
@@ -4002,25 +4398,24 @@ body.rh-carpentry-home .rh-bento-page > .rh-home-section + .rh-home-section .rh-
 /* Slider only: badges sit on the text block baseline but start translated
    below the card (clipped by overflow:hidden) and move up with --rh-card-active. */
 [data-rh-projects-carousel] .rh-home-project-card.rh-bento-cell .rh-home-project-card__text {
-	padding-bottom: calc(clamp(1rem, 2.6vw, 1.4rem) + var(--rh-card-active, 0) * clamp(1.85rem, 6vw, 3.25rem));
+	padding-bottom: calc(var(--rh-card-pad-bottom) + var(--rh-card-active, 0) * (var(--rh-card-badge-row-h) + var(--rh-card-title-badge-gap)));
 }
 
 [data-rh-projects-carousel] .rh-home-project-card.rh-bento-cell .rh-home-project-card__title {
-	margin-bottom: calc(var(--rh-card-active, 0) * clamp(0.45rem, 1.5vw, 0.7rem));
+	margin-bottom: calc(var(--rh-card-active, 0) * var(--rh-card-title-badge-gap));
 }
 
 [data-rh-projects-carousel] .rh-home-project-card.rh-bento-cell .rh-home-project-card__badges {
 	position: absolute;
-	left: clamp(1rem, 2.4vw, 1.25rem);
-	right: clamp(1rem, 2.4vw, 1.25rem);
-	bottom: clamp(1rem, 2.6vw, 1.4rem);
+	left: var(--rh-card-pad-x);
+	right: var(--rh-card-pad-x);
+	bottom: var(--rh-card-pad-bottom);
 	margin: 0;
-	/* Lags behind --rh-card-active so the title settles first, then the badge eases in. */
-	--rh-card-badge: clamp(0, 1, calc((var(--rh-card-active, 0) - 0.2) / 0.8));
+	--rh-card-badge: clamp(0, 1, calc((var(--rh-card-active, 0) - 0.15) / 0.85));
 	opacity: var(--rh-card-badge, 0);
 	transform: translate3d(
 		0,
-		calc((1 - var(--rh-card-badge, 0)) * (100% + clamp(0.85rem, 3.5cqw, 1.35rem))),
+		calc((1 - var(--rh-card-badge, 0)) * (var(--rh-card-badge-row-h) + var(--rh-card-title-badge-gap))),
 		0
 	);
 	will-change: transform, opacity;
@@ -4213,6 +4608,13 @@ body.rh-carpentry-home .rh-bento-page > .rh-home-section + .rh-home-section .rh-
 
 	:where(.rh-home-section--projects, .rh-single-related, .rh-archive-projects) .rh-home-project-card.rh-bento-cell .rh-home-project-card__title {
 		transition: none;
+	}
+
+	.rh-archive-projects__bento > .rh-home-project-card.rh-bento-cell .rh-home-project-card__badges,
+	.rh-archive-projects__bento > .rh-home-project-card.rh-bento-cell.is-card-touch .rh-home-project-card__badges {
+		max-height: none;
+		opacity: 1;
+		transform: none;
 	}
 
 	.rh-home-projects-carousel__pause .rh-home-projects-carousel__pause-progress {
@@ -4544,11 +4946,32 @@ body.rh-carpentry-home .rh-bento-page > .rh-home-section + .rh-home-section .rh-
 	);
 }
 
+.rh-home-service-card__link {
+	display: flex;
+	flex-direction: column;
+	justify-content: flex-end;
+	align-items: flex-start;
+	position: absolute;
+	inset: 0;
+	z-index: 3;
+	box-sizing: border-box;
+	padding: clamp(1.35rem, 3.2vw, 1.85rem);
+	border-radius: inherit;
+	text-decoration: none;
+	color: inherit;
+}
+
+.rh-home-feature--service {
+	position: relative;
+}
+
 .rh-home-section--features .rh-home-feature--service .rh-home-feature__title {
 	position: relative;
 	z-index: 2;
 	margin: 0;
-	max-width: 36rem;
+	margin-top: auto;
+	align-self: flex-start;
+	max-width: min(36rem, 92%);
 	font-size: clamp(0.92rem, 2.1vw, 1.05rem);
 	font-weight: 700;
 	letter-spacing: 0.04em;
@@ -4563,38 +4986,14 @@ body.rh-carpentry-home .rh-bento-page > .rh-home-section + .rh-home-section .rh-
 	margin: 0;
 	padding: 0;
 	display: flex;
-	flex-wrap: wrap;
+	flex-wrap: nowrap;
 	align-items: center;
-	justify-content: center;
-	gap: clamp(1rem, 2.5vw, 2.25rem);
-	width: 100%;
+	gap: 1.5rem;
 }
 
 .rh-home-feature__credentials-item {
 	margin: 0;
 	padding: 0;
-	display: inline-flex;
-	align-items: center;
-	justify-content: center;
-}
-
-.rh-home-feature__credentials-img {
-	display: block;
-	width: auto;
-	max-width: 100%;
-	height: clamp(48px, 6vw, 78px);
-	object-fit: contain;
-	mix-blend-mode: multiply;
-}
-
-.rh-home-feature__credentials-img--uk-fire-door {
-	height: clamp(58px, 7.5vw, 92px);
-}
-
-/* Official FireQual mark (PNG); avoid multiply so reds/navy stay true on light surfaces */
-.rh-home-feature__credentials-img--firequal {
-	mix-blend-mode: normal;
-	height: clamp(44px, 5.8vw, 76px);
 }
 
 .rh-home-section--sectors {
@@ -4737,7 +5136,23 @@ body.rh-carpentry-home .rh-bento-page > .rh-home-section + .rh-home-section .rh-
 	animation: none;
 }
 
+.rh-home-projects-carousel--bento .rh-home-project-card.rh-bento-cell .rh-home-project-card__text {
+	padding-bottom: var(--rh-card-pad-bottom);
+	gap: var(--rh-card-title-badge-gap);
+}
+
+.rh-home-projects-carousel--bento .rh-home-project-card.rh-bento-cell .rh-home-project-card__title {
+	transform: none;
+	margin-bottom: 0;
+}
+
 .rh-home-projects-carousel--bento .rh-home-project-card.rh-bento-cell .rh-home-project-card__badges {
+	position: static;
+	left: auto;
+	right: auto;
+	bottom: auto;
+	max-height: none;
+	overflow: visible;
 	opacity: 1;
 	transform: none;
 }
@@ -5280,9 +5695,42 @@ body.rh-carpentry-home .rh-bento-page > .rh-home-section + .rh-home-section .rh-
 
 /* --- Project archive & single --- */
 
+.rh-archive-projects__filters {
+	display: flex;
+	flex-wrap: wrap;
+	gap: 0.5rem;
+	margin: clamp(2rem, 5vw, 3rem) 0 clamp(1.25rem, 3vw, 1.75rem);
+}
+
+.rh-archive-projects__filter {
+	padding: 0.4rem 0.85rem;
+	border-radius: 999px;
+	border: 1px solid rgba(0, 0, 0, 0.2);
+	background: transparent;
+	font: inherit;
+	cursor: pointer;
+}
+
+.rh-archive-projects__filter.is-active,
+.rh-archive-projects__filter:hover {
+	background: #1a1a1a;
+	color: #fff;
+	border-color: #1a1a1a;
+}
+
+.rh-archive-project-card.is-filtered-out {
+	display: none !important;
+}
+
+.rh-archive-projects__filter-empty {
+	margin: 0 0 1.5rem;
+	color: var(--rh-color-muted, #5c5c5c);
+}
+
 .rh-archive-projects {
 	padding-block: 0;
 	font-family: "Poppins", var(--rh-font-sans, system-ui, sans-serif);
+	background: var(--rh-color-surface, #ffffff);
 }
 
 .rh-archive-projects__inner {
@@ -5317,6 +5765,16 @@ body.rh-carpentry-home .rh-bento-page > .rh-home-section + .rh-home-section .rh-
 	font-size: clamp(2rem, 5dvw, 60px);
 	line-height: 0.95;
 	letter-spacing: 0.02em;
+}
+
+.rh-archive-projects__subtitle {
+	margin: clamp(0.65rem, 1.4vw, 0.9rem) 0 0;
+	max-width: 42rem;
+	font-size: clamp(1.05rem, 2.2vw, 1.25rem);
+	line-height: 1.45;
+	font-weight: 500;
+	color: var(--rh-heading-color, #0e396e);
+	text-align: left;
 }
 
 .rh-archive-projects__intro {
@@ -5359,20 +5817,10 @@ body.rh-carpentry-home .rh-bento-page > .rh-home-section + .rh-home-section .rh-
 }
 
 .rh-archive-projects__bento > .rh-home-project-card.rh-bento-cell {
-	flex: none;
-	width: auto;
-	min-width: 0;
 	height: auto;
 	min-height: 0;
 	aspect-ratio: 4 / 3;
-	scroll-snap-align: none;
-	scroll-snap-stop: normal;
-	opacity: 1;
 	cursor: pointer;
-	transition:
-		transform 0.25s ease,
-		box-shadow 0.25s ease,
-		border-color 0.25s ease;
 }
 
 /* 5n+1: wide hero (7 cols, banner aspect) */
@@ -5395,37 +5843,43 @@ body.rh-carpentry-home .rh-bento-page > .rh-home-section + .rh-home-section .rh-
 	aspect-ratio: 4 / 3;
 }
 
-/* Hover lift */
-.rh-archive-projects__bento > .rh-home-project-card.rh-bento-cell:hover,
-.rh-archive-projects__bento > .rh-home-project-card.rh-bento-cell:focus-within {
-	transform: translateY(-3px);
-	box-shadow: 0 18px 48px rgba(12, 28, 52, 0.3);
-}
+@media (max-width: 768px) {
+	:where(.rh-home-section--projects, .rh-single-related, .rh-archive-projects) .rh-home-project-card.rh-bento-cell {
+		--rh-card-pad-x: clamp(0.85rem, 2.2vw, 1.1rem);
+		--rh-card-pad-bottom: clamp(0.85rem, 2.4vw, 1.15rem);
+		--rh-card-title-badge-gap: clamp(0.15rem, 0.5vw, 0.28rem);
+		--rh-card-badge-row-h: clamp(1.1rem, 2.8vw, 1.35rem);
+	}
 
-/* CTA stays hidden at rest on archive cards and reveals on hover/focus
-   (the .is-active:hover rule scoped above to :where(...,.rh-archive-projects)
-   handles the reveal — no archive-specific override here). */
+	:where(.rh-home-section--projects, .rh-single-related, .rh-archive-projects) .rh-home-project-card.rh-bento-cell .rh-home-project-card__title {
+		font-size: clamp(0.9rem, 2.4vw, 1rem);
+		line-height: 1.22;
+	}
 
-/* Disable the slider's slow horizontal pan; use a soft hover zoom instead */
-.rh-archive-projects__bento .rh-home-project-card.rh-bento-cell .rh-home-project-card__bg {
-	animation: none;
-	transform: scale(1);
-	transition:
-		transform 0.55s cubic-bezier(0.4, 0, 0.2, 1),
-		filter 0.4s ease;
-}
-
-.rh-archive-projects__bento .rh-home-project-card.rh-bento-cell:hover .rh-home-project-card__bg {
-	transform: scale(1.04);
+	:where(.rh-home-section--projects, .rh-single-related, .rh-archive-projects) .rh-home-project-card.rh-bento-cell .rh-home-project-card__badge {
+		font-size: 0.6rem;
+		padding: 0.18rem 0.45rem;
+	}
 }
 
 @media (prefers-reduced-motion: reduce) {
 	.rh-archive-projects__bento > .rh-home-project-card.rh-bento-cell,
-	.rh-archive-projects__bento > .rh-home-project-card.rh-bento-cell:hover,
-	.rh-archive-projects__bento .rh-home-project-card.rh-bento-cell .rh-home-project-card__bg,
-	.rh-archive-projects__bento .rh-home-project-card.rh-bento-cell:hover .rh-home-project-card__bg {
-		transform: none;
+	.rh-archive-projects__bento > .rh-home-project-card.rh-bento-cell .rh-home-project-card__bg,
+	.rh-archive-projects__bento > .rh-home-project-card.rh-bento-cell .rh-home-project-card__overlay::after,
+	.rh-archive-projects__bento > .rh-home-project-card.rh-bento-cell .rh-home-project-card__title,
+	.rh-archive-projects__bento > .rh-home-project-card.rh-bento-cell .rh-home-project-card__text,
+	.rh-archive-projects__bento > .rh-home-project-card.rh-bento-cell .rh-home-project-card__badges,
+	.rh-archive-projects__bento > .rh-home-project-card.rh-bento-cell:hover .rh-home-project-card__cta,
+	.rh-archive-projects__bento > .rh-home-project-card.rh-bento-cell:focus-within .rh-home-project-card__cta,
+	.rh-archive-projects__bento > .rh-home-project-card.rh-bento-cell.is-card-touch .rh-home-project-card__cta {
 		transition: none;
+	}
+
+	.rh-archive-projects__bento > .rh-home-project-card.rh-bento-cell:hover .rh-home-project-card__cta-icon,
+	.rh-archive-projects__bento > .rh-home-project-card.rh-bento-cell:focus-within .rh-home-project-card__cta-icon,
+	.rh-archive-projects__bento > .rh-home-project-card.rh-bento-cell.is-card-touch .rh-home-project-card__cta-icon {
+		animation: none;
+		opacity: 0.92;
 	}
 }
 
@@ -5450,10 +5904,18 @@ body.rh-carpentry-home .rh-bento-page > .rh-home-section + .rh-home-section .rh-
 /* Lazy-loaded card scale-in for cards appended via infinite scroll.
    Each appended card gets an inline --rh-card-stagger so they pop in
    one after another rather than as a batch. */
-.rh-archive-projects__bento > .rh-home-project-card.rh-bento-cell.rh-is-appended {
+.rh-archive-projects__bento > .rh-home-project-card.rh-bento-cell.rh-is-appended,
+.rh-archive-projects__bento > .rh-home-project-card.rh-bento-cell.rh-archive-card-enter {
 	animation: rh-archive-card-in 0.5s cubic-bezier(0.34, 1.32, 0.5, 1) both;
 	animation-delay: var(--rh-card-stagger, 0ms);
 	transform-origin: center center;
+}
+
+/* Sector filter: scale all cards out together, then replace and stagger in. */
+.rh-archive-projects__bento > .rh-home-project-card.rh-bento-cell.rh-archive-card-exit {
+	animation: rh-archive-card-out var(--rh-archive-filter-out-dur, 0.32s) cubic-bezier(0.4, 0, 1, 1) forwards;
+	transform-origin: center center;
+	pointer-events: none;
 }
 
 @keyframes rh-archive-card-in {
@@ -5470,14 +5932,27 @@ body.rh-carpentry-home .rh-bento-page > .rh-home-section + .rh-home-section .rh-
 	}
 }
 
+@keyframes rh-archive-card-out {
+	from {
+		opacity: 1;
+		transform: scale(1) translateY(0);
+	}
+	to {
+		opacity: 0;
+		transform: scale(0.86) translateY(10px);
+	}
+}
+
 @media (prefers-reduced-motion: reduce) {
-	.rh-archive-projects__bento > .rh-home-project-card.rh-bento-cell.rh-is-appended {
+	.rh-archive-projects__bento > .rh-home-project-card.rh-bento-cell.rh-is-appended,
+	.rh-archive-projects__bento > .rh-home-project-card.rh-bento-cell.rh-archive-card-enter,
+	.rh-archive-projects__bento > .rh-home-project-card.rh-bento-cell.rh-archive-card-exit {
 		animation: none;
 	}
 }
 
-/* Tablet: drop to 2 cols, no spans, uniform aspect. */
-@media (max-width: 1099px) {
+/* Tablet: 2 cols between desktop bento and mobile stack. */
+@media (min-width: 900px) and (max-width: 1099px) {
 	.rh-archive-projects__grid {
 		grid-template-columns: repeat(2, minmax(0, 1fr));
 	}
@@ -5493,10 +5968,27 @@ body.rh-carpentry-home .rh-bento-page > .rh-home-section + .rh-home-section .rh-
 	}
 }
 
-/* Mobile: single column. */
-@media (max-width: 640px) {
+/* Mobile + phone landscape: single column, full-width cards (slider-like height). */
+@media (max-width: 899px) {
 	.rh-archive-projects__grid {
 		grid-template-columns: minmax(0, 1fr);
+		gap: clamp(0.75rem, 2.5vw, var(--rh-bento-gap));
+	}
+
+	.rh-archive-projects__bento > .rh-home-project-card.rh-bento-cell,
+	.rh-archive-projects__bento > .rh-home-project-card.rh-bento-cell:nth-child(5n + 1),
+	.rh-archive-projects__bento > .rh-home-project-card.rh-bento-cell:nth-child(5n + 2),
+	.rh-archive-projects__bento > .rh-home-project-card.rh-bento-cell:nth-child(5n + 3),
+	.rh-archive-projects__bento > .rh-home-project-card.rh-bento-cell:nth-child(5n + 4),
+	.rh-archive-projects__bento > .rh-home-project-card.rh-bento-cell:nth-child(5n + 5) {
+		grid-column: 1 / -1;
+		width: 100%;
+		max-width: none;
+		min-width: 0;
+		flex: none;
+		min-height: clamp(280px, 58svh, 440px);
+		height: auto;
+		aspect-ratio: auto;
 	}
 }
 
@@ -6371,7 +6863,7 @@ body.rh-carpentry-home .rh-bento-page > .rh-home-section + .rh-home-section .rh-
 .rh-single-related {
 	padding-block: clamp(1.75rem, 4.5vw, 3rem);
 	font-family: "Poppins", var(--rh-font-sans, system-ui, sans-serif);
-	border-top: 1px solid rgba(12, 28, 52, 0.1);
+	border-top: none;
 }
 
 .rh-single-related--band {

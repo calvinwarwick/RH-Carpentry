@@ -8,7 +8,6 @@
 get_header();
 
 $current_project_id = 0;
-$other_projects     = array();
 ?>
 
 <div class="rh-single-project">
@@ -135,184 +134,22 @@ $other_projects     = array();
 </div>
 
 <?php
-if ($current_project_id > 0 && function_exists('rh_project_get_other_projects')) {
-	$other_projects = rh_project_get_other_projects($current_project_id);
+if ($current_project_id > 0 && function_exists('rh_landing_render_projects_slider')) {
+	$rh_slider_sectors = array();
+	$rh_slider_terms   = get_the_terms($current_project_id, 'rh_project_sector');
+	if ($rh_slider_terms && ! is_wp_error($rh_slider_terms)) {
+		$rh_slider_sectors = wp_list_pluck($rh_slider_terms, 'slug');
+	}
+	rh_landing_render_projects_slider(
+		$rh_slider_sectors,
+		'rh-single-related-heading',
+		$current_project_id,
+		__('More projects', 'rh-base-child')
+	);
 }
-if ($other_projects !== array()) :
-	$other_count    = count($other_projects);
-	$other_multi    = $other_count > 1;
-	$other_is_bento = $other_count < 5;
-	?>
-	<section class="rh-single-related rh-single-related--band<?php echo $other_is_bento ? ' rh-single-related--bento' : ''; ?>" data-count="<?php echo (int) $other_count; ?>" aria-labelledby="rh-single-related-heading">
-		<div class="rh-single-project__shell">
-			<div class="rh-clients-hero rh-testimonials-hero rh-single-project-hero">
-				<div class="rh-clients-hero__bg" aria-hidden="true"></div>
-				<div class="rh-clients-hero__overlay" aria-hidden="true"></div>
-				<div class="rh-clients-hero__inner">
-					<header class="rh-single-related__intro rh-home-section__header--row" data-rh-fx-group data-rh-fx-stagger="140">
-						<div>
-							<p class="rh-home-kicker" data-rh-fx="wipe" data-rh-fx-tone="light">
-								<span class="rh-home-kicker__line" aria-hidden="true"></span>
-								<?php esc_html_e('More work', 'rh-base-child'); ?>
-							</p>
-							<h2 id="rh-single-related-heading" class="rh-home-heading rh-home-heading--section" data-rh-fx="wipe" data-rh-fx-tone="light">
-								<?php esc_html_e('Related', 'rh-base-child'); ?>
-							</h2>
-						</div>
-						<?php
-						$rh_related_archive_url = function_exists('rh_carpentry_projects_archive_url')
-							? rh_carpentry_projects_archive_url()
-							: home_url('/projects/');
-						?>
-						<a class="rh-hero-btn rh-hero-btn--muted rh-single-related__cta" href="<?php echo esc_url($rh_related_archive_url); ?>" data-rh-fx="fade">
-							<?php esc_html_e('View all projects', 'rh-base-child'); ?>
-						</a>
-					</header>
-					<div
-						class="rh-single-related__cards-fx"
-						data-rh-fx-group
-						data-rh-fx-stagger="82"
-						data-rh-fx-base="1080"
-					>
-					<div
-						class="rh-home-projects-carousel rh-single-related-carousel<?php echo $other_is_bento ? ' rh-home-projects-carousel--bento' : ''; ?>"
-						<?php if (! $other_is_bento) : ?>data-rh-projects-carousel
-						data-interval="5000"
-						data-at-start="true"
-						data-at-end="<?php echo esc_attr($other_count <= 1 ? 'true' : 'false'); ?>"<?php endif; ?>
-						data-count="<?php echo (int) $other_count; ?>"
-						role="region"
-						<?php if (! $other_is_bento) : ?>aria-roledescription="<?php echo esc_attr__('Carousel', 'rh-base-child'); ?>"<?php endif; ?>
-						aria-label="<?php echo esc_attr__('Other projects', 'rh-base-child'); ?>"
-					>
-						<div class="rh-home-projects-carousel__viewport" tabindex="0">
-							<div class="rh-home-projects-carousel__track" role="list">
-								<?php
-								foreach ($other_projects as $oi => $rel_post) {
-									if (! $rel_post instanceof WP_Post) {
-										continue;
-									}
-									$rel_id    = (int) $rel_post->ID;
-									$rel_url   = get_permalink($rel_post);
-									$thumb_id  = (int) get_post_thumbnail_id($rel_id);
-									$bg_url    = $thumb_id > 0 ? wp_get_attachment_image_url($thumb_id, 'large') : '';
-									$rel_terms = get_the_terms($rel_id, 'rh_project_sector');
-									$badges    = array();
-									if ($rel_terms && ! is_wp_error($rel_terms)) {
-										foreach (array_slice($rel_terms, 0, 4) as $t) {
-											$badges[] = (string) $t->name;
-										}
-									}
-									$is_active = $other_is_bento || 0 === $oi;
-									?>
-									<article
-										class="rh-home-project-card rh-bento-cell<?php echo $is_active ? ' is-active' : ''; ?>"
-										id="<?php echo esc_attr('rh-single-related-project-' . $oi); ?>"
-										role="listitem"
-										data-rh-fx="scale"
-										<?php if (! $other_is_bento) : ?>data-rh-project-slide
-										data-rh-project-index="<?php echo (int) $oi; ?>"<?php endif; ?>
-										data-rh-project-url="<?php echo esc_url(is_string($rel_url) ? $rel_url : ''); ?>"
-										aria-label="<?php
-										echo esc_attr(
-											sprintf(
-												/* translators: 1: project title, 2: slide number, 3: total slides */
-												__('%1$s — project %2$d of %3$d', 'rh-base-child'),
-												get_the_title($rel_post),
-												$oi + 1,
-												$other_count
-											)
-										);
-										?>"
-									>
-										<span class="rh-home-project-card__cta" aria-hidden="true">
-											<?php esc_html_e('Find out more', 'rh-base-child'); ?>
-											<i class="fa-solid fa-chevron-right rh-home-project-card__cta-icon" aria-hidden="true"></i>
-										</span>
-										<?php if ($bg_url !== '' && $bg_url !== false) : ?>
-											<span class="rh-home-project-card__bg" style="background-image: url('<?php echo esc_url($bg_url); ?>');"></span>
-										<?php else : ?>
-											<span class="rh-home-project-card__bg rh-home-project-card__bg--placeholder" aria-hidden="true"></span>
-										<?php endif; ?>
-										<span class="rh-home-project-card__overlay" aria-hidden="true"></span>
-										<div class="rh-home-project-card__text">
-											<span class="rh-home-project-card__title"><?php echo esc_html(get_the_title($rel_post)); ?></span>
-											<?php if ($badges !== array()) : ?>
-												<ul class="rh-home-project-card__badges">
-													<?php foreach ($badges as $badge_label) : ?>
-														<li>
-															<span class="rh-home-project-card__badge"><?php echo esc_html($badge_label); ?></span>
-														</li>
-													<?php endforeach; ?>
-												</ul>
-											<?php endif; ?>
-										</div>
-									</article>
-									<?php
-								}
-								?>
-							</div>
-						</div>
-						<?php if (! $other_is_bento) : ?>
-						<div class="rh-home-projects-carousel__bottom-bar">
-							<?php if ($other_multi) : ?>
-								<button
-									type="button"
-									class="rh-home-projects-carousel__pause"
-									data-rh-project-autoplay-toggle
-									data-label-pause="<?php echo esc_attr(__('Pause automatic slideshow', 'rh-base-child')); ?>"
-									data-label-play="<?php echo esc_attr(__('Play automatic slideshow', 'rh-base-child')); ?>"
-									aria-pressed="false"
-									aria-label="<?php echo esc_attr(__('Pause automatic slideshow', 'rh-base-child')); ?>"
-								>
-									<svg class="rh-home-projects-carousel__pause-svg" viewBox="0 0 40 40" aria-hidden="true" focusable="false">
-										<circle class="rh-home-projects-carousel__pause-track" cx="20" cy="20" r="17" fill="none" stroke="rgba(255,255,255,0.22)" stroke-width="2" />
-										<circle
-											class="rh-home-projects-carousel__pause-progress"
-											cx="20"
-											cy="20"
-											r="17"
-											fill="none"
-											stroke="rgba(255,255,255,0.92)"
-											stroke-width="2"
-											stroke-dasharray="106.814"
-											stroke-dashoffset="106.814"
-											stroke-linecap="round"
-											transform="rotate(-90 20 20)"
-										/>
-									</svg>
-									<span class="rh-home-projects-carousel__pause-icon-wrap">
-										<i class="fa-solid fa-pause" aria-hidden="true"></i>
-									</span>
-								</button>
-							<?php endif; ?>
-							<div class="rh-home-projects-carousel__arrows">
-								<button
-									type="button"
-									class="rh-home-projects-carousel__arrow"
-									data-rh-project-prev
-									aria-label="<?php echo esc_attr(__('Previous project', 'rh-base-child')); ?>"
-								>
-									<i class="fa-solid fa-chevron-left" aria-hidden="true"></i>
-								</button>
-								<button
-									type="button"
-									class="rh-home-projects-carousel__arrow"
-									data-rh-project-next
-									aria-label="<?php echo esc_attr(__('Next project', 'rh-base-child')); ?>"
-								>
-									<i class="fa-solid fa-chevron-right" aria-hidden="true"></i>
-								</button>
-							</div>
-						</div>
-						<?php endif; ?>
-					</div>
-					</div>
-				</div>
-			</div>
-		</div>
-	</section>
-	<?php
-endif;
+
+if (function_exists('rh_landing_render_contact_band')) {
+	rh_landing_render_contact_band();
+}
 
 get_footer();

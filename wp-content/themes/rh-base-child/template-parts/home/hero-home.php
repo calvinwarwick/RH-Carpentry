@@ -10,8 +10,8 @@ if (! defined('ABSPATH')) {
 }
 
 $bg_url         = rh_carpentry_get_hero_background_url();
-$cta_contact    = rh_carpentry_home_section_url('contact');
-$cta_projects   = rh_carpentry_home_section_url('projects');
+$cta_contact    = rh_carpentry_contact_url();
+$cta_projects   = rh_carpentry_projects_archive_url();
 $hero_logo_path = get_stylesheet_directory() . '/assets/images/rh-logo-hero.png';
 $hero_logo_url  = get_stylesheet_directory_uri() . '/assets/images/rh-logo-hero.png';
 $hero_logo_ver  = file_exists($hero_logo_path) ? (string) filemtime($hero_logo_path) : wp_get_theme()->get('Version');

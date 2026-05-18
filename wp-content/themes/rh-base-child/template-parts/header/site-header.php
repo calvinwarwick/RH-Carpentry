@@ -44,44 +44,44 @@ $hero_logo_src  = add_query_arg('v', $hero_logo_ver, $hero_logo_url);
 					<span class="rh-hero-nav-toggle__bar" aria-hidden="true"></span>
 				</button>
 
-				<nav
-					class="rh-hero-nav"
-					id="rh-site-top-nav"
-					aria-label="<?php esc_attr_e('Primary', 'rh-base-child'); ?>"
-					data-rh-hero-nav
-				>
-					<?php
-					$rh_home_icon_item = sprintf(
-						'<li class="menu-item rh-hero-nav__home-item"><a class="rh-hero-nav__home" href="%1$s"><span class="screen-reader-text">%2$s</span><i class="fa-solid fa-house" aria-hidden="true"></i></a></li>',
-						esc_url(home_url('/')),
-						esc_html__('Home', 'rh-base-child')
-					);
-					wp_nav_menu(
-						array(
-							'theme_location' => 'primary',
-							'menu_id'        => 'rh-site-top-primary-menu',
-							'container'      => false,
-							'menu_class'     => 'rh-hero-nav__menu',
-							'fallback_cb'    => 'rh_carpentry_site_top_fallback_menu',
-							'items_wrap'     => '<ul id="%1$s" class="%2$s">' . $rh_home_icon_item . '%3$s</ul>',
-						)
-					);
-					?>
-					<a
-						class="rh-hero-btn rh-hero-btn--light rh-site-top-bar__cta rh-site-top-bar__cta--menu"
-						href="<?php echo esc_url(rh_carpentry_home_section_url('contact')); ?>"
-					>
-						<span class="rh-site-top-bar__cta-text"><?php esc_html_e('Get in touch', 'rh-base-child'); ?></span>
-					</a>
-				</nav>
-
 				<a
 					class="rh-hero-btn rh-hero-btn--light rh-site-top-bar__cta rh-site-top-bar__cta--bar"
-					href="<?php echo esc_url(rh_carpentry_home_section_url('contact')); ?>"
+					href="<?php echo esc_url(rh_carpentry_contact_url()); ?>"
 				>
 					<span class="rh-site-top-bar__cta-text"><?php esc_html_e('Get in touch', 'rh-base-child'); ?></span>
 				</a>
 			</div>
+
+			<nav
+				class="rh-hero-nav"
+				id="rh-site-top-nav"
+				aria-label="<?php esc_attr_e('Primary', 'rh-base-child'); ?>"
+				data-rh-hero-nav
+			>
+				<?php
+				$rh_home_icon_item = sprintf(
+					'<li class="menu-item rh-hero-nav__home-item"><a class="rh-hero-nav__home" href="%1$s"><span class="screen-reader-text">%2$s</span><i class="fa-solid fa-house" aria-hidden="true"></i></a></li>',
+					esc_url(home_url('/')),
+					esc_html__('Home', 'rh-base-child')
+				);
+				wp_nav_menu(
+					array(
+						'theme_location' => 'primary',
+						'menu_id'        => 'rh-site-top-primary-menu',
+						'container'      => false,
+						'menu_class'     => 'rh-hero-nav__menu',
+						'fallback_cb'    => 'rh_carpentry_site_top_fallback_menu',
+						'items_wrap'     => '<ul id="%1$s" class="%2$s">' . $rh_home_icon_item . '%3$s</ul>',
+					)
+				);
+				?>
+				<a
+					class="rh-hero-btn rh-hero-btn--light rh-site-top-bar__cta rh-site-top-bar__cta--menu"
+					href="<?php echo esc_url(rh_carpentry_contact_url()); ?>"
+				>
+					<span class="rh-site-top-bar__cta-text"><?php esc_html_e('Get in touch', 'rh-base-child'); ?></span>
+				</a>
+			</nav>
 		</div>
 	</div>
 </header>

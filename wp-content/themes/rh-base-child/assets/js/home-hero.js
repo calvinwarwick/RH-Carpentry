@@ -12,6 +12,11 @@
 			n.classList.contains('is-open')
 		);
 		document.body.classList.toggle('rh-hero-nav-open', anyOpen);
+		document.querySelectorAll('.rh-site-top-bar__shell').forEach((shell) => {
+			if (anyOpen) {
+				shell.style.clipPath = 'none';
+			}
+		});
 	};
 
 	const restartMobileNavLinkAnimations = (nav) => {
@@ -53,9 +58,22 @@
 		});
 	});
 
+	document.querySelectorAll('[data-rh-hero-nav]').forEach((nav) => {
+		nav.addEventListener('click', (e) => {
+			const link = e.target.closest('a[href]');
+			if (!link || !nav.contains(link) || !nav.classList.contains('is-open')) {
+				return;
+			}
+			setNavOpen(nav, false);
+		});
+	});
+
 	document.addEventListener('keydown', (e) => {
 		if (e.key === 'Escape') {
-			if (document.body.classList.contains('rh-contact-overlay-open')) {
+			if (
+				document.body.classList.contains('rh-contact-overlay-open') ||
+				document.body.classList.contains('rh-section-overlay-open')
+			) {
 				return;
 			}
 			setNavOpen(null, false);
@@ -64,7 +82,8 @@
 })();
 
 /**
- * Home stats strip: count up on scroll, left→right; next stat starts when the previous count is 50% done; label letters after each count (below About).
+ * Home stats strip: after the home hero intro, cards stagger in, then count up left→right
+ * (next stat starts when the previous count is 50% done; label wipe after each count).
  */
 (function () {
 	const strip = document.querySelector('.rh-home-stats-strip');
@@ -78,6 +97,11 @@
 	}
 
 	const prefersReduced = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+	const HERO_SHELL_ANIM_MS = 2350;
+	/** Match rh-home-hero-shell-in keyframes: shrink + frame begin at 27%. */
+	const HERO_SHRINK_START_MS = Math.round(HERO_SHELL_ANIM_MS * 0.27);
+	const STAT_CARD_STAGGER_MS = 200;
+	const STAT_CARD_ANIM_MS = 520;
 	const DURATION_MS = 900;
 	const LABEL_REVEAL_MS = 920;
 	/** Start label swipe before count completes (0.8 = 80% through count). */
@@ -109,7 +133,12 @@
 	}
 
 	function finalizeStrip() {
-		strip.classList.remove('rh-home-stats-strip--pending');
+		strip.classList.remove('rh-home-stats-strip--pending', 'rh-home-stats-strip--active');
+	}
+
+	function beginStrip() {
+		strip.classList.remove('rh-home-stats-strip--await-hero');
+		strip.classList.add('rh-home-stats-strip--active');
 	}
 
 	function prepareLabels() {
@@ -136,6 +165,7 @@
 	}
 
 	function runReduced() {
+		beginStrip();
 		prepareLabels();
 		items.forEach((item) => {
 			const el = item.querySelector('[data-rh-stat-value]');
@@ -220,26 +250,67 @@
 		});
 	}
 
-	const observer = new IntersectionObserver(
-		(entries) => {
-			const hit = entries.some((e) => e.isIntersecting);
-			if (!hit) {
-				return;
-			}
-			observer.disconnect();
+	let heroIntroDone = prefersReduced;
+	let stripVisible = false;
+	let started = false;
 
-			if (prefersReduced) {
-				runReduced();
-				return;
-			}
+	function startWhenReady() {
+		if (started || !heroIntroDone || !stripVisible) {
+			return;
+		}
+		started = true;
+		observer.disconnect();
 
+		if (prefersReduced) {
+			runReduced();
+			return;
+		}
+
+		beginStrip();
+		window.setTimeout(() => {
 			prepareLabels();
 			runOverlapping();
+		}, Math.round(STAT_CARD_ANIM_MS * 0.4));
+	}
+
+	const observer = new IntersectionObserver(
+		(entries) => {
+			if (entries.some((e) => e.isIntersecting)) {
+				stripVisible = true;
+				startWhenReady();
+			}
 		},
 		{ root: null, rootMargin: '0px 0px -8% 0px', threshold: 0.12 }
 	);
 
 	observer.observe(strip);
+
+	const heroShell = document.querySelector('.rh-home-hero .rh-hero-home');
+	if (!heroShell) {
+		heroIntroDone = true;
+		startWhenReady();
+		return;
+	}
+
+	const markHeroIntroDone = () => {
+		if (heroIntroDone) {
+			return;
+		}
+		heroIntroDone = true;
+		startWhenReady();
+	};
+
+	const onHeroAnimEnd = (e) => {
+		if (e.animationName !== 'rh-home-hero-shell-in') {
+			return;
+		}
+		heroShell.removeEventListener('animationend', onHeroAnimEnd);
+		markHeroIntroDone();
+	};
+
+	heroShell.addEventListener('animationend', onHeroAnimEnd);
+	window.setTimeout(markHeroIntroDone, HERO_SHRINK_START_MS);
+	window.setTimeout(markHeroIntroDone, HERO_SHELL_ANIM_MS + 80);
 })();
 
 /**
@@ -1253,11 +1324,254 @@
 	});
 	}
 
+/**
+ * Projects archive: hover/touch card state matches the home project slider (--rh-card-active).
+ */
+(function () {
+	const grid = document.querySelector('.rh-archive-projects__bento');
+	if (!grid) {
+		return;
+	}
+
+	let touchCard = null;
+
+	const clearTouch = () => {
+		if (touchCard) {
+			touchCard.classList.remove('is-card-touch');
+			touchCard = null;
+		}
+	};
+
+	grid.addEventListener(
+		'pointerdown',
+		(e) => {
+			if (e.pointerType !== 'touch') {
+				return;
+			}
+			const card = e.target.closest('.rh-home-project-card.rh-bento-cell');
+			if (!card || !grid.contains(card)) {
+				return;
+			}
+			clearTouch();
+			touchCard = card;
+			card.classList.add('is-card-touch');
+		},
+		{ passive: true }
+	);
+
+	grid.addEventListener('pointerup', clearTouch, { passive: true });
+	grid.addEventListener('pointercancel', clearTouch, { passive: true });
+})();
+
 	document.querySelectorAll('[data-rh-projects-carousel]').forEach((root) => {
 		if (root instanceof HTMLElement) {
 			initProjectsCarousel(root);
 		}
 	});
+})();
+
+/**
+ * About / Services section overlays (#about, #services) on the current page.
+ */
+(function () {
+	const overlays = new Map();
+	document.querySelectorAll('[data-rh-section-overlay]').forEach((el) => {
+		const id = el.getAttribute('data-rh-section-overlay');
+		if (id) {
+			overlays.set(id, el);
+		}
+	});
+	if (!overlays.size) {
+		return;
+	}
+
+	const CLOSE_MS = 420;
+	let closeTimer = null;
+	let activeId = '';
+
+	const syncBodyLock = () => {
+		const anyOpen = Array.from(overlays.values()).some((el) => el.classList.contains('is-open'));
+		document.body.classList.toggle('rh-section-overlay-open', anyOpen);
+		if (!anyOpen && !document.body.classList.contains('rh-contact-overlay-open')) {
+			document.body.style.overflow = '';
+		} else if (anyOpen) {
+			document.body.style.overflow = 'hidden';
+		}
+	};
+
+	const hashId = () => {
+		const id = window.location.hash.replace(/^#/, '');
+		return overlays.has(id) ? id : '';
+	};
+
+	const finishClose = (el) => {
+		closeTimer = null;
+		el.classList.remove('is-closing', 'is-open');
+		el.setAttribute('aria-hidden', 'true');
+		syncBodyLock();
+	};
+
+	const animateClose = (el) => {
+		if (!el || !el.classList.contains('is-open')) {
+			return;
+		}
+		el.classList.remove('is-open');
+		el.classList.add('is-closing');
+		window.clearTimeout(closeTimer);
+		closeTimer = window.setTimeout(() => finishClose(el), CLOSE_MS);
+	};
+
+	const setOpen = (id, open) => {
+		const el = overlays.get(id);
+		if (!el) {
+			return;
+		}
+		if (open) {
+			window.clearTimeout(closeTimer);
+			closeTimer = null;
+			overlays.forEach((other, otherId) => {
+				if (otherId === id) {
+					return;
+				}
+				other.classList.remove('is-open', 'is-closing');
+				other.setAttribute('aria-hidden', 'true');
+			});
+			activeId = id;
+			el.classList.remove('is-closing');
+			el.classList.add('is-open');
+			el.setAttribute('aria-hidden', 'false');
+			if (document.getElementById(id)) {
+				window.scrollTo(0, 0);
+			}
+			syncBodyLock();
+			const closeBtn = el.querySelector('[data-rh-section-overlay-close]');
+			if (closeBtn && typeof closeBtn.focus === 'function') {
+				window.requestAnimationFrame(() => closeBtn.focus());
+			}
+			return;
+		}
+		animateClose(el);
+		if (activeId === id) {
+			activeId = '';
+		}
+	};
+
+	const closeActive = () => {
+		const id = activeId || hashId();
+		if (!id) {
+			return;
+		}
+		try {
+			const u = new URL(window.location.href);
+			u.hash = '';
+			const q = u.searchParams.toString();
+			history.replaceState(null, '', u.pathname + (q ? '?' + q : '') + u.hash);
+		} catch {
+			history.replaceState(null, '', window.location.pathname + window.location.search);
+		}
+		setOpen(id, false);
+	};
+
+	const syncFromLocation = () => {
+		const id = hashId();
+		if (id) {
+			setOpen(id, true);
+			return;
+		}
+		if (activeId) {
+			const el = overlays.get(activeId);
+			if (el) {
+				animateClose(el);
+			}
+			activeId = '';
+			return;
+		}
+		overlays.forEach((el) => {
+			if (el.classList.contains('is-open')) {
+				animateClose(el);
+			}
+		});
+	};
+
+	const openFromLink = (id) => {
+		const hash = '#' + id;
+		if (window.location.hash !== hash) {
+			try {
+				const u = new URL(window.location.href);
+				u.hash = id;
+				history.pushState(null, '', u.pathname + u.search + u.hash);
+			} catch {
+				window.location.hash = hash;
+			}
+		}
+		setOpen(id, true);
+	};
+
+	document.addEventListener('click', (e) => {
+		const link = e.target.closest('a[href]');
+		if (!link) {
+			return;
+		}
+		const raw = link.getAttribute('href') || '';
+		if (raw === '#about' || raw === '#services') {
+			e.preventDefault();
+			openFromLink(raw.slice(1));
+			return;
+		}
+		try {
+			const u = new URL(link.href, window.location.href);
+			if (u.origin !== window.location.origin) {
+				return;
+			}
+			const frag = u.hash.replace(/^#/, '');
+			if (!overlays.has(frag)) {
+				return;
+			}
+			if (u.pathname !== window.location.pathname || u.search !== window.location.search) {
+				return;
+			}
+			e.preventDefault();
+			openFromLink(frag);
+		} catch {
+			/* ignore malformed href */
+		}
+	});
+
+	window.addEventListener('hashchange', syncFromLocation);
+	window.addEventListener('pageshow', syncFromLocation);
+	document.addEventListener('DOMContentLoaded', syncFromLocation);
+
+	overlays.forEach((el) => {
+		el.querySelectorAll('[data-rh-section-overlay-close]').forEach((btn) => {
+			btn.addEventListener('click', () => closeActive());
+		});
+	});
+
+	document.addEventListener(
+		'keydown',
+		(e) => {
+			if (e.key !== 'Escape') {
+				return;
+			}
+			const id = activeId || hashId();
+			if (!id) {
+				return;
+			}
+			const el = overlays.get(id);
+			if (!el || (!el.classList.contains('is-open') && !el.classList.contains('is-closing'))) {
+				return;
+			}
+			if (el.classList.contains('is-closing')) {
+				window.clearTimeout(closeTimer);
+				finishClose(el);
+				e.preventDefault();
+				return;
+			}
+			e.preventDefault();
+			closeActive();
+		},
+		true
+	);
 })();
 
 /**
@@ -1279,8 +1593,10 @@
 		closeTimer = null;
 		overlay.classList.remove('is-closing');
 		overlay.setAttribute('aria-hidden', 'true');
+		if (!document.body.classList.contains('rh-section-overlay-open')) {
+			document.body.style.overflow = '';
+		}
 		document.body.classList.remove('rh-contact-overlay-open');
-		document.body.style.overflow = '';
 	};
 
 	const animateClose = () => {
@@ -1312,14 +1628,48 @@
 		if (!overlay.classList.contains('is-closing')) {
 			overlay.setAttribute('aria-hidden', 'true');
 			document.body.classList.remove('rh-contact-overlay-open');
-			document.body.style.overflow = '';
+			if (!document.body.classList.contains('rh-section-overlay-open')) {
+				document.body.style.overflow = '';
+			}
+		}
+	};
+
+	const showNoticeFromQuery = () => {
+		if (!ajaxConfig || !ajaxConfig.messages) {
+			return;
+		}
+		let status = '';
+		try {
+			status = new URL(window.location.href).searchParams.get('contact') || '';
+		} catch {
+			status = '';
+		}
+		if (!status) {
+			return;
+		}
+		const message =
+			typeof ajaxConfig.messages[status] === 'string' ? ajaxConfig.messages[status] : '';
+		if (message) {
+			showAjaxNotice(status, message);
 		}
 	};
 
 	const syncFromLocation = () => {
-		const open = window.location.hash === '#contact';
+		let contactParam = '';
+		try {
+			contactParam = new URL(window.location.href).searchParams.get('contact') || '';
+		} catch {
+			contactParam = '';
+		}
+		const open = window.location.hash === '#contact' || contactParam !== '';
 		if (open) {
 			setOpen(true);
+			if (
+				contactParam !== '' &&
+				!overlay.querySelector('.rh-contact-overlay__notice--success, .rh-contact-overlay__notice--warn')
+			) {
+				showNoticeFromQuery();
+			}
 			window.clearTimeout(focusTimer);
 			focusTimer = window.setTimeout(() => {
 				focusTimer = null;
@@ -1379,34 +1729,173 @@
 		},
 		true
 	);
+
+	const form = overlay.querySelector('[data-rh-contact-form]');
+	const noticeSlot = overlay.querySelector('[data-rh-contact-notice-slot]');
+	const noticeEl = overlay.querySelector('[data-rh-contact-notice]');
+	const ajaxConfig = typeof rhContactForm === 'object' && rhContactForm ? rhContactForm : null;
+
+	const clearAjaxNotice = () => {
+		if (!noticeSlot || !noticeEl) {
+			return;
+		}
+		noticeSlot.hidden = true;
+		noticeEl.textContent = '';
+		noticeEl.classList.remove('rh-contact-overlay__notice--success', 'rh-contact-overlay__notice--warn');
+		noticeEl.removeAttribute('role');
+	};
+
+	const showAjaxNotice = (status, message) => {
+		if (!noticeSlot || !noticeEl || !message) {
+			return;
+		}
+		const isSuccess = status === 'sent';
+		noticeEl.textContent = message;
+		noticeEl.classList.toggle('rh-contact-overlay__notice--success', isSuccess);
+		noticeEl.classList.toggle('rh-contact-overlay__notice--warn', !isSuccess);
+		noticeEl.setAttribute('role', isSuccess ? 'status' : 'alert');
+		noticeSlot.hidden = false;
+		noticeEl.focus({ preventScroll: true });
+	};
+
+	if (form instanceof HTMLFormElement && ajaxConfig && ajaxConfig.ajaxUrl) {
+		form.addEventListener('submit', async (e) => {
+			e.preventDefault();
+			clearAjaxNotice();
+
+			const submitBtn = form.querySelector('.rh-contact-overlay__submit');
+			if (submitBtn instanceof HTMLButtonElement) {
+				if (submitBtn.disabled) {
+					return;
+				}
+				submitBtn.disabled = true;
+				submitBtn.setAttribute('aria-busy', 'true');
+			}
+
+			const body = new FormData(form);
+			body.set('action', ajaxConfig.action);
+
+			try {
+				const res = await fetch(ajaxConfig.ajaxUrl, {
+					method: 'POST',
+					body,
+					credentials: 'same-origin',
+					headers: {
+						'X-Requested-With': 'XMLHttpRequest',
+					},
+				});
+
+				let payload = null;
+				try {
+					payload = await res.json();
+				} catch {
+					payload = null;
+				}
+
+				const data = payload && typeof payload === 'object' ? payload.data : null;
+				const status =
+					data && typeof data.status === 'string'
+						? data.status
+						: payload && payload.success
+							? 'sent'
+							: 'failed';
+				const message =
+					data && typeof data.message === 'string'
+						? data.message
+						: status === 'sent'
+							? ''
+							: '';
+
+				const fallback =
+					ajaxConfig.messages && typeof ajaxConfig.messages[status] === 'string'
+						? ajaxConfig.messages[status]
+						: '';
+				showAjaxNotice(status, message || fallback);
+
+				if (status === 'sent') {
+					form.reset();
+				}
+			} catch {
+				const failedMsg =
+					ajaxConfig.messages && typeof ajaxConfig.messages.failed === 'string'
+						? ajaxConfig.messages.failed
+						: '';
+				showAjaxNotice('failed', failedMsg);
+			} finally {
+				if (submitBtn instanceof HTMLButtonElement) {
+					submitBtn.disabled = false;
+					submitBtn.removeAttribute('aria-busy');
+				}
+			}
+		});
+	}
 })();
 
 /**
- * Homepage sections/footer: fade/slide in when entering viewport.
+ * Homepage section shells: simple fade-up on scroll, then reveal [data-rh-fx] inside.
  */
 (function () {
 	if (!document.body.classList.contains('rh-carpentry-home')) {
 		return;
 	}
 
-	const targets = Array.from(
-		document.querySelectorAll(
-			'.site-main--front > .rh-home-section, .site-main--front > .rh-bento-page, body.rh-carpentry-home .rh-site-footer'
-		)
-	).filter((el) => !el.querySelector('[data-rh-fx]'));
-	if (!targets.length) {
+	const shellSelectors = [
+		'.rh-home-about-container',
+		'.rh-home-section--projects .rh-clients-hero',
+		'.rh-home-section--features .rh-home-section__inner',
+		'.rh-home-section--testimonials .rh-clients-hero',
+		'.rh-home-section--clients .rh-home-clients-container',
+		'body.rh-carpentry-home .rh-site-footer__surface',
+	];
+
+	const shells = [];
+	shellSelectors.forEach((selector) => {
+		document.querySelectorAll(selector).forEach((el) => {
+			if (!el.hasAttribute('data-rh-section-shell')) {
+				el.setAttribute('data-rh-section-shell', '');
+			}
+			shells.push(el);
+		});
+	});
+
+	if (!shells.length) {
 		return;
 	}
 
 	const prefersReduced =
-		typeof window.matchMedia === 'function' && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+		typeof window.matchMedia === 'function' &&
+		window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+	const SHELL_CONTENT_DELAY_MS = 160;
 
-	targets.forEach((el) => {
-		el.setAttribute('data-rh-reveal', '');
-	});
+	const revealFxInShell = (shell) => {
+		shell.querySelectorAll('[data-rh-fx-group]').forEach((group) => {
+			group.querySelectorAll('[data-rh-fx]').forEach((el) => {
+				el.classList.add('is-inview');
+			});
+		});
+		shell.querySelectorAll('[data-rh-fx]').forEach((el) => {
+			if (!el.closest('[data-rh-fx-group]')) {
+				el.classList.add('is-inview');
+			}
+		});
+	};
+
+	const activateShell = (shell) => {
+		if (shell.classList.contains('is-inview')) {
+			return;
+		}
+		shell.classList.add('is-inview');
+		if (prefersReduced) {
+			revealFxInShell(shell);
+			return;
+		}
+		window.setTimeout(() => {
+			revealFxInShell(shell);
+		}, SHELL_CONTENT_DELAY_MS);
+	};
 
 	if (prefersReduced || typeof IntersectionObserver === 'undefined') {
-		targets.forEach((el) => el.classList.add('is-inview'));
+		shells.forEach((shell) => activateShell(shell));
 		return;
 	}
 
@@ -1416,21 +1905,14 @@
 				if (!entry.isIntersecting) {
 					return;
 				}
-				entry.target.classList.add('is-inview');
+				activateShell(entry.target);
 				observer.unobserve(entry.target);
 			});
 		},
-		{ root: null, rootMargin: '0px 0px -10% 0px', threshold: 0.16 }
+		{ root: null, rootMargin: '0px 0px -8% 0px', threshold: 0.12 }
 	);
 
-	targets.forEach((el, index) => {
-		if (index <= 1) {
-			/* Avoid hiding the first visible bands on initial paint. */
-			el.classList.add('is-inview');
-			return;
-		}
-		observer.observe(el);
-	});
+	shells.forEach((shell) => observer.observe(shell));
 })();
 
 /**
@@ -1484,13 +1966,18 @@
 	}
 
 	/* Items inside a [data-rh-fx-group] are revealed together when the group
-	   enters the viewport; items outside any group fire individually. */
+	   enters the viewport; items outside any group fire individually.
+	   Homepage section shells reveal their own [data-rh-fx] after the shell fades up. */
 	const itemInGroup = new WeakSet();
 	groups.forEach((group) => {
 		group.querySelectorAll('[data-rh-fx]').forEach((el) => itemInGroup.add(el));
 	});
 
-	const standalone = allItems.filter((el) => !itemInGroup.has(el));
+	const isInHomeSectionShell = (el) => !!el.closest('[data-rh-section-shell]');
+
+	const standalone = allItems.filter((el) => !itemInGroup.has(el) && !isInHomeSectionShell(el));
+
+	const groupsOutsideShells = groups.filter((group) => !isInHomeSectionShell(group));
 
 	const observerOptions = { root: null, rootMargin: '0px 0px -8% 0px', threshold: 0.12 };
 
@@ -1505,7 +1992,7 @@
 		standalone.forEach((el) => standaloneObserver.observe(el));
 	}
 
-	if (groups.length) {
+	if (groupsOutsideShells.length) {
 		/* Row headers on narrow viewports use display:contents so the title block,
 		   body, and CTA can be reordered in CSS grid. That removes the group's
 		   layout box, so observing the group never intersects — titles stay hidden. */
@@ -1542,12 +2029,22 @@
 				groupObserver.unobserve(entry.target);
 			});
 		}, observerOptions);
-		groups.forEach((group) => {
+		groupsOutsideShells.forEach((group) => {
 			const target = resolveFxGroupObserveTarget(group);
 			observeTargetToGroup.set(target, group);
 			groupObserver.observe(target);
 		});
 	}
+
+	/* Landing page heroes are above the fold — reveal immediately so kicker/title/subtitle show on load. */
+	document
+		.querySelectorAll('.rh-page-hero-split[data-rh-fx-group], .rh-archive-projects__header[data-rh-fx-group]')
+		.forEach((group) => {
+			const rect = group.getBoundingClientRect();
+			if (rect.top < window.innerHeight && rect.bottom > 0) {
+				group.querySelectorAll('[data-rh-fx]').forEach((el) => el.classList.add('is-inview'));
+			}
+		});
 })();
 
 /**
@@ -1568,53 +2065,58 @@
 	}
 	const shell = document.querySelector('.rh-site-top-bar__shell');
 	if (!shell) return;
+	const finishReveal = () => {
+		shell.style.clipPath = 'none';
+		shell.classList.add('rh-site-top-bar__shell--revealed');
+	};
 	const handle = (e) => {
 		if (e.animationName !== 'rh-site-top-bar-shell-reveal') return;
-		shell.style.clipPath = 'none';
+		finishReveal();
 		shell.removeEventListener('animationend', handle);
 	};
 	shell.addEventListener('animationend', handle);
 	/* Safety net: if the animationend event is missed (e.g. throttled tab),
 	   still clear the clip-path after a generous timeout matching the CSS
 	   shell animation duration. */
-	setTimeout(() => {
-		if (shell.style.clipPath !== 'none') {
-			shell.style.clipPath = 'none';
-		}
-	}, 2200);
+	setTimeout(finishReveal, 2200);
 })();
 
 /**
- * Projects archive infinite scroll.
- *
- * Fetches subsequent pages from the rh/v1/projects REST endpoint when the
- * sentinel approaches the viewport, then appends the returned cards into
- * the bento grid. Status messages live in [data-rh-archive-status].
+ * Projects archive: sector filters + infinite scroll (rh/v1/projects).
  */
 (function () {
 	const grid = document.querySelector('[data-rh-archive-loader]');
+	if (!grid || typeof window.fetch !== 'function') {
+		return;
+	}
+
+	const filters = document.querySelector('[data-rh-archive-filters]');
 	const sentinel = document.querySelector('[data-rh-archive-sentinel]');
 	const statusEl = document.querySelector('[data-rh-archive-status]');
-	if (
-		!grid ||
-		!sentinel ||
-		typeof window.IntersectionObserver !== 'function' ||
-		typeof window.fetch !== 'function'
-	) {
-		return;
-	}
+	const filterEmptyEl = document.querySelector('[data-rh-archive-filter-empty]');
 
-	let page = parseInt(grid.getAttribute('data-page') || '1', 10) || 1;
-	let totalPages = parseInt(grid.getAttribute('data-total-pages') || '1', 10) || 1;
 	const perPage = parseInt(grid.getAttribute('data-per-page') || '0', 10) || 0;
 	const restUrl = grid.getAttribute('data-rest-url') || '';
-	if (!restUrl || page >= totalPages) {
-		return;
-	}
+	const initialGridHtml = grid.innerHTML;
+	const initialPage = parseInt(grid.getAttribute('data-page') || '1', 10) || 1;
+	const initialTotalPages = parseInt(grid.getAttribute('data-total-pages') || '1', 10) || 1;
 
+	let page = initialPage;
+	let totalPages = initialTotalPages;
+	let activeSector = '';
 	let loading = false;
 	let done = false;
 	let observer = null;
+
+	const STAGGER_MS = 110;
+	const FILTER_ENTER_STAGGER_MS = 110;
+	const prefersReduced =
+		typeof window.matchMedia === 'function' &&
+		window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+	const FILTER_EXIT_MS = prefersReduced ? 0 : 320;
+	let filterAnimating = false;
+
+	const getCards = () => Array.from(grid.querySelectorAll('.rh-archive-project-card'));
 
 	const setStatus = (state, text) => {
 		if (!statusEl) return;
@@ -1626,40 +2128,135 @@
 		}
 	};
 
-	/* Per-card stagger so appended cards pop in one after another. */
-	const STAGGER_MS = 110;
-
 	const hideStatus = () => {
 		if (!statusEl) return;
 		statusEl.classList.remove('is-loading', 'is-done', 'is-error');
 		statusEl.style.display = 'none';
 	};
 
-	const fetchNext = () => {
-		if (loading || done) return;
-		loading = true;
-		setStatus('is-loading', 'Loading more projects…');
+	const showStatus = () => {
+		if (!statusEl) return;
+		statusEl.style.display = '';
+	};
 
-		const nextPage = page + 1;
+	const setFilterEmptyVisible = (visible) => {
+		if (!filterEmptyEl) return;
+		filterEmptyEl.hidden = !visible;
+	};
+
+	const buildFetchUrl = (pageNum) => {
 		let url;
 		try {
 			url = new URL(restUrl, window.location.origin);
-		} catch (e) {
+		} catch {
 			url = null;
 		}
-		const fetchUrl = url
-			? (() => {
-					url.searchParams.set('page', String(nextPage));
-					if (perPage > 0) url.searchParams.set('per_page', String(perPage));
-					return url.toString();
-				})()
-			: restUrl +
-				(restUrl.indexOf('?') === -1 ? '?' : '&') +
-				'page=' +
-				encodeURIComponent(String(nextPage)) +
-				(perPage > 0 ? '&per_page=' + encodeURIComponent(String(perPage)) : '');
+		if (url) {
+			url.searchParams.set('page', String(pageNum));
+			if (perPage > 0) url.searchParams.set('per_page', String(perPage));
+			if (activeSector) url.searchParams.set('sector', activeSector);
+			else url.searchParams.delete('sector');
+			return url.toString();
+		}
+		const parts = [
+			'page=' + encodeURIComponent(String(pageNum)),
+			perPage > 0 ? 'per_page=' + encodeURIComponent(String(perPage)) : '',
+			activeSector ? 'sector=' + encodeURIComponent(activeSector) : '',
+		].filter(Boolean);
+		return restUrl + (restUrl.indexOf('?') === -1 ? '?' : '&') + parts.join('&');
+	};
 
-		fetch(fetchUrl, {
+	const mountCards = (html, append) => {
+		if (!append) {
+			grid.style.minHeight = '';
+			grid.innerHTML = '';
+		}
+		if (html.trim() === '') {
+			return [];
+		}
+		const tmp = document.createElement('div');
+		tmp.innerHTML = html;
+		const nodes = Array.from(tmp.children);
+		nodes.forEach((node, i) => {
+			node.removeAttribute('data-rh-fx');
+			if (append) {
+				node.classList.add('rh-is-appended');
+				node.style.setProperty('--rh-card-stagger', i * STAGGER_MS + 'ms');
+			}
+			grid.appendChild(node);
+		});
+		return nodes;
+	};
+
+	const preserveGridHeight = () => {
+		const h = grid.offsetHeight;
+		if (h > 0) {
+			grid.style.minHeight = h + 'px';
+		}
+	};
+
+	const animateFilterOut = () =>
+		new Promise((resolve) => {
+			const cards = getCards();
+			if (!cards.length || prefersReduced) {
+				resolve();
+				return;
+			}
+			preserveGridHeight();
+			cards.forEach((card) => {
+				card.classList.remove('rh-archive-card-enter', 'rh-is-appended');
+				card.classList.add('rh-archive-card-exit');
+			});
+			window.setTimeout(resolve, FILTER_EXIT_MS);
+		});
+
+	const animateFilterIn = (nodes) => {
+		grid.style.minHeight = '';
+		const cards = nodes && nodes.length ? nodes : getCards();
+		if (prefersReduced || !cards.length) {
+			return;
+		}
+		cards.forEach((card, i) => {
+			card.classList.remove('rh-archive-card-exit');
+			card.style.setProperty('--rh-card-stagger', i * FILTER_ENTER_STAGGER_MS + 'ms');
+			card.classList.remove('rh-archive-card-enter');
+			void card.offsetWidth;
+			card.classList.add('rh-archive-card-enter');
+		});
+	};
+
+	const updatePaginationState = (json, pageNum) => {
+		page = pageNum;
+		grid.setAttribute('data-page', String(page));
+		if (typeof json.total_pages === 'number' && json.total_pages > 0) {
+			totalPages = json.total_pages;
+			grid.setAttribute('data-total-pages', String(totalPages));
+		}
+		const hasMore = !!json.has_more && page < totalPages;
+		done = !hasMore;
+		if (sentinel) {
+			sentinel.hidden = done;
+		}
+		if (done) {
+			if (observer) observer.disconnect();
+			hideStatus();
+		} else {
+			showStatus();
+			hideStatus();
+			startObserver();
+		}
+	};
+
+	const fetchPage = (pageNum, { append = false, silent = false } = {}) => {
+		if (!restUrl || loading) {
+			return Promise.resolve(null);
+		}
+		loading = true;
+		if (!silent) {
+			setStatus('is-loading', append ? 'Loading more projects…' : 'Loading projects…');
+		}
+
+		return fetch(buildFetchUrl(pageNum), {
 			credentials: 'same-origin',
 			headers: { Accept: 'application/json' },
 		})
@@ -1669,50 +2266,120 @@
 			})
 			.then((json) => {
 				const html = typeof json.html === 'string' ? json.html : '';
-				if (html.trim() !== '') {
-					const tmp = document.createElement('div');
-					tmp.innerHTML = html;
-					Array.from(tmp.children).forEach((node, i) => {
-						node.classList.add('rh-is-appended');
-						node.style.setProperty('--rh-card-stagger', i * STAGGER_MS + 'ms');
-						/* Initial cards use [data-rh-fx] in a delayed group; appended nodes miss
-						   group init and would stay opacity:0 — rely on rh-archive-card-in only. */
-						node.removeAttribute('data-rh-fx');
-						grid.appendChild(node);
-					});
-				}
-				page = nextPage;
-				grid.setAttribute('data-page', String(page));
-				if (typeof json.total_pages === 'number' && json.total_pages > 0) {
-					totalPages = json.total_pages;
-					grid.setAttribute('data-total-pages', String(totalPages));
-				}
-				const hasMore = !!json.has_more && page < totalPages;
-				if (!hasMore) {
-					done = true;
-					if (observer) observer.disconnect();
-					hideStatus();
-				} else {
-					hideStatus();
-				}
+				const nodes = mountCards(html, append);
+				const total = typeof json.total === 'number' ? json.total : 0;
+				setFilterEmptyVisible(activeSector !== '' && total === 0);
+				updatePaginationState(json, pageNum);
+				return { json, nodes };
 			})
 			.catch(() => {
-				setStatus('is-error', 'Could not load more projects — please refresh');
+				setStatus('is-error', 'Could not load projects — please refresh');
 			})
 			.finally(() => {
 				loading = false;
 			});
 	};
 
-	observer = new IntersectionObserver(
-		(entries) => {
-			entries.forEach((entry) => {
-				if (entry.isIntersecting) {
-					fetchNext();
+	const fetchNext = () => {
+		if (loading || done) return;
+		fetchPage(page + 1, { append: true });
+	};
+
+	const startObserver = () => {
+		if (!sentinel || typeof window.IntersectionObserver !== 'function' || done) {
+			return;
+		}
+		if (observer) {
+			observer.disconnect();
+		}
+		observer = new IntersectionObserver(
+			(entries) => {
+				entries.forEach((entry) => {
+					if (entry.isIntersecting) {
+						fetchNext();
+					}
+				});
+			},
+			{ root: null, rootMargin: '0px 0px 200px 0px', threshold: 0 }
+		);
+		observer.observe(sentinel);
+	};
+
+	const setActiveFilterUi = (btn) => {
+		if (!filters) return;
+		filters.querySelectorAll('[data-rh-sector-filter]').forEach((el) => {
+			const active = el === btn;
+			el.classList.toggle('is-active', active);
+			el.setAttribute('aria-pressed', active ? 'true' : 'false');
+		});
+	};
+
+	const applySectorFilter = (slug) => {
+		if (filterAnimating || loading) {
+			return;
+		}
+		filterAnimating = true;
+		activeSector = slug;
+		setFilterEmptyVisible(false);
+		done = false;
+
+		if (observer) {
+			observer.disconnect();
+		}
+
+		animateFilterOut().then(() => {
+			if (slug === '') {
+				grid.innerHTML = initialGridHtml;
+				grid.style.minHeight = '';
+				getCards().forEach((card) => card.removeAttribute('data-rh-fx'));
+				page = initialPage;
+				totalPages = initialTotalPages;
+				grid.setAttribute('data-page', String(initialPage));
+				grid.setAttribute('data-total-pages', String(initialTotalPages));
+				done = page >= totalPages;
+				if (sentinel) {
+					sentinel.hidden = done;
 				}
-			});
-		},
-		{ root: null, rootMargin: '0px 0px 200px 0px', threshold: 0 }
-	);
-	observer.observe(sentinel);
+				hideStatus();
+				animateFilterIn(getCards());
+				filterAnimating = false;
+				if (!done) {
+					startObserver();
+				}
+				return;
+			}
+
+			fetchPage(1, { append: false, silent: true })
+				.then((result) => {
+					animateFilterIn(result && result.nodes ? result.nodes : []);
+				})
+				.finally(() => {
+					filterAnimating = false;
+				});
+		});
+	};
+
+	if (filters) {
+		filters.addEventListener('click', (e) => {
+			const btn = e.target.closest('[data-rh-sector-filter]');
+			if (!btn || filterAnimating) {
+				return;
+			}
+			const slug = btn.getAttribute('data-rh-sector-filter') || '';
+			if (slug === activeSector) {
+				return;
+			}
+			setActiveFilterUi(btn);
+			applySectorFilter(slug);
+		});
+	}
+
+	if (sentinel && restUrl) {
+		if (initialPage < initialTotalPages) {
+			startObserver();
+		} else {
+			sentinel.hidden = true;
+		}
+	}
 })();
+

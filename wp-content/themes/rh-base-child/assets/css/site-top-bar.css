@@ -33,8 +33,15 @@
 	box-shadow: 0 14px 40px rgba(8, 20, 40, 0.28);
 }
 
-body.rh-hero-nav-open .rh-site-top-bar__shell {
+body.rh-hero-nav-open .rh-site-top-bar.site-header,
+body.rh-hero-nav-open .rh-site-top-bar__shell,
+body.rh-hero-nav-open .rh-site-top-bar__inner {
 	overflow: visible;
+}
+
+body.rh-hero-nav-open .rh-site-top-bar__shell,
+.rh-site-top-bar__shell.rh-site-top-bar__shell--revealed {
+	clip-path: none;
 }
 
 .rh-site-top-bar__bg {
@@ -65,6 +72,9 @@ body.rh-hero-nav-open .rh-site-top-bar__shell {
 .rh-site-top-bar__inner {
 	position: relative;
 	z-index: 2;
+	display: flex;
+	flex-direction: column;
+	align-items: stretch;
 	width: 100%;
 	margin: 0;
 	/* Padding inside the navy shell is sized off --rh-hero-pad (from
@@ -483,6 +493,53 @@ body.rh-hero-nav-open .rh-site-top-bar__shell {
 	}
 }
 
+/* Desktop: logo, nav, and CTA share one row (nav sits outside the header in markup). */
+@media (min-width: 901px) {
+	.rh-site-top-bar__inner {
+		display: grid;
+		grid-template-columns: minmax(0, 1fr) auto auto;
+		align-items: center;
+		gap: clamp(0.75rem, 2vw, 1.25rem);
+	}
+
+	.rh-site-top-bar .rh-site-top-bar__header.rh-hero-header {
+		display: contents;
+	}
+
+	.rh-site-top-bar .rh-hero-logo {
+		grid-column: 1;
+		grid-row: 1;
+	}
+
+	.rh-site-top-bar .rh-hero-nav {
+		grid-column: 2;
+		grid-row: 1;
+		justify-self: end;
+		align-self: center;
+		width: auto;
+		margin-top: 0;
+		max-height: none;
+		padding: 0;
+		background: transparent;
+		border: none;
+		border-radius: 0;
+		box-shadow: none;
+		opacity: 1;
+		visibility: visible;
+		pointer-events: auto;
+		overflow: visible;
+	}
+
+	.rh-site-top-bar .rh-site-top-bar__cta--bar {
+		grid-column: 3;
+		grid-row: 1;
+	}
+
+	.rh-site-top-bar .rh-site-top-bar__cta--menu {
+		display: none;
+	}
+}
+
 @media (max-width: 900px) {
 	.rh-site-top-bar .rh-hero-nav-toggle {
 		display: flex;
@@ -506,8 +563,8 @@ body.rh-hero-nav-open .rh-site-top-bar__shell {
 		letter-spacing: 0.14em;
 	}
 
-	/* Mobile dropdown — height grows with a quick bounce; links use the same
-	   wipe as the homepage hero nav on page load. */
+	/* Mobile dropdown — in document flow below the logo row so the shell grows
+	   with the menu instead of clipping under overflow/clip-path. */
 	.rh-site-top-bar .rh-hero-nav {
 		--rh-mobile-nav-bounce: cubic-bezier(0.34, 1.46, 0.64, 1);
 		--rh-mobile-nav-reveal-ease: cubic-bezier(0.2, 0.82, 0.2, 1);
@@ -515,11 +572,13 @@ body.rh-hero-nav-open .rh-site-top-bar__shell {
 		grid-column: unset;
 		grid-row: unset;
 		justify-self: unset;
-		align-self: unset;
-		position: absolute;
-		top: calc(100% + 0.5rem);
-		right: 0;
-		left: 0;
+		align-self: stretch;
+		position: relative;
+		top: auto;
+		right: auto;
+		left: auto;
+		width: 100%;
+		margin-top: 0.5rem;
 		z-index: 60;
 		flex-direction: column;
 		align-items: flex-start;
@@ -531,7 +590,7 @@ body.rh-hero-nav-open .rh-site-top-bar__shell {
 		border: 1px solid rgba(255, 255, 255, 0.12);
 		border-radius: 12px;
 		overflow: hidden;
-		opacity: 1;
+		opacity: 0;
 		visibility: hidden;
 		pointer-events: none;
 		transform: none;
@@ -539,24 +598,28 @@ body.rh-hero-nav-open .rh-site-top-bar__shell {
 		font-size: clamp(1.35rem, 5.2vw, 1.85rem);
 		letter-spacing: 0.08em;
 		transition:
-			max-height 0.42s var(--rh-mobile-nav-bounce),
-			padding-block 0.42s var(--rh-mobile-nav-bounce),
-			visibility 0s linear 0.42s;
+			max-height 0.36s var(--rh-mobile-nav-bounce),
+			padding-block 0.36s var(--rh-mobile-nav-bounce),
+			opacity 0.32s ease,
+			visibility 0s linear 0.36s;
 	}
 
 	.rh-site-top-bar .rh-site-top-bar__header.rh-hero-header {
 		position: relative;
 		z-index: 40;
+		flex: 0 0 auto;
 	}
 
 	.rh-site-top-bar .rh-hero-nav.is-open {
 		max-height: min(85vh, 32rem);
 		padding-block: 1.1rem 1.25rem;
+		opacity: 1;
 		visibility: visible;
 		pointer-events: auto;
 		transition:
 			max-height 0.42s var(--rh-mobile-nav-bounce),
 			padding-block 0.42s var(--rh-mobile-nav-bounce),
+			opacity 0.32s ease,
 			visibility 0s linear 0s;
 	}
 

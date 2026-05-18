@@ -9,7 +9,7 @@ if (! defined('ABSPATH')) {
 	exit;
 }
 ?>
-<section class="rh-home-stats-strip rh-home-stats-strip--pending" aria-label="<?php esc_attr_e('Key figures', 'rh-base-child'); ?>">
+<section class="rh-home-stats-strip rh-home-stats-strip--pending rh-home-stats-strip--await-hero" aria-label="<?php esc_attr_e('Key figures', 'rh-base-child'); ?>">
 	<div class="rh-home-stats-strip__inner">
 		<ul class="rh-home-stats-strip__list" role="list">
 			<li class="rh-home-stats-strip__item" data-rh-stat-item>

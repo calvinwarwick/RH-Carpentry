@@ -23,14 +23,8 @@ function rh_carpentry_render_hero_contact_icons(string $extra_classes = ''): voi
 	$mobile_label = (string) get_theme_mod('rh_contact_mobile', '');
 	$mobile_href  = rh_carpentry_tel_href_from_display($mobile_label);
 
-	$facebook  = (string) get_theme_mod('rh_social_facebook', '');
-	$instagram = (string) get_theme_mod('rh_social_instagram', '');
-	if ($facebook === '') {
-		$facebook = RH_CARPENTRY_DEFAULT_SOCIAL_FACEBOOK;
-	}
-	if ($instagram === '') {
-		$instagram = RH_CARPENTRY_DEFAULT_SOCIAL_INSTAGRAM;
-	}
+	$facebook  = rh_carpentry_facebook_url();
+	$instagram = rh_carpentry_instagram_url();
 
 	$phone_item = null;
 	if ($phone_href !== '') {
@@ -78,7 +72,7 @@ function rh_carpentry_render_hero_contact_icons(string $extra_classes = ''): voi
 
 	$items = array();
 	$items[] = array(
-		'href'     => rh_carpentry_home_section_url('contact'),
+		'href'     => rh_carpentry_contact_url(),
 		'label'    => __('Open contact form', 'rh-base-child'),
 		'icon'     => 'fa-solid fa-envelope',
 		'title'    => '',
@@ -127,14 +121,8 @@ function rh_carpentry_get_footer_contact_icon_items(): array {
 	$mobile_label = (string) get_theme_mod('rh_contact_mobile', '');
 	$mobile_href  = rh_carpentry_tel_href_from_display($mobile_label);
 
-	$facebook  = (string) get_theme_mod('rh_social_facebook', '');
-	$instagram = (string) get_theme_mod('rh_social_instagram', '');
-	if ($facebook === '') {
-		$facebook = RH_CARPENTRY_DEFAULT_SOCIAL_FACEBOOK;
-	}
-	if ($instagram === '') {
-		$instagram = RH_CARPENTRY_DEFAULT_SOCIAL_INSTAGRAM;
-	}
+	$facebook  = rh_carpentry_facebook_url();
+	$instagram = rh_carpentry_instagram_url();
 	$linkedin  = (string) get_theme_mod('rh_social_linkedin', '');
 
 	$items = array();

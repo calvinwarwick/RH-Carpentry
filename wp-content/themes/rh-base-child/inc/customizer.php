@@ -12,10 +12,40 @@ if (! defined('ABSPATH')) {
 }
 
 /** Default Facebook profile URL (Customizer + theme_mod fallback). */
-const RH_CARPENTRY_DEFAULT_SOCIAL_FACEBOOK = 'https://www.facebook.com/profile.php?id=61587190835676#';
+const RH_CARPENTRY_DEFAULT_SOCIAL_FACEBOOK = 'https://www.facebook.com/profile.php?id=61587190835676';
 
 /** Default Instagram profile URL (Customizer + theme_mod fallback). */
-const RH_CARPENTRY_DEFAULT_SOCIAL_INSTAGRAM = 'https://www.instagram.com/rhcarpentersukltd/';
+const RH_CARPENTRY_DEFAULT_SOCIAL_INSTAGRAM = 'https://www.instagram.com/rhcarpentersukltd';
+
+/**
+ * Facebook profile URL for hero, footer, and schema.
+ */
+function rh_carpentry_facebook_url(): string {
+	$url = trim((string) get_theme_mod('rh_social_facebook', ''));
+	return $url !== '' ? $url : RH_CARPENTRY_DEFAULT_SOCIAL_FACEBOOK;
+}
+
+/**
+ * Instagram profile URL for hero, footer, and schema.
+ */
+function rh_carpentry_instagram_url(): string {
+	$url = trim((string) get_theme_mod('rh_social_instagram', ''));
+	return $url !== '' ? $url : RH_CARPENTRY_DEFAULT_SOCIAL_INSTAGRAM;
+}
+
+/**
+ * Sync Customizer social URLs to the canonical RH Carpentry profiles.
+ */
+function rh_carpentry_ensure_social_urls(): void {
+	$revision = 1;
+	if ((int) get_option('rh_social_urls_revision', 0) >= $revision) {
+		return;
+	}
+	set_theme_mod('rh_social_facebook', RH_CARPENTRY_DEFAULT_SOCIAL_FACEBOOK);
+	set_theme_mod('rh_social_instagram', RH_CARPENTRY_DEFAULT_SOCIAL_INSTAGRAM);
+	update_option('rh_social_urls_revision', $revision);
+}
+add_action('after_setup_theme', 'rh_carpentry_ensure_social_urls', 5);
 
 /**
  * Register customizer controls.
@@ -141,7 +171,7 @@ function rh_carpentry_customize_register(WP_Customize_Manager $wp_customize): vo
 	$wp_customize->add_setting(
 		'rh_hero_title',
 		array(
-			'default'           => '',
+			'default'           => __('Carpentry & complete build packages in Essex', 'rh-base-child'),
 			'sanitize_callback' => 'sanitize_text_field',
 		)
 	);
@@ -242,6 +272,27 @@ function rh_carpentry_customize_register(WP_Customize_Manager $wp_customize): vo
 			array(
 				'label'       => __('About section image', 'rh-base-child'),
 				'description' => __('Optional. If not set, the bundled about-section.jpg in the theme is used.', 'rh-base-child'),
+				'section'     => 'rh_carpentry_about_home',
+				'mime_type'   => 'image',
+			)
+		)
+	);
+
+	$wp_customize->add_setting(
+		'rh_uk_fire_door_logo_id',
+		array(
+			'default'           => 0,
+			'sanitize_callback' => 'absint',
+		)
+	);
+
+	$wp_customize->add_control(
+		new WP_Customize_Media_Control(
+			$wp_customize,
+			'rh_uk_fire_door_logo_id',
+			array(
+				'label'       => __('UK Fire Door Training logo', 'rh-base-child'),
+				'description' => __('Shown in the About section beside the FireQual logo. Optional; falls back to the bundled theme file.', 'rh-base-child'),
 				'section'     => 'rh_carpentry_about_home',
 				'mime_type'   => 'image',
 			)

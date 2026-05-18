@@ -26,5 +26,6 @@ if (! defined('ABSPATH')) {
 		<main id="primary" class="site-main site-main--front">
 <?php else : ?>
 	<?php get_template_part('template-parts/header/site-header'); ?>
+	<?php get_template_part('template-parts/seo/breadcrumbs-bar'); ?>
 	<main id="primary" class="site-main">
 <?php endif; ?>

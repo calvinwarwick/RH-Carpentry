@@ -20,7 +20,11 @@ $map_query = (string) apply_filters(
 );
 $map_src   = 'https://maps.google.com/maps?q=' . rawurlencode($map_query) . '&z=14&output=embed';
 
-$footer_uri = get_stylesheet_directory_uri() . '/assets/images/footer/';
+$footer_uri         = get_stylesheet_directory_uri() . '/assets/images/footer/';
+$webcube_logo_path  = get_stylesheet_directory() . '/assets/images/webcube-logo.svg';
+$webcube_logo_url   = get_stylesheet_directory_uri() . '/assets/images/webcube-logo.svg';
+$webcube_logo_ver   = file_exists($webcube_logo_path) ? (string) filemtime($webcube_logo_path) : wp_get_theme()->get('Version');
+$webcube_logo       = add_query_arg('v', $webcube_logo_ver, $webcube_logo_url);
 $hero_logo_path = get_stylesheet_directory() . '/assets/images/rh-logo-hero.png';
 $hero_logo_url  = get_stylesheet_directory_uri() . '/assets/images/rh-logo-hero.png';
 $hero_logo_ver  = file_exists($hero_logo_path) ? (string) filemtime($hero_logo_path) : wp_get_theme()->get('Version');
@@ -55,6 +59,21 @@ $footer_grid_class    = 'rh-site-footer__grid' . ( $footer_has_contact ? '' : ' 
 						<img src="<?php echo esc_url($footer_uri . 'citb.png'); ?>" width="3840" height="1450" alt="<?php echo esc_attr__('CITB', 'rh-base-child'); ?>" loading="lazy" decoding="async" />
 						<img src="<?php echo esc_url($footer_uri . 'chas.png'); ?>" width="600" height="306" alt="<?php echo esc_attr__('CHAS — Accredited Contractor', 'rh-base-child'); ?>" loading="lazy" decoding="async" />
 						<img src="<?php echo esc_url($footer_uri . 'fsb.png'); ?>" width="237" height="155" alt="<?php echo esc_attr__('FSB member', 'rh-base-child'); ?>" loading="lazy" decoding="async" />
+					</div>
+					<div class="webcube-link" data-rh-fx="fade">
+						<a href="https://webcube.uk" target="_blank" rel="noopener noreferrer">
+							<?php esc_html_e('made by', 'rh-base-child'); ?>
+							<img
+								class="webcube-logo"
+								src="<?php echo esc_url($webcube_logo); ?>"
+								width="26"
+								height="25"
+								alt="<?php echo esc_attr__('Webcube', 'rh-base-child'); ?>"
+								loading="lazy"
+								decoding="async"
+							/>
+							<?php esc_html_e('webcube', 'rh-base-child'); ?>
+						</a>
 					</div>
 				</div>
 
@@ -92,9 +111,9 @@ $footer_grid_class    = 'rh-site-footer__grid' . ( $footer_has_contact ? '' : ' 
 							} else {
 								?>
 								<ul id="rh-footer-primary-menu" class="rh-site-footer__menu rh-site-footer__menu--primary">
-									<li><a href="<?php echo esc_url(rh_carpentry_home_section_url('about')); ?>"><?php esc_html_e('About', 'rh-base-child'); ?></a></li>
-									<li><a href="<?php echo esc_url(rh_carpentry_home_section_url('services')); ?>"><?php esc_html_e('Services', 'rh-base-child'); ?></a></li>
-									<li><a href="<?php echo esc_url(rh_carpentry_home_section_url('projects')); ?>"><?php esc_html_e('Projects', 'rh-base-child'); ?></a></li>
+									<li><a href="<?php echo esc_url(rh_carpentry_about_page_url()); ?>"><?php esc_html_e('About', 'rh-base-child'); ?></a></li>
+									<li><a href="<?php echo esc_url(rh_carpentry_services_hub_url()); ?>"><?php esc_html_e('Services', 'rh-base-child'); ?></a></li>
+									<li><a href="<?php echo esc_url(rh_carpentry_projects_archive_url()); ?>"><?php esc_html_e('Projects', 'rh-base-child'); ?></a></li>
 								</ul>
 								<?php
 							}
