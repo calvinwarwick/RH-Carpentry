@@ -282,8 +282,9 @@ if (post_type_exists('rh_project')) {
 						);
 					} else {
 						printf(
-							'<img class="rh-home-about__img" src="%s" alt="" width="1200" height="800" loading="lazy" decoding="async" />',
-							esc_url(rh_carpentry_get_about_section_image_url())
+							'<img class="rh-home-about__img" src="%s" alt="%s" width="1200" height="800" loading="lazy" decoding="async" />',
+							esc_url(rh_carpentry_get_about_section_image_url()),
+							esc_attr__('Modern kitchen interior fitted by RH Carpentry', 'rh-base-child')
 						);
 					}
 					?>

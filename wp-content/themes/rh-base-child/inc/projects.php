@@ -220,6 +220,9 @@ function rh_project_get_slideshow_attachment_ids(int $post_id): array {
 
 	$ids = rh_project_dedupe_attachment_ids_by_file_hash($ids);
 	if ($ids !== array()) {
+		if ($thumb > 0 && ! rh_project_attachment_is_brand_asset($thumb) && ! in_array($thumb, $ids, true)) {
+			array_unshift($ids, $thumb);
+		}
 		return $ids;
 	}
 

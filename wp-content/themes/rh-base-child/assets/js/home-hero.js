@@ -14,10 +14,25 @@
 		document.body.classList.toggle('rh-hero-nav-open', anyOpen);
 	};
 
+	const restartMobileNavLinkAnimations = (nav) => {
+		if (!nav || window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
+			return;
+		}
+		nav.querySelectorAll('.rh-hero-nav__menu li a').forEach((link) => {
+			link.style.animation = 'none';
+			// Force reflow so opening the menu replays the wipe stagger.
+			void link.offsetWidth;
+			link.style.removeProperty('animation');
+		});
+	};
+
 	const setNavOpen = (targetNav, open) => {
 		document.querySelectorAll('[data-rh-hero-nav]').forEach((n) => {
 			n.classList.toggle('is-open', open && n === targetNav);
 		});
+		if (open && targetNav) {
+			restartMobileNavLinkAnimations(targetNav);
+		}
 		document.querySelectorAll('[data-rh-hero-nav-toggle]').forEach((t) => {
 			const id = t.getAttribute('aria-controls');
 			const nav = id ? document.getElementById(id) : null;

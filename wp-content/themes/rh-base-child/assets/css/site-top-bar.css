@@ -152,6 +152,23 @@ body.rh-hero-nav-open .rh-site-top-bar__shell {
 	margin: 0 auto;
 	background: currentColor;
 	border-radius: 1px;
+	transform-origin: center center;
+	transition:
+		transform 0.34s cubic-bezier(0.34, 1.46, 0.64, 1),
+		opacity 0.22s ease;
+}
+
+.rh-site-top-bar .rh-hero-nav-toggle[aria-expanded="true"] .rh-hero-nav-toggle__bar:nth-child(2) {
+	transform: translateY(8px) rotate(45deg);
+}
+
+.rh-site-top-bar .rh-hero-nav-toggle[aria-expanded="true"] .rh-hero-nav-toggle__bar:nth-child(3) {
+	opacity: 0;
+	transform: scaleX(0);
+}
+
+.rh-site-top-bar .rh-hero-nav-toggle[aria-expanded="true"] .rh-hero-nav-toggle__bar:nth-child(4) {
+	transform: translateY(-8px) rotate(-45deg);
 }
 
 .rh-site-top-bar .rh-hero-nav {
@@ -426,6 +443,46 @@ body.rh-hero-nav-open .rh-site-top-bar__shell {
 	   reveals more of the bar. */
 }
 
+/* Shared with home-hero.css — duplicated here because inner pages do not load that file. */
+@keyframes rh-home-hero-link-reveal {
+	0%,
+	24% {
+		opacity: 0;
+		clip-path: inset(0 100% 0 0);
+	}
+	50% {
+		opacity: 1;
+		clip-path: inset(0 0 0 0);
+	}
+	100% {
+		opacity: 1;
+		clip-path: inset(0 0 0 0);
+	}
+}
+
+@keyframes rh-home-hero-link-wipe {
+	0% {
+		transform: translate3d(-115%, 0, 0);
+	}
+	46% {
+		transform: translate3d(0, 0, 0);
+	}
+	100% {
+		transform: translate3d(112%, 0, 0);
+	}
+}
+
+@keyframes rh-home-hero-item-in {
+	from {
+		opacity: 0;
+		transform: translate3d(0, 0.55rem, 0);
+	}
+	to {
+		opacity: 1;
+		transform: translate3d(0, 0, 0);
+	}
+}
+
 @media (max-width: 900px) {
 	.rh-site-top-bar .rh-hero-nav-toggle {
 		display: flex;
@@ -449,16 +506,12 @@ body.rh-hero-nav-open .rh-site-top-bar__shell {
 		letter-spacing: 0.14em;
 	}
 
-	/* Mobile dropdown — fade down.
-	   Closed: panel sits just above the header bar (translateY(-0.5rem)) with
-	          opacity 0 and pointer-events disabled.
-	   Open:  it slides down to its resting position below the bar and fades
-	          in, while each menu item wipes in with a stagger. Reverses on
-	          close via the base (no .is-open) state.
-	          z-index is pushed way past anything on the page (header itself
-	          is at 10020) so the panel never sits behind page content on
-	          inner pages. */
+	/* Mobile dropdown — height grows with a quick bounce; links use the same
+	   wipe as the homepage hero nav on page load. */
 	.rh-site-top-bar .rh-hero-nav {
+		--rh-mobile-nav-bounce: cubic-bezier(0.34, 1.46, 0.64, 1);
+		--rh-mobile-nav-reveal-ease: cubic-bezier(0.2, 0.82, 0.2, 1);
+		--rh-mobile-nav-wipe-ease: cubic-bezier(0.65, 0.02, 0.35, 1);
 		grid-column: unset;
 		grid-row: unset;
 		justify-self: unset;
@@ -470,22 +523,25 @@ body.rh-hero-nav-open .rh-site-top-bar__shell {
 		z-index: 60;
 		flex-direction: column;
 		align-items: flex-start;
-		gap: 1rem;
+		gap: 0.85rem;
+		max-height: 0;
+		padding-block: 0;
 		padding-inline: 1.15rem;
-		padding-block: 1.1rem 1.25rem;
 		background: #0c1c34;
 		border: 1px solid rgba(255, 255, 255, 0.12);
 		border-radius: 12px;
-		opacity: 0;
+		overflow: hidden;
+		opacity: 1;
 		visibility: hidden;
 		pointer-events: none;
-		transform: translate3d(0, -0.5rem, 0);
-		transform-origin: top center;
+		transform: none;
 		box-shadow: 0 18px 38px rgba(8, 20, 40, 0.35);
+		font-size: clamp(1.35rem, 5.2vw, 1.85rem);
+		letter-spacing: 0.08em;
 		transition:
-			opacity 0.28s cubic-bezier(0.4, 0, 0.2, 1),
-			transform 0.36s cubic-bezier(0.4, 0, 0.2, 1),
-			visibility 0s linear 0.36s;
+			max-height 0.42s var(--rh-mobile-nav-bounce),
+			padding-block 0.42s var(--rh-mobile-nav-bounce),
+			visibility 0s linear 0.42s;
 	}
 
 	.rh-site-top-bar .rh-site-top-bar__header.rh-hero-header {
@@ -494,13 +550,13 @@ body.rh-hero-nav-open .rh-site-top-bar__shell {
 	}
 
 	.rh-site-top-bar .rh-hero-nav.is-open {
-		opacity: 1;
+		max-height: min(85vh, 32rem);
+		padding-block: 1.1rem 1.25rem;
 		visibility: visible;
 		pointer-events: auto;
-		transform: translate3d(0, 0, 0);
 		transition:
-			opacity 0.32s cubic-bezier(0.2, 0.82, 0.2, 1),
-			transform 0.4s cubic-bezier(0.2, 0.82, 0.2, 1),
+			max-height 0.42s var(--rh-mobile-nav-bounce),
+			padding-block 0.42s var(--rh-mobile-nav-bounce),
 			visibility 0s linear 0s;
 	}
 
@@ -508,86 +564,144 @@ body.rh-hero-nav-open .rh-site-top-bar__shell {
 		flex-direction: column;
 		align-items: flex-start;
 		width: 100%;
+		gap: 0.35rem;
 	}
 
-	/* Each menu item wipes in from the left as the panel fades down. Base
-	   delays are the reverse-stagger used when the menu closes (last items
-	   leave first, top item leaves last). .is-open overrides them with the
-	   forward stagger used when it opens. */
-	.rh-site-top-bar .rh-hero-nav__menu li {
+	.rh-site-top-bar .rh-hero-nav__menu a::after {
+		display: none;
+	}
+
+	.rh-site-top-bar .rh-hero-nav__menu li a {
+		position: relative;
+		overflow: hidden;
+		display: inline-flex;
+		align-items: center;
+		padding-block: 0.15rem;
 		opacity: 0;
 		clip-path: inset(0 100% 0 0);
-		transform: translate3d(-0.5rem, 0, 0);
-		transition:
-			opacity 0.26s ease,
-			clip-path 0.4s cubic-bezier(0.2, 0.82, 0.2, 1),
-			transform 0.4s cubic-bezier(0.2, 0.82, 0.2, 1);
-		transition-delay: 0.18s;
 	}
 
-	.rh-site-top-bar .rh-hero-nav__menu li:nth-child(1) {
-		transition-delay: 0.18s;
-	}
-	.rh-site-top-bar .rh-hero-nav__menu li:nth-child(2) {
-		transition-delay: 0.14s;
-	}
-	.rh-site-top-bar .rh-hero-nav__menu li:nth-child(3) {
-		transition-delay: 0.1s;
-	}
-	.rh-site-top-bar .rh-hero-nav__menu li:nth-child(4) {
-		transition-delay: 0.06s;
-	}
-	.rh-site-top-bar .rh-hero-nav__menu li:nth-child(n + 5) {
-		transition-delay: 0.02s;
+	.rh-site-top-bar .rh-hero-nav__menu li a::before {
+		content: "";
+		position: absolute;
+		inset: -0.08em -0.2em;
+		background: #fff;
+		transform: translate3d(-115%, 0, 0);
+		pointer-events: none;
+		z-index: 2;
 	}
 
-	.rh-site-top-bar .rh-hero-nav.is-open .rh-hero-nav__menu li {
-		opacity: 1;
-		clip-path: inset(0 0 0 0);
-		transform: translate3d(0, 0, 0);
-	}
-	.rh-site-top-bar .rh-hero-nav.is-open .rh-hero-nav__menu li:nth-child(1) {
-		transition-delay: 0.1s;
-	}
-	.rh-site-top-bar .rh-hero-nav.is-open .rh-hero-nav__menu li:nth-child(2) {
-		transition-delay: 0.16s;
-	}
-	.rh-site-top-bar .rh-hero-nav.is-open .rh-hero-nav__menu li:nth-child(3) {
-		transition-delay: 0.22s;
-	}
-	.rh-site-top-bar .rh-hero-nav.is-open .rh-hero-nav__menu li:nth-child(4) {
-		transition-delay: 0.28s;
-	}
-	.rh-site-top-bar .rh-hero-nav.is-open .rh-hero-nav__menu li:nth-child(n + 5) {
-		transition-delay: 0.34s;
+	/* Home icon: fade only (wipe ::before would cover the glyph). */
+	.rh-site-top-bar .rh-hero-nav__menu a.rh-hero-nav__home::before {
+		content: none;
 	}
 
-	/* CTA button: last to appear on open (after the panel + menu items), and
-	   first to leave on close (transition-delay 0 in the base state). */
+	.rh-site-top-bar .rh-hero-nav.is-open .rh-hero-nav__menu a.rh-hero-nav__home {
+		animation: rh-home-hero-item-in 0.46s var(--rh-mobile-nav-reveal-ease) both;
+	}
+
+	.rh-site-top-bar .rh-hero-nav.is-open .rh-hero-nav__menu a.rh-hero-nav__home::before {
+		animation: none;
+	}
+
+	.rh-site-top-bar .rh-hero-nav:not(.is-open) .rh-hero-nav__menu li a,
+	.rh-site-top-bar .rh-hero-nav:not(.is-open) .rh-hero-nav__menu li a::before {
+		animation: none !important;
+	}
+
+	.rh-site-top-bar .rh-hero-nav.is-open .rh-hero-nav__menu li a {
+		animation: rh-home-hero-link-reveal 0.72s var(--rh-mobile-nav-reveal-ease) both;
+	}
+
+	.rh-site-top-bar .rh-hero-nav.is-open .rh-hero-nav__menu li a::before {
+		animation: rh-home-hero-link-wipe 0.72s var(--rh-mobile-nav-wipe-ease) both;
+	}
+
+	.rh-site-top-bar .rh-hero-nav.is-open .rh-hero-nav__menu li:nth-child(1) a,
+	.rh-site-top-bar .rh-hero-nav.is-open .rh-hero-nav__menu li:nth-child(1) a::before {
+		animation-delay: 0.14s;
+	}
+
+	.rh-site-top-bar .rh-hero-nav.is-open .rh-hero-nav__menu li:nth-child(2) a,
+	.rh-site-top-bar .rh-hero-nav.is-open .rh-hero-nav__menu li:nth-child(2) a::before {
+		animation-delay: 0.22s;
+	}
+
+	.rh-site-top-bar .rh-hero-nav.is-open .rh-hero-nav__menu li:nth-child(3) a,
+	.rh-site-top-bar .rh-hero-nav.is-open .rh-hero-nav__menu li:nth-child(3) a::before {
+		animation-delay: 0.3s;
+	}
+
+	.rh-site-top-bar .rh-hero-nav.is-open .rh-hero-nav__menu li:nth-child(4) a,
+	.rh-site-top-bar .rh-hero-nav.is-open .rh-hero-nav__menu li:nth-child(4) a::before {
+		animation-delay: 0.38s;
+	}
+
+	.rh-site-top-bar .rh-hero-nav.is-open .rh-hero-nav__menu li:nth-child(5) a,
+	.rh-site-top-bar .rh-hero-nav.is-open .rh-hero-nav__menu li:nth-child(5) a::before {
+		animation-delay: 0.46s;
+	}
+
+	.rh-site-top-bar .rh-hero-nav.is-open .rh-hero-nav__menu li:nth-child(n + 6) a,
+	.rh-site-top-bar .rh-hero-nav.is-open .rh-hero-nav__menu li:nth-child(n + 6) a::before {
+		animation-delay: 0.54s;
+	}
+
 	.rh-site-top-bar .rh-site-top-bar__cta--menu {
 		opacity: 0;
-		transform: translate3d(0, 0.6rem, 0);
-		transition:
-			opacity 0.26s ease,
-			transform 0.32s cubic-bezier(0.2, 0.82, 0.2, 1);
-		transition-delay: 0s;
+		transform: translate3d(0, 0.5rem, 0);
+		font-size: clamp(0.78rem, 2.8vw, 0.92rem);
+		letter-spacing: 0.14em;
+	}
+
+	.rh-site-top-bar .rh-hero-nav:not(.is-open) .rh-site-top-bar__cta--menu {
+		animation: none !important;
 	}
 
 	.rh-site-top-bar .rh-hero-nav.is-open .rh-site-top-bar__cta--menu {
-		opacity: 1;
-		transform: translate3d(0, 0, 0);
-		transition-delay: 0.38s;
+		animation: rh-home-hero-item-in 0.46s var(--rh-mobile-nav-reveal-ease) 0.58s both;
 	}
 }
 
 @media (max-width: 900px) and (prefers-reduced-motion: reduce) {
+	.rh-site-top-bar .rh-hero-nav-toggle__bar {
+		transition-duration: 0.01ms;
+	}
+
 	.rh-site-top-bar .rh-hero-nav,
 	.rh-site-top-bar .rh-hero-nav.is-open,
-	.rh-site-top-bar .rh-hero-nav__menu li,
-	.rh-site-top-bar .rh-hero-nav.is-open .rh-hero-nav__menu li,
+	.rh-site-top-bar .rh-hero-nav__menu li a,
+	.rh-site-top-bar .rh-hero-nav.is-open .rh-hero-nav__menu li a,
+	.rh-site-top-bar .rh-hero-nav.is-open .rh-hero-nav__menu li a::before,
 	.rh-site-top-bar .rh-site-top-bar__cta--menu,
 	.rh-site-top-bar .rh-hero-nav.is-open .rh-site-top-bar__cta--menu {
 		transition-duration: 0.01ms !important;
 		transition-delay: 0s !important;
+		animation: none !important;
+	}
+
+	.rh-site-top-bar .rh-hero-nav:not(.is-open) {
+		max-height: 0;
+		visibility: hidden;
+	}
+
+	.rh-site-top-bar .rh-hero-nav.is-open {
+		max-height: none;
+		visibility: visible;
+	}
+
+	.rh-site-top-bar .rh-hero-nav__menu li a {
+		opacity: 1;
+		clip-path: none;
+	}
+
+	.rh-site-top-bar .rh-hero-nav__menu li a::before {
+		display: none;
+	}
+
+	.rh-site-top-bar .rh-site-top-bar__cta--menu,
+	.rh-site-top-bar .rh-hero-nav.is-open .rh-site-top-bar__cta--menu {
+		opacity: 1;
+		transform: none;
 	}
 }

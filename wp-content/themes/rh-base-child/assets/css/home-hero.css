@@ -16,7 +16,7 @@
 	--rh-hero-radius: clamp(28px, 4.5vw, 42px);
 	/* Hero image/gradient (inside white frame) — use for surfaces inset in the same channel, e.g. testimonials blue box */
 	--rh-hero-inner-radius: max(0px, calc(var(--rh-hero-radius) - var(--rh-frame-inset)));
-	/* Navy wash over hero photo — reused on About image for consistency */
+	/* Navy wash over hero photo */
 	--rh-hero-overlay-gradient: linear-gradient(
 		120deg,
 		rgba(8, 20, 40, 0.92) 0%,
@@ -1562,6 +1562,24 @@ body.rh-contact-overlay-open {
 	margin: 0 auto;
 	background: currentColor;
 	border-radius: 1px;
+	transform-origin: center center;
+	transition:
+		transform 0.34s cubic-bezier(0.34, 1.46, 0.64, 1),
+		opacity 0.22s ease;
+}
+
+/* Burger → X when mobile nav is open */
+.rh-hero-nav-toggle[aria-expanded="true"] .rh-hero-nav-toggle__bar:nth-child(2) {
+	transform: translateY(8px) rotate(45deg);
+}
+
+.rh-hero-nav-toggle[aria-expanded="true"] .rh-hero-nav-toggle__bar:nth-child(3) {
+	opacity: 0;
+	transform: scaleX(0);
+}
+
+.rh-hero-nav-toggle[aria-expanded="true"] .rh-hero-nav-toggle__bar:nth-child(4) {
+	transform: translateY(-8px) rotate(-45deg);
 }
 
 .rh-hero-nav {
@@ -1643,6 +1661,9 @@ body.rh-contact-overlay-open {
 	}
 
 	.rh-hero-nav {
+		--rh-mobile-nav-bounce: cubic-bezier(0.34, 1.46, 0.64, 1);
+		--rh-mobile-nav-reveal-ease: cubic-bezier(0.2, 0.82, 0.2, 1);
+		--rh-mobile-nav-wipe-ease: cubic-bezier(0.65, 0.02, 0.35, 1);
 		grid-column: unset;
 		grid-row: unset;
 		justify-self: unset;
@@ -1654,16 +1675,25 @@ body.rh-contact-overlay-open {
 		z-index: 40;
 		flex-direction: column;
 		align-items: flex-start;
-		gap: 1rem;
-		padding: 1.25rem 1.25rem 1.5rem;
-		background: rgba(8, 20, 40, 0.96);
+		gap: 0.85rem;
+		max-height: 0;
+		padding-block: 0;
+		padding-inline: 1.25rem;
+		background: rgba(8, 20, 40, 0.98);
 		border: 1px solid rgba(255, 255, 255, 0.12);
 		border-radius: 12px;
+		overflow: hidden;
 		visibility: hidden;
-		opacity: 0;
-		transform: translateY(-6px);
+		opacity: 1;
+		transform: none;
 		pointer-events: none;
-		transition: opacity 0.2s ease, transform 0.2s ease, visibility 0.2s;
+		box-shadow: 0 18px 38px rgba(8, 20, 40, 0.35);
+		transition:
+			max-height 0.42s var(--rh-mobile-nav-bounce),
+			padding-block 0.42s var(--rh-mobile-nav-bounce),
+			visibility 0s linear 0.42s;
+		font-size: clamp(1.35rem, 5.2vw, 1.85rem);
+		letter-spacing: 0.08em;
 	}
 
 	.rh-hero-header {
@@ -1672,16 +1702,121 @@ body.rh-contact-overlay-open {
 	}
 
 	.rh-hero-nav.is-open {
+		max-height: min(85vh, 32rem);
+		padding-block: 1.2rem 1.45rem;
 		visibility: visible;
-		opacity: 1;
-		transform: translateY(0);
 		pointer-events: auto;
+		transition:
+			max-height 0.42s var(--rh-mobile-nav-bounce),
+			padding-block 0.42s var(--rh-mobile-nav-bounce),
+			visibility 0s linear 0s;
 	}
 
 	.rh-hero-nav__menu {
 		flex-direction: column;
 		align-items: flex-start;
 		width: 100%;
+		gap: 0.35rem;
+	}
+
+	.rh-hero-nav__menu a::after {
+		display: none;
+	}
+
+	.rh-hero-nav__menu li a {
+		position: relative;
+		overflow: hidden;
+		display: inline-block;
+		padding-block: 0.15rem;
+		opacity: 0;
+		clip-path: inset(0 100% 0 0);
+	}
+
+	.rh-hero-nav__menu li a::before {
+		content: "";
+		position: absolute;
+		inset: -0.08em -0.2em;
+		background: #fff;
+		transform: translate3d(-115%, 0, 0);
+		pointer-events: none;
+		z-index: 2;
+	}
+
+	.rh-hero-nav:not(.is-open) .rh-hero-nav__menu li a,
+	.rh-hero-nav:not(.is-open) .rh-hero-nav__menu li a::before {
+		animation: none !important;
+	}
+
+	.rh-hero-nav.is-open .rh-hero-nav__menu li a {
+		animation: rh-home-hero-link-reveal 0.72s var(--rh-mobile-nav-reveal-ease) both;
+	}
+
+	.rh-hero-nav.is-open .rh-hero-nav__menu li a::before {
+		animation: rh-home-hero-link-wipe 0.72s var(--rh-mobile-nav-wipe-ease) both;
+	}
+
+	.rh-hero-nav.is-open .rh-hero-nav__menu li:nth-child(1) a,
+	.rh-hero-nav.is-open .rh-hero-nav__menu li:nth-child(1) a::before {
+		animation-delay: 0.14s;
+	}
+
+	.rh-hero-nav.is-open .rh-hero-nav__menu li:nth-child(2) a,
+	.rh-hero-nav.is-open .rh-hero-nav__menu li:nth-child(2) a::before {
+		animation-delay: 0.22s;
+	}
+
+	.rh-hero-nav.is-open .rh-hero-nav__menu li:nth-child(3) a,
+	.rh-hero-nav.is-open .rh-hero-nav__menu li:nth-child(3) a::before {
+		animation-delay: 0.3s;
+	}
+
+	.rh-hero-nav.is-open .rh-hero-nav__menu li:nth-child(4) a,
+	.rh-hero-nav.is-open .rh-hero-nav__menu li:nth-child(4) a::before {
+		animation-delay: 0.38s;
+	}
+
+	.rh-hero-nav.is-open .rh-hero-nav__menu li:nth-child(5) a,
+	.rh-hero-nav.is-open .rh-hero-nav__menu li:nth-child(5) a::before {
+		animation-delay: 0.46s;
+	}
+
+	.rh-hero-nav.is-open .rh-hero-nav__menu li:nth-child(n + 6) a,
+	.rh-hero-nav.is-open .rh-hero-nav__menu li:nth-child(n + 6) a::before {
+		animation-delay: 0.54s;
+	}
+}
+
+@media (max-width: 900px) and (prefers-reduced-motion: reduce) {
+	.rh-hero-nav-toggle__bar {
+		transition-duration: 0.01ms;
+	}
+
+	.rh-hero-nav,
+	.rh-hero-nav.is-open,
+	.rh-hero-nav__menu li a,
+	.rh-hero-nav.is-open .rh-hero-nav__menu li a,
+	.rh-hero-nav.is-open .rh-hero-nav__menu li a::before {
+		transition-duration: 0.01ms !important;
+		animation: none !important;
+	}
+
+	.rh-hero-nav:not(.is-open) {
+		max-height: 0;
+		visibility: hidden;
+	}
+
+	.rh-hero-nav.is-open {
+		max-height: none;
+		visibility: visible;
+	}
+
+	.rh-hero-nav__menu li a {
+		opacity: 1;
+		clip-path: none;
+	}
+
+	.rh-hero-nav__menu li a::before {
+		display: none;
 	}
 }
 
@@ -2710,17 +2845,6 @@ body.rh-carpentry-home .rh-bento-page > .rh-home-section + .rh-home-section .rh-
 	isolation: isolate;
 }
 
-/* About image: same navy wash as homepage hero */
-.rh-home-about__media::after {
-	content: '';
-	position: absolute;
-	inset: 0;
-	z-index: 1;
-	pointer-events: none;
-	background: var(--rh-hero-overlay-gradient);
-	opacity: var(--rh-hero-photo-overlay-opacity);
-}
-
 .rh-home-about__img {
 	position: absolute;
 	inset: 0;
@@ -2803,13 +2927,26 @@ body.rh-carpentry-home .rh-bento-page > .rh-home-section + .rh-home-section .rh-
 
 /* Fire door accreditations (UK Fire Door Training, FireQual) — under About CTA */
 .rh-home-about__credentials-panel {
-	margin-top: clamp(1.25rem, 2.8vw, 1.85rem);
-	padding-top: clamp(1.1rem, 2.4vw, 1.5rem);
-	border-top: 1px solid rgba(12, 28, 52, 0.1);
+	margin-top: clamp(1.35rem, 3vw, 2rem);
+	padding-top: 0;
+	border-top: none;
 }
 
 .rh-home-about__credentials-panel .rh-home-feature__credentials-list {
 	justify-content: flex-start;
+	gap: clamp(1.25rem, 3vw, 2.75rem);
+}
+
+.rh-home-about__credentials-panel .rh-home-feature__credentials-img {
+	height: clamp(64px, 8vw, 104px);
+}
+
+.rh-home-about__credentials-panel .rh-home-feature__credentials-img--uk-fire-door {
+	height: clamp(76px, 10vw, 124px);
+}
+
+.rh-home-about__credentials-panel .rh-home-feature__credentials-img--firequal {
+	height: clamp(60px, 8vw, 100px);
 }
 
 @media (max-width: 520px) {

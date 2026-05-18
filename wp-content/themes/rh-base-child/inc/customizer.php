@@ -241,7 +241,7 @@ function rh_carpentry_customize_register(WP_Customize_Manager $wp_customize): vo
 			'rh_about_section_image_id',
 			array(
 				'label'       => __('About section image', 'rh-base-child'),
-				'description' => __('Optional. If not set, the hero background image is used.', 'rh-base-child'),
+				'description' => __('Optional. If not set, the bundled about-section.jpg in the theme is used.', 'rh-base-child'),
 				'section'     => 'rh_carpentry_about_home',
 				'mime_type'   => 'image',
 			)
@@ -305,7 +305,7 @@ function rh_carpentry_get_hero_background_url(): string {
 }
 
 /**
- * About section image URL: Customizer attachment, else same fallback as hero.
+ * About section image URL: Customizer attachment, else bundled about-section.jpg, else hero.
  */
 function rh_carpentry_get_about_section_image_url(): string {
 	$id = (int) get_theme_mod('rh_about_section_image_id', 0);
@@ -314,6 +314,11 @@ function rh_carpentry_get_about_section_image_url(): string {
 		if ($url) {
 			return $url;
 		}
+	}
+
+	$bundled_path = get_stylesheet_directory() . '/assets/images/about-section.jpg';
+	if (is_readable($bundled_path)) {
+		return get_stylesheet_directory_uri() . '/assets/images/about-section.jpg';
 	}
 
 	return rh_carpentry_get_hero_background_url();
