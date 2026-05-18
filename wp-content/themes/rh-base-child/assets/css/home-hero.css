@@ -125,7 +125,7 @@ body.admin-bar {
 
 body.rh-carpentry-home {
 	margin: 0;
-	background: var(--rh-color-bg, #f5f4f0);
+	background: var(--rh-color-surface, #ffffff);
 	overflow-x: clip;
 }
 
@@ -1163,7 +1163,7 @@ body.rh-contact-overlay-open {
 .rh-home-hero {
 	position: relative;
 	z-index: 1;
-	background: var(--rh-color-bg, #f5f4f0);
+	background: var(--rh-color-surface, #ffffff);
 }
 
 .rh-home-hero .rh-hero-home {
@@ -2333,10 +2333,10 @@ body.rh-contact-overlay-open {
 }
 
 /*
- * Narrow viewports: row headers (title + CTA) — place the button after section body so it sits at the bottom.
+ * Narrow viewports (carousel mobile): row headers (title + CTA) — place the button after section body so it sits at the bottom.
  * Uses display:contents on the header so title block, content, and CTA become grid siblings.
  */
-@media (max-width: 768px) {
+@media (max-width: 899px) {
 	.rh-home-section--features .rh-home-section__inner {
 		display: grid;
 		grid-template-columns: minmax(0, 1fr);
@@ -2390,15 +2390,17 @@ body.rh-contact-overlay-open {
 		box-sizing: border-box;
 	}
 
-	/* Fill at least min-height; push Get in touch to the bottom of the blue shell */
+	/* Fill at least min-height; push section CTAs (Get in touch, View all) to the bottom of the blue shell */
 	.rh-home-section--testimonials .rh-clients-hero.rh-testimonials-hero,
-	.rh-home-section--projects .rh-clients-hero.rh-testimonials-hero {
+	.rh-home-section--projects .rh-clients-hero.rh-testimonials-hero,
+	.rh-single-related--band .rh-clients-hero.rh-testimonials-hero {
 		display: flex;
 		flex-direction: column;
 	}
 
 	.rh-home-section--testimonials .rh-clients-hero__inner,
-	.rh-home-section--projects .rh-clients-hero__inner {
+	.rh-home-section--projects .rh-clients-hero__inner,
+	.rh-single-related--band .rh-clients-hero__inner {
 		display: grid;
 		grid-template-columns: minmax(0, 1fr);
 		grid-template-rows: auto 1fr auto;
@@ -2407,17 +2409,20 @@ body.rh-contact-overlay-open {
 		row-gap: clamp(1rem, 3vw, 1.5rem);
 	}
 
-	.rh-home-section--projects .rh-clients-hero__inner {
+	.rh-home-section--projects .rh-clients-hero__inner,
+	.rh-single-related--band .rh-clients-hero__inner {
 		overflow: hidden;
 	}
 
 	.rh-home-section--testimonials .rh-clients-hero__inner .rh-home-section__header--clients.rh-home-section__header--row,
-	.rh-home-section--projects .rh-clients-hero__inner .rh-home-section__header--clients.rh-home-section__header--row {
+	.rh-home-section--projects .rh-clients-hero__inner .rh-home-section__header--clients.rh-home-section__header--row,
+	.rh-single-related--band .rh-clients-hero__inner .rh-single-related__intro.rh-home-section__header--row {
 		display: contents;
 	}
 
 	.rh-home-section--testimonials .rh-clients-hero__inner > div:first-child,
-	.rh-home-section--projects .rh-clients-hero__inner > div:first-child {
+	.rh-home-section--projects .rh-clients-hero__inner > div:first-child,
+	.rh-single-related--band .rh-clients-hero__inner > div:first-child {
 		grid-row: 1;
 		padding-bottom: clamp(1rem, 3.2vw, 1.85rem);
 	}
@@ -2432,7 +2437,8 @@ body.rh-contact-overlay-open {
 	}
 
 	.rh-home-section--testimonials .rh-clients-hero__inner > a.rh-hero-btn,
-	.rh-home-section--projects .rh-clients-hero__inner > a.rh-hero-btn {
+	.rh-home-section--projects .rh-clients-hero__inner > a.rh-hero-btn,
+	.rh-single-related--band .rh-clients-hero__inner > a.rh-hero-btn {
 		grid-row: 3;
 		justify-self: stretch;
 		align-self: end;
@@ -2513,10 +2519,9 @@ body.rh-carpentry-home .site-main--front {
 	max-width: 100%;
 	margin-inline: auto;
 	box-sizing: border-box;
-	border: var(--rh-frame-inset) solid var(--rh-color-bg, #f5f4f0);
+	border: var(--rh-frame-inset) solid var(--rh-color-surface, #ffffff);
 	border-top: none;
 	border-radius: 0;
-	/* Transparent so `body.rh-carpentry-home` (--rh-color-bg) shows through; avoid a second fill that reads grey against the body. */
 	background: transparent;
 	overflow-x: hidden;
 	overflow-y: visible;
@@ -3022,9 +3027,9 @@ body.rh-carpentry-home .rh-bento-page > .rh-home-section + .rh-home-section .rh-
 	min-width: 0;
 	box-sizing: border-box;
 	background: transparent;
-	border: var(--rh-bento-cell-border);
-	border-radius: var(--rh-bento-radius);
-	box-shadow: var(--rh-bento-cell-shadow);
+	border: none;
+	border-radius: 0;
+	box-shadow: none;
 	/* Match .rh-home-section__inner (Services / What we offer, Our Clients, etc.) */
 	padding: var(--rh-hero-pad) var(--rh-hero-pad-x-end) var(--rh-hero-pad) var(--rh-hero-pad-x);
 }
@@ -3060,9 +3065,9 @@ body.rh-carpentry-home .rh-bento-page > .rh-home-section + .rh-home-section .rh-
 	min-height: 0;
 	box-sizing: border-box;
 	background: transparent;
-	border: var(--rh-bento-cell-border);
+	border: none;
 	border-radius: var(--rh-bento-radius);
-	box-shadow: var(--rh-bento-cell-shadow);
+	box-shadow: none;
 	overflow: hidden;
 }
 
@@ -3596,6 +3601,11 @@ body.rh-carpentry-home .rh-bento-page > .rh-home-section + .rh-home-section .rh-
 	.rh-home-section--testimonials .rh-home-testimonial.rh-bento-cell {
 		scroll-snap-align: center;
 	}
+
+	.rh-home-section--testimonials .rh-home-testimonials-carousel__viewport {
+		flex: 0 0 auto;
+		min-height: clamp(280px, 52svh, 480px);
+	}
 }
 
 .rh-home-testimonials-carousel__viewport::-webkit-scrollbar {
@@ -3998,10 +4008,15 @@ body.rh-carpentry-home .rh-bento-page > .rh-home-section + .rh-home-section .rh-
 		width: 100%;
 	}
 
+	[data-rh-projects-carousel] .rh-home-project-card.rh-bento-cell {
+		min-height: 100%;
+		align-self: stretch;
+	}
+
 	[data-rh-projects-carousel] .rh-home-project-card.rh-bento-cell .rh-home-project-card__cta {
-		top: clamp(1rem, 2.6vw, 1.4rem);
-		right: clamp(1rem, 2.4vw, 1.25rem);
-		bottom: auto;
+		top: auto;
+		right: var(--rh-card-pad-x, clamp(1rem, 2.4vw, 1.25rem));
+		bottom: var(--rh-card-pad-bottom, clamp(1rem, 2.6vw, 1.4rem));
 		opacity: 0;
 		transform: translateY(0);
 		pointer-events: none;
@@ -4011,6 +4026,24 @@ body.rh-carpentry-home .rh-bento-page > .rh-home-section + .rh-home-section .rh-
 	.rh-archive-projects .rh-home-project-card.rh-bento-cell.is-card-touch .rh-home-project-card__cta {
 		opacity: 1;
 		pointer-events: auto;
+	}
+
+	[data-rh-testimonials-carousel] .rh-home-testimonials-carousel__track {
+		align-items: stretch;
+		min-height: 100%;
+	}
+
+	[data-rh-testimonials-carousel] .rh-home-testimonials-carousel__viewport-shell,
+	[data-rh-testimonials-carousel] .rh-home-testimonials-carousel__viewport {
+		display: flex;
+		flex-direction: column;
+		flex: 1 1 auto;
+		min-height: 0;
+	}
+
+	.rh-home-section--testimonials .rh-home-testimonial.rh-bento-cell {
+		min-height: 100%;
+		height: auto;
 	}
 }
 
@@ -4099,9 +4132,9 @@ body.rh-carpentry-home .rh-bento-page > .rh-home-section + .rh-home-section .rh-
 
 @media (max-width: 899px) {
 	.rh-archive-projects__bento > .rh-home-project-card.rh-bento-cell .rh-home-project-card__cta {
-		top: clamp(1rem, 2.6vw, 1.4rem);
-		right: clamp(1rem, 2.4vw, 1.25rem);
-		bottom: auto;
+		top: auto;
+		right: var(--rh-card-pad-x, clamp(1rem, 2.4vw, 1.25rem));
+		bottom: var(--rh-card-pad-bottom, clamp(1rem, 2.6vw, 1.4rem));
 		opacity: 0;
 		transform: translateY(0);
 		pointer-events: none;
@@ -4688,7 +4721,7 @@ body.rh-carpentry-home .rh-bento-page > .rh-home-section + .rh-home-section .rh-
 .rh-home-features--services {
 	display: grid;
 	grid-template-columns: repeat(12, minmax(0, 1fr));
-	grid-auto-rows: minmax(6.25rem, auto);
+	grid-auto-rows: minmax(9rem, auto);
 	gap: var(--rh-bento-gap);
 	list-style: none;
 	margin: 0;
@@ -4782,7 +4815,7 @@ body.rh-carpentry-home .rh-bento-page > .rh-home-section + .rh-home-section .rh-
 	 */
 	.rh-home-features--services {
 		grid-template-columns: repeat(6, minmax(0, 1fr));
-		grid-auto-rows: minmax(6.25rem, auto);
+		grid-auto-rows: minmax(8.5rem, auto);
 	}
 
 	.rh-home-service-bento--a {
@@ -4844,7 +4877,7 @@ body.rh-carpentry-home .rh-bento-page > .rh-home-section + .rh-home-section .rh-
 	}
 
 	.rh-home-service-bento--a {
-		min-height: clamp(9.5rem, 38vw, 13rem);
+		min-height: clamp(11.5rem, 44vw, 16rem);
 	}
 }
 
@@ -4916,9 +4949,13 @@ body.rh-carpentry-home .rh-bento-page > .rh-home-section + .rh-home-section .rh-
 	overflow: hidden;
 	isolation: isolate;
 	padding: clamp(1.15rem, 2.6vw, 1.65rem);
-	border: 1px solid rgba(255, 255, 255, 0.12);
+	border: 1px solid rgba(255, 255, 255, 0.16);
+	border-radius: var(--rh-bento-radius);
 	box-shadow: 0 14px 40px rgba(12, 28, 52, 0.2);
 	color: #fff;
+	transition:
+		border-color 0.45s cubic-bezier(0.33, 1, 0.68, 1),
+		box-shadow 0.45s cubic-bezier(0.33, 1, 0.68, 1);
 }
 
 /* Hero-matched photo + blue wash */
@@ -4930,7 +4967,14 @@ body.rh-carpentry-home .rh-bento-page > .rh-home-section + .rh-home-section .rh-
 	background-color: var(--rh-hero-navy-solid, #0c1c34);
 	background-size: cover;
 	background-position: center;
-	transform: scale(1.02);
+	background-repeat: no-repeat;
+	pointer-events: none;
+	transform: scale(1);
+	filter: brightness(1) saturate(1);
+	transition:
+		transform 0.55s cubic-bezier(0.33, 1, 0.68, 1),
+		filter 0.55s cubic-bezier(0.33, 1, 0.68, 1);
+	will-change: transform, filter;
 }
 
 .rh-home-service-card__overlay {
@@ -4938,12 +4982,117 @@ body.rh-carpentry-home .rh-bento-page > .rh-home-section + .rh-home-section .rh-
 	inset: 0;
 	z-index: 1;
 	border-radius: inherit;
+	pointer-events: none;
 	background: linear-gradient(
 		120deg,
-		rgba(8, 20, 40, 0.92) 0%,
-		rgba(20, 45, 85, 0.78) 45%,
-		rgba(10, 25, 48, 0.72) 100%
+		rgba(8, 20, 40, 0.88) 0%,
+		rgba(20, 45, 85, 0.72) 45%,
+		rgba(10, 25, 48, 0.65) 100%
 	);
+	transition: opacity 0.45s ease;
+}
+
+.rh-home-service-card__overlay::after {
+	content: "";
+	position: absolute;
+	inset: 0;
+	border-radius: inherit;
+	pointer-events: none;
+	background:
+		linear-gradient(
+			to top,
+			rgba(8, 22, 48, 0.82) 0%,
+			rgba(12, 32, 68, 0.7) 28%,
+			rgba(18, 42, 88, 0.4) 52%,
+			rgba(14, 36, 72, 0.14) 72%,
+			transparent 82%
+		),
+		linear-gradient(
+			120deg,
+			rgba(8, 20, 40, 0.42) 0%,
+			rgba(20, 45, 85, 0.32) 45%,
+			rgba(10, 28, 55, 0.26) 100%
+		);
+	opacity: 0;
+	transition: opacity 0.45s cubic-bezier(0.33, 1, 0.68, 1);
+}
+
+.rh-home-service-card__cta {
+	position: absolute;
+	bottom: clamp(1rem, 2.6vw, 1.4rem);
+	right: clamp(1rem, 2.4vw, 1.25rem);
+	z-index: 4;
+	display: inline-flex;
+	align-items: center;
+	gap: 0.4em;
+	padding: 0.35rem 0.55rem;
+	font-size: 0.72rem;
+	font-weight: 700;
+	letter-spacing: 0.08em;
+	text-transform: uppercase;
+	color: #fff;
+	text-shadow: 0 1px 8px rgba(0, 0, 0, 0.45);
+	opacity: 0;
+	transform: translateY(4px);
+	pointer-events: none;
+	transition:
+		opacity 0.35s ease,
+		transform 0.35s ease;
+}
+
+.rh-home-service-card__cta-icon {
+	display: inline-block;
+	font-size: 0.85rem;
+	line-height: 1;
+	margin-inline-start: 0.12em;
+	opacity: 0.85;
+}
+
+.rh-home-feature--service:hover .rh-home-service-card__bg,
+.rh-home-feature--service:focus-within .rh-home-service-card__bg {
+	transform: scale(1.12);
+	filter: brightness(1.04) saturate(1.03);
+}
+
+.rh-home-feature--service:hover .rh-home-service-card__overlay::after,
+.rh-home-feature--service:focus-within .rh-home-service-card__overlay::after {
+	opacity: 0.88;
+}
+
+.rh-home-feature--service:hover,
+.rh-home-feature--service:focus-within {
+	border-color: rgba(255, 255, 255, 0.28);
+	box-shadow: 0 18px 48px rgba(12, 28, 52, 0.28);
+}
+
+.rh-home-feature--service:hover .rh-home-service-card__cta,
+.rh-home-feature--service:focus-within .rh-home-service-card__cta {
+	opacity: 1;
+	transform: translateY(0);
+}
+
+.rh-home-feature--service:hover .rh-home-service-card__cta-icon,
+.rh-home-feature--service:focus-within .rh-home-service-card__cta-icon {
+	animation: rh-project-card-find-chevron 1.15s ease-in-out forwards;
+}
+
+@media (prefers-reduced-motion: reduce) {
+	.rh-home-service-card__bg,
+	.rh-home-service-card__overlay::after,
+	.rh-home-service-card__cta {
+		transition: none;
+	}
+
+	.rh-home-feature--service:hover .rh-home-service-card__bg,
+	.rh-home-feature--service:focus-within .rh-home-service-card__bg {
+		transform: scale(1.04);
+	}
+
+	.rh-home-feature--service:hover .rh-home-service-card__cta-icon,
+	.rh-home-feature--service:focus-within .rh-home-service-card__cta-icon {
+		animation: none;
+		opacity: 0.92;
+	}
 }
 
 .rh-home-service-card__link {
@@ -4971,7 +5120,7 @@ body.rh-carpentry-home .rh-bento-page > .rh-home-section + .rh-home-section .rh-
 	margin: 0;
 	margin-top: auto;
 	align-self: flex-start;
-	max-width: min(36rem, 92%);
+	max-width: min(16rem, 68%);
 	font-size: clamp(0.92rem, 2.1vw, 1.05rem);
 	font-weight: 700;
 	letter-spacing: 0.04em;
@@ -5196,7 +5345,7 @@ body.rh-carpentry-home .rh-bento-page > .rh-home-section + .rh-home-section .rh-
    content. Carousel viewport height is set again *after* the shared
    .rh-home-projects-carousel__viewport flex rules — those use height: auto
    and would otherwise win the cascade and collapse card height. */
-@media (max-width: 768px) {
+@media (max-width: 899px) {
 	.rh-home-section--projects#projects,
 	.rh-home-section--projects {
 		height: auto;
@@ -5208,7 +5357,7 @@ body.rh-carpentry-home .rh-bento-page > .rh-home-section + .rh-home-section .rh-
    extra side padding beyond the global --rh-frame-inset already applied to
    .site-main--front. */
 
-@media (min-width: 769px) {
+@media (min-width: 900px) {
 	.rh-home-section--projects .rh-clients-hero__inner {
 		display: flex;
 		flex-direction: column;
@@ -5254,12 +5403,9 @@ body.rh-carpentry-home .rh-bento-page > .rh-home-section + .rh-home-section .rh-
 
 /* Home #projects on small screens: explicit viewport height (must follow the
    rule above so it is not overridden by height: auto). */
-@media (max-width: 768px) {
-	:where(.rh-home-section--projects) .rh-home-projects-carousel__viewport {
+@media (max-width: 899px) {
+	:where(.rh-home-section--projects, .rh-single-related--band) .rh-home-projects-carousel__viewport {
 		flex: 0 0 auto;
-		height: clamp(300px, 58vh, 500px);
-		max-height: clamp(300px, 58vh, 500px);
-		min-height: clamp(300px, 58vh, 500px);
 		height: clamp(300px, 58svh, 500px);
 		max-height: clamp(300px, 58svh, 500px);
 		min-height: clamp(300px, 58svh, 500px);
@@ -6879,16 +7025,18 @@ body.rh-carpentry-home .rh-bento-page > .rh-home-section + .rh-home-section .rh-
 	max-width: none;
 }
 
-.rh-single-related--band .rh-clients-hero__inner {
-	display: flex;
-	flex-direction: column;
-	min-height: min(93vh, 810px);
-	row-gap: clamp(0.65rem, 2vw, 1.15rem);
+@media (min-width: 900px) {
+	.rh-single-related--band .rh-clients-hero__inner {
+		display: flex;
+		flex-direction: column;
+		min-height: min(93vh, 810px);
+		row-gap: clamp(0.65rem, 2vw, 1.15rem);
+	}
 }
 
-/* Phones: shorten the More projects band to match the home slider so the
-   full card stays in view. */
-@media (max-width: 768px) {
+/* Phones / tablet: shorten the More projects band to match the home slider so the
+   full card stays in view; grid shell (above) pins the section CTA to the bottom. */
+@media (max-width: 899px) {
 	.rh-single-related--band .rh-clients-hero__inner {
 		min-height: 0;
 	}
@@ -6897,6 +7045,7 @@ body.rh-carpentry-home .rh-bento-page > .rh-home-section + .rh-home-section .rh-
 		flex: 0 0 auto;
 		height: clamp(280px, 56vh, 460px);
 		max-height: clamp(280px, 56vh, 460px);
+		min-height: clamp(280px, 56svh, 460px);
 	}
 }
 

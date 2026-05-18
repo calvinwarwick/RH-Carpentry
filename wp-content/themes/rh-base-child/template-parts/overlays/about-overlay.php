@@ -34,7 +34,6 @@ if (is_readable($rh_fire_credentials_dir . 'firequal-logo.png')) {
 }
 
 $about_section_image_id = (int) get_theme_mod('rh_about_section_image_id', 0);
-$show_landing_link      = ! is_page('about');
 ?>
 <div
 	class="rh-section-overlay rh-section-overlay--about"
@@ -62,7 +61,6 @@ $show_landing_link      = ! is_page('about');
 					'rh_fire_credentials'    => $rh_fire_credentials,
 					'rh_fire_credentials_dir'  => $rh_fire_credentials_dir,
 					'rh_fire_credentials_base' => $rh_fire_credentials_base,
-					'show_landing_link'      => $show_landing_link,
 				)
 			);
 			?>

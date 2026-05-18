@@ -111,17 +111,16 @@ if (post_type_exists('rh_project')) {
 ?>
 
 <section id="about" class="rh-home-section rh-home-section--about" aria-labelledby="rh-home-about-heading">
-	<?php
+									<?php
 	get_template_part(
 		'template-parts/home/about-section-inner',
 		null,
-		array(
+							array(
 			'heading_id'             => 'rh-home-about-heading',
 			'about_section_image_id' => $about_section_image_id,
 			'rh_fire_credentials'    => $rh_fire_credentials,
 			'rh_fire_credentials_dir'  => $rh_fire_credentials_dir,
 			'rh_fire_credentials_base' => $rh_fire_credentials_base,
-			'show_landing_link'      => false,
 		)
 	);
 	?>
@@ -299,7 +298,7 @@ if (post_type_exists('rh_project')) {
 
 <div class="rh-bento-page">
 	<section id="services" class="rh-home-section rh-home-section--features" aria-labelledby="rh-home-work-heading">
-		<?php
+					<?php
 		get_template_part(
 			'template-parts/home/services-section-inner',
 			null,
@@ -312,7 +311,7 @@ if (post_type_exists('rh_project')) {
 		?>
 	</section>
 </div>
-<?php
+			<?php
 rh_include_template_part(
 	'template-parts/home/testimonials-section.php',
 	array(

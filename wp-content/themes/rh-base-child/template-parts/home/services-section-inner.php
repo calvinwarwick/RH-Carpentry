@@ -43,6 +43,10 @@ $hide_cta_buttons  = isset($hide_cta_buttons) && $hide_cta_buttons;
 			<article class="rh-home-feature rh-home-feature--service rh-home-service-bento--<?php echo esc_attr($service['bento']); ?>" role="listitem">
 				<a class="rh-home-service-card__link" href="<?php echo esc_url($service_url); ?>">
 					<span class="screen-reader-text"><?php echo esc_html($service['label']); ?></span>
+					<span class="rh-home-service-card__cta" aria-hidden="true">
+						<?php esc_html_e('Find out more', 'rh-base-child'); ?>
+						<i class="fa-solid fa-chevron-right rh-home-service-card__cta-icon" aria-hidden="true"></i>
+					</span>
 					<div class="rh-home-service-card__bg" style="background-image: url('<?php echo esc_url($service_bg_url); ?>');"></div>
 					<div class="rh-home-service-card__overlay" aria-hidden="true"></div>
 					<h3 class="rh-home-feature__title"><?php echo esc_html($service['label']); ?></h3>

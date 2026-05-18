@@ -9,13 +9,12 @@ if (! defined('ABSPATH')) {
 	exit;
 }
 
-$cta_contact            = isset($cta_contact) ? $cta_contact : rh_carpentry_contact_url();
 $about_section_image_id = isset($about_section_image_id) ? (int) $about_section_image_id : (int) get_theme_mod('rh_about_section_image_id', 0);
 $heading_id             = isset($heading_id) ? $heading_id : 'rh-home-about-heading';
 $rh_fire_credentials    = isset($rh_fire_credentials) && is_array($rh_fire_credentials) ? $rh_fire_credentials : array();
 $rh_fire_credentials_dir  = isset($rh_fire_credentials_dir) ? $rh_fire_credentials_dir : get_stylesheet_directory() . '/assets/images/credentials/';
 $rh_fire_credentials_base = isset($rh_fire_credentials_base) ? $rh_fire_credentials_base : get_stylesheet_directory_uri() . '/assets/images/credentials/';
-$show_landing_link      = ! isset($show_landing_link) || $show_landing_link;
+$about_page_url         = function_exists('rh_carpentry_about_page_url') ? rh_carpentry_about_page_url() : home_url('/about/');
 $rh_about_hero          = function_exists('rh_landing_page_hero') ? rh_landing_page_hero('about') : null;
 $rh_about_subtitle      = is_array($rh_about_hero) ? (string) ($rh_about_hero['subtitle'] ?? '') : '';
 if ($rh_about_subtitle === '') {
@@ -50,10 +49,7 @@ if ($rh_about_subtitle === '') {
 					</p>
 				</div>
 				<div class="rh-home-about__actions rh-hero-actions">
-					<a class="rh-hero-btn rh-hero-btn--accent" href="<?php echo esc_url($cta_contact); ?>" data-rh-fx="fade" data-rh-fx-tone="dark"><?php esc_html_e('Get in touch', 'rh-base-child'); ?></a>
-					<?php if ($show_landing_link && function_exists('rh_carpentry_about_landing_url')) : ?>
-						<a class="rh-hero-btn rh-hero-btn--muted" href="<?php echo esc_url(add_query_arg('overlay', '0', rh_carpentry_about_landing_url())); ?>" data-rh-fx="fade" data-rh-fx-tone="dark"><?php esc_html_e('Full about page', 'rh-base-child'); ?></a>
-					<?php endif; ?>
+					<a class="rh-hero-btn rh-hero-btn--accent" href="<?php echo esc_url($about_page_url); ?>" data-rh-fx="fade" data-rh-fx-tone="dark"><?php esc_html_e('Find out more', 'rh-base-child'); ?></a>
 				</div>
 				<?php if ($rh_fire_credentials !== array()) : ?>
 					<div class="rh-home-about__credentials-panel" role="region" aria-label="<?php esc_attr_e('Fire door accreditations', 'rh-base-child'); ?>" data-rh-fx="fade" data-rh-fx-tone="dark">
