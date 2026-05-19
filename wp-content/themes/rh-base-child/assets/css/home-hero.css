@@ -3183,17 +3183,17 @@ body.rh-carpentry-home .rh-bento-page > .rh-home-section + .rh-home-section .rh-
 	gap: 1.5rem;
 }
 
-/* UK Fire Door Training logo only — half size; FireQual (second item) unchanged. */
+/* UK Fire Door Training logo only — 70% size; FireQual (second item) unchanged. */
 .rh-home-about__credentials-panel .rh-home-feature__credentials-item:first-child img {
 	display: block;
 	width: auto;
 	height: auto;
-	zoom: 0.5;
+	zoom: 0.7;
 }
 
 @supports not (zoom: 1) {
 	.rh-home-about__credentials-panel .rh-home-feature__credentials-item:first-child img {
-		transform: scale(0.5);
+		transform: scale(0.7);
 		transform-origin: left center;
 	}
 }
