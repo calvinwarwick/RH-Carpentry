@@ -11,28 +11,7 @@ if (! defined('ABSPATH')) {
 
 $rh_fire_credentials_dir  = get_stylesheet_directory() . '/assets/images/credentials/';
 $rh_fire_credentials_base = get_stylesheet_directory_uri() . '/assets/images/credentials/';
-$rh_fire_credentials       = array();
-$rh_uk_fire_door_logo_id   = (int) get_theme_mod('rh_uk_fire_door_logo_id', 0);
-$rh_uk_fire_door_alt       = __('UK Fire Door Training — Approved Installer, Inspector and Maintainer', 'rh-base-child');
-
-if ($rh_uk_fire_door_logo_id > 0 && wp_attachment_is_image($rh_uk_fire_door_logo_id)) {
-	$rh_fire_credentials[] = array(
-		'attachment_id' => $rh_uk_fire_door_logo_id,
-		'alt'           => $rh_uk_fire_door_alt,
-	);
-} elseif (is_readable($rh_fire_credentials_dir . 'uk-fire-door-training.png')) {
-	$rh_fire_credentials[] = array(
-		'file' => 'uk-fire-door-training.png',
-		'alt'  => $rh_uk_fire_door_alt,
-	);
-}
-if (is_readable($rh_fire_credentials_dir . 'firequal-logo.png')) {
-	$rh_fire_credentials[] = array(
-		'file' => 'firequal-logo.png',
-		'alt'  => __('FireQual', 'rh-base-child'),
-	);
-}
-
+$rh_fire_credentials       = function_exists('rh_carpentry_fire_credentials') ? rh_carpentry_fire_credentials() : array();
 $about_section_image_id = (int) get_theme_mod('rh_about_section_image_id', 0);
 ?>
 <div

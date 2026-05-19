@@ -1960,32 +1960,34 @@
 		});
 	});
 
-	/* Breadcrumbs sit above the archive hero — start each crumb when the subtitle wipe runs. */
-	const syncBreadcrumbFxWithHero = () => {
-		const crumbsNav = document.querySelector('nav.rh-breadcrumbs[data-rh-breadcrumbs-sync-hero]');
+	/* Breadcrumbs: first crumb fades with the hero subtitle; each next crumb staggers after. */
+	const syncBreadcrumbsWithHero = () => {
+		const crumbsNav = document.querySelector('.rh-breadcrumbs[data-rh-fx-sync="hero-subtitle"]');
 		if (!crumbsNav) {
 			return;
 		}
 		const hero = document.querySelector(
-			'.rh-page-hero-split[data-rh-fx-group], .rh-archive-projects__header[data-rh-fx-group]'
+			'.rh-page-hero-split[data-rh-fx-group], .rh-archive-projects__header[data-rh-fx-group], .rh-single-project__header[data-rh-fx-group]'
 		);
 		if (!hero) {
 			return;
 		}
 		const anchor =
 			hero.querySelector('.rh-archive-projects__subtitle[data-rh-fx]') ||
+			hero.querySelector('.rh-single-project__title[data-rh-fx]') ||
 			hero.querySelector('.rh-archive-projects__intro[data-rh-fx]') ||
-			hero.querySelector('.page-title[data-rh-fx], .rh-home-heading[data-rh-fx]');
+			hero.querySelector('.page-title[data-rh-fx], h1[data-rh-fx]');
 		if (!anchor) {
 			return;
 		}
-		const anchorDelay = parseInt(anchor.style.getPropertyValue('--rh-fx-delay') || '0', 10) || 0;
-		const crumbStagger = Math.max(0, parseInt(crumbsNav.getAttribute('data-rh-fx-stagger') || '70', 10) || 0);
-		crumbsNav.querySelectorAll('[data-rh-fx]').forEach((item, idx) => {
-			item.style.setProperty('--rh-fx-delay', anchorDelay + idx * crumbStagger + 'ms');
+		const baseMs = parseInt(anchor.style.getPropertyValue('--rh-fx-delay') || '0', 10) || 0;
+		const stagger = Math.max(0, parseInt(crumbsNav.getAttribute('data-rh-fx-stagger') || '90', 10) || 0);
+		const items = crumbsNav.querySelectorAll('.rh-breadcrumbs__item[data-rh-fx]');
+		items.forEach((item, idx) => {
+			item.style.setProperty('--rh-fx-delay', baseMs + idx * stagger + 'ms');
 		});
 	};
-	syncBreadcrumbFxWithHero();
+	syncBreadcrumbsWithHero();
 
 	if (prefersReduced || typeof IntersectionObserver === 'undefined') {
 		allItems.forEach((el) => el.classList.add('is-inview'));
@@ -2064,23 +2066,18 @@
 	}
 
 	/* Landing page heroes are above the fold — reveal immediately so kicker/title/subtitle show on load. */
-	const revealBreadcrumbFx = () => {
-		const crumbsNav = document.querySelector('nav.rh-breadcrumbs[data-rh-breadcrumbs-sync-hero]');
-		if (!crumbsNav) {
-			return;
-		}
-		crumbsNav.querySelectorAll('[data-rh-fx]').forEach((el) => el.classList.add('is-inview'));
-	};
-
-	document
-		.querySelectorAll('.rh-page-hero-split[data-rh-fx-group], .rh-archive-projects__header[data-rh-fx-group]')
-		.forEach((group) => {
-			const rect = group.getBoundingClientRect();
-			if (rect.top < window.innerHeight && rect.bottom > 0) {
-				group.querySelectorAll('[data-rh-fx]').forEach((el) => el.classList.add('is-inview'));
-				revealBreadcrumbFx();
+	const aboveFoldHeroSelector =
+		'.rh-page-hero-split[data-rh-fx-group], .rh-archive-projects__header[data-rh-fx-group], .rh-single-project__header[data-rh-fx-group]';
+	const crumbsSynced = document.querySelector('.rh-breadcrumbs[data-rh-fx-sync="hero-subtitle"]');
+	document.querySelectorAll(aboveFoldHeroSelector).forEach((group) => {
+		const rect = group.getBoundingClientRect();
+		if (rect.top < window.innerHeight && rect.bottom > 0) {
+			group.querySelectorAll('[data-rh-fx]').forEach((el) => el.classList.add('is-inview'));
+			if (crumbsSynced) {
+				crumbsSynced.querySelectorAll('[data-rh-fx]').forEach((el) => el.classList.add('is-inview'));
 			}
-		});
+		}
+	});
 })();
 
 /**

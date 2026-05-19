@@ -376,6 +376,39 @@ function rh_carpentry_get_about_section_image_url(): string {
 }
 
 /**
+ * Fire door accreditation logos for the About section (UK Fire Door Training, FireQual).
+ *
+ * @return array<int, array{attachment_id?: int, file?: string, alt: string}>
+ */
+function rh_carpentry_fire_credentials(): array {
+	$dir = get_stylesheet_directory() . '/assets/images/credentials/';
+	$out = array();
+	$alt  = __('UK Fire Door Training — Approved Installer, Inspector and Maintainer', 'rh-base-child');
+	$logo_id = (int) get_theme_mod('rh_uk_fire_door_logo_id', 0);
+
+	if ($logo_id > 0 && wp_attachment_is_image($logo_id)) {
+		$out[] = array(
+			'attachment_id' => $logo_id,
+			'alt'           => $alt,
+		);
+	} elseif (is_readable($dir . 'uk-fire-door-training.png')) {
+		$out[] = array(
+			'file' => 'uk-fire-door-training.png',
+			'alt'  => $alt,
+		);
+	}
+
+	if (is_readable($dir . 'firequal-logo.png')) {
+		$out[] = array(
+			'file' => 'firequal-logo.png',
+			'alt'  => __('FireQual', 'rh-base-child'),
+		);
+	}
+
+	return $out;
+}
+
+/**
  * Service bento card background URL: Customizer attachment per slug, else theme file, else hero image.
  *
  * @param string $slug File basename without extension (e.g. timber, new-build). Maps to theme mod rh_service_card_{suffix}_id where hyphens become underscores.
