@@ -44,7 +44,7 @@ get_header();
 				<?php esc_html_e('This page is off the level.', 'rh-base-child'); ?>
 			</h1>
 			<p class="rh-error-404__lede">
-				<?php esc_html_e('The link might be crooked, the page may have moved, or someone measured twice and cut once in the wrong place. Either way — nothing to see here.', 'rh-base-child'); ?>
+				<?php esc_html_e('The link might be crooked, or the page may have moved. Either way — nothing to see here.', 'rh-base-child'); ?>
 			</p>
 
 			<nav class="rh-error-404__actions" aria-label="<?php esc_attr_e('Helpful links', 'rh-base-child'); ?>">

@@ -480,7 +480,7 @@ function rh_project_render_bento_card($post, int $index = 0): string {
 		role="listitem"
 		data-rh-project-url="<?php echo esc_url($permalink); ?>"
 		data-rh-sectors="<?php echo esc_attr($sectors_attr); ?>"
-		data-rh-fx="scale"
+		style="--rh-card-index: <?php echo (int) $index; ?>;"
 		aria-label="<?php echo esc_attr($title); ?>"
 	>
 		<a class="rh-archive-project-cover-link" href="<?php echo esc_url($permalink); ?>" aria-label="<?php echo esc_attr(sprintf(

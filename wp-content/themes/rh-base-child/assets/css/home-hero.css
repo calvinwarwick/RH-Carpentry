@@ -3183,19 +3183,19 @@ body.rh-carpentry-home .rh-bento-page > .rh-home-section + .rh-home-section .rh-
 	gap: 1.5rem;
 }
 
-/* UK Fire Door Training logo only — 70% size; FireQual (second item) unchanged. */
-.rh-home-about__credentials-panel .rh-home-feature__credentials-item:first-child img {
+/* Credential logos — cap height so uploads and theme assets align in the row. */
+.rh-home-about__credentials-panel .rh-home-feature__credentials-item img {
 	display: block;
 	width: auto;
 	height: auto;
-	zoom: 0.7;
+	max-height: 4rem;
+	object-fit: contain;
 }
 
-@supports not (zoom: 1) {
-	.rh-home-about__credentials-panel .rh-home-feature__credentials-item:first-child img {
-		transform: scale(0.7);
-		transform-origin: left center;
-	}
+/* UK Fire Door Training logo — primary accreditation in the row. */
+.rh-home-about__credentials-panel .rh-home-feature__credentials-item--uk-fire-door img,
+.rh-home-about__credentials-panel .rh-home-feature__credentials-item:first-child img {
+	max-height: 5rem;
 }
 
 @media (max-width: 520px) {
@@ -5854,13 +5854,20 @@ body.rh-carpentry-home .rh-bento-page > .rh-home-section + .rh-home-section .rh-
 	border: 1px solid rgba(0, 0, 0, 0.2);
 	background: transparent;
 	font: inherit;
+	font-family: inherit;
+	color: var(--rh-color-text, #1a1a1a);
+	-webkit-text-fill-color: currentColor;
+	appearance: none;
+	-webkit-appearance: none;
 	cursor: pointer;
 }
 
 .rh-archive-projects__filter.is-active,
-.rh-archive-projects__filter:hover {
+.rh-archive-projects__filter:hover,
+.rh-archive-projects__filter:focus-visible {
 	background: #1a1a1a;
 	color: #fff;
+	-webkit-text-fill-color: currentColor;
 	border-color: #1a1a1a;
 }
 
@@ -6045,6 +6052,35 @@ body.rh-carpentry-home .rh-bento-page > .rh-home-section + .rh-home-section .rh-
 .rh-archive-project-cover-link:focus-visible {
 	outline: 2px solid rgba(255, 255, 255, 0.85);
 	outline-offset: -4px;
+}
+
+/* Archive bento cards must not use the global [data-rh-fx] hide (opacity:0) — it
+   caused a visible → hidden → visible flash on /projects/. Filter + infinite
+   scroll use rh-archive-card-enter / rh-is-appended instead. */
+.rh-fx-js .rh-archive-projects__bento > .rh-archive-project-card[data-rh-fx] {
+	opacity: 1;
+	transform: none;
+	animation: none !important;
+	clip-path: none;
+}
+
+/* Projects archive: first paint hides cards, then staggered scale-in (no rh-fx). */
+@media (prefers-reduced-motion: no-preference) {
+	.rh-archive-projects__bento--await-reveal:not(.is-initial-reveal) > .rh-home-project-card.rh-bento-cell {
+		opacity: 0;
+	}
+
+	.rh-archive-projects__bento.is-initial-reveal > .rh-home-project-card.rh-bento-cell {
+		animation: rh-archive-card-in 0.56s cubic-bezier(0.34, 1.32, 0.5, 1) both;
+		animation-delay: calc(var(--rh-card-index, 0) * 76ms);
+		transform-origin: center center;
+	}
+}
+
+@media (prefers-reduced-motion: reduce) {
+	.rh-archive-projects__bento--await-reveal > .rh-home-project-card.rh-bento-cell {
+		opacity: 1;
+	}
 }
 
 /* Lazy-loaded card scale-in for cards appended via infinite scroll.
@@ -7035,10 +7071,39 @@ body.rh-carpentry-home .rh-bento-page > .rh-home-section + .rh-home-section .rh-
 }
 
 /* Phones / tablet: shorten the More projects band to match the home slider so the
-   full card stays in view; grid shell (above) pins the section CTA to the bottom. */
+   full card stays in view; CTA sits at the bottom of the slider shell. */
 @media (max-width: 899px) {
 	.rh-single-related--band .rh-clients-hero__inner {
 		min-height: 0;
+	}
+
+	.rh-single-related--band .rh-single-related__intro .rh-single-related__cta--desktop {
+		display: none;
+	}
+
+	.rh-single-related--band .rh-single-related__cards-fx {
+		display: flex;
+		flex-direction: column;
+		flex: 1 1 auto;
+		min-height: 0;
+		align-self: stretch;
+	}
+
+	.rh-single-related--band .rh-single-related__cards-fx > .rh-home-projects-carousel {
+		flex: 1 1 auto;
+		min-height: 0;
+	}
+
+	.rh-single-related--band .rh-single-related__cta--mobile {
+		display: inline-flex;
+		justify-content: center;
+		align-self: stretch;
+		width: 100%;
+		max-width: none;
+		box-sizing: border-box;
+		margin-top: auto;
+		padding-top: clamp(1rem, 3vw, 1.35rem);
+		flex: 0 0 auto;
 	}
 
 	.rh-single-related--band .rh-single-related-carousel .rh-home-projects-carousel__viewport {
@@ -7074,15 +7139,19 @@ body.rh-carpentry-home .rh-bento-page > .rh-home-section + .rh-home-section .rh-
 	flex: 1 1 auto;
 }
 
-.rh-single-related--band .rh-single-related__intro .rh-single-related__cta.rh-hero-btn--muted {
+.rh-single-related--band .rh-single-related__cta.rh-hero-btn--muted {
 	flex-shrink: 0;
 	background: rgba(255, 255, 255, 0.1);
 	border: 1px solid rgba(255, 255, 255, 0.22);
 	color: rgba(255, 255, 255, 0.92);
 }
 
-.rh-single-related--band .rh-single-related__intro .rh-single-related__cta.rh-hero-btn--muted:hover,
-.rh-single-related--band .rh-single-related__intro .rh-single-related__cta.rh-hero-btn--muted:focus-visible {
+.rh-single-related--band .rh-single-related__cta--mobile {
+	display: none;
+}
+
+.rh-single-related--band .rh-single-related__cta.rh-hero-btn--muted:hover,
+.rh-single-related--band .rh-single-related__cta.rh-hero-btn--muted:focus-visible {
 	background: rgba(255, 255, 255, 0.18);
 	border-color: rgba(255, 255, 255, 0.38);
 	color: #fff;

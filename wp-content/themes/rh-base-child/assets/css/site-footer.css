@@ -131,7 +131,7 @@ body.rh-carpentry-home .rh-site-footer {
 	align-items: start;
 }
 
-/* Desktop: brand (left) → map (centre column) → menu + social (end). */
+/* Desktop: menu + social (left) → map (centre) → brand / logos / webcube (end). */
 @media (min-width: 960px) {
 	.rh-site-footer__grid {
 		grid-template-columns:
@@ -146,9 +146,26 @@ body.rh-carpentry-home .rh-site-footer {
 		grid-template-columns: minmax(0, max-content) minmax(260px, 1fr);
 	}
 
-	.rh-site-footer__col--brand {
-		justify-self: start;
+	.rh-site-footer__grid:not(.rh-site-footer__grid--no-contact) .rh-site-footer__col--contact {
+		grid-column: 1;
+		grid-row: 1;
 		height: 100%;
+		justify-self: start;
+		align-items: flex-start;
+		text-align: left;
+	}
+
+	.rh-site-footer__grid:not(.rh-site-footer__grid--no-contact) .rh-site-footer__col--map {
+		grid-column: 2;
+		grid-row: 1;
+	}
+
+	.rh-site-footer__grid:not(.rh-site-footer__grid--no-contact) .rh-site-footer__col--brand {
+		grid-column: 3;
+		grid-row: 1;
+		justify-self: end;
+		height: 100%;
+		align-items: flex-end;
 	}
 
 	.rh-site-footer__col--map {
@@ -172,11 +189,24 @@ body.rh-carpentry-home .rh-site-footer {
 		justify-content: flex-start;
 	}
 
-	.rh-site-footer__col--contact {
+	.rh-site-footer__grid--no-contact .rh-site-footer__col--brand {
+		justify-self: start;
 		height: 100%;
-		justify-self: end;
-		align-items: flex-start;
-		text-align: left;
+	}
+}
+
+/* Mobile: menu first, map, then logos / webcube. */
+@media (max-width: 959px) {
+	.rh-site-footer__grid:not(.rh-site-footer__grid--no-contact) .rh-site-footer__col--contact {
+		order: 1;
+	}
+
+	.rh-site-footer__grid:not(.rh-site-footer__grid--no-contact) .rh-site-footer__col--map {
+		order: 2;
+	}
+
+	.rh-site-footer__grid:not(.rh-site-footer__grid--no-contact) .rh-site-footer__col--brand {
+		order: 3;
 	}
 }
 
@@ -187,6 +217,17 @@ body.rh-carpentry-home .rh-site-footer {
 	gap: clamp(0.65rem, 1.8vw, 1rem);
 	width: fit-content;
 	max-width: 100%;
+}
+
+@media (min-width: 960px) {
+	.rh-site-footer__grid:not(.rh-site-footer__grid--no-contact) .rh-site-footer__col--brand {
+		align-items: flex-end;
+		text-align: right;
+	}
+
+	.rh-site-footer__grid:not(.rh-site-footer__grid--no-contact) .rh-site-footer__col--brand .rh-site-footer__badges {
+		justify-content: flex-end;
+	}
 }
 
 .rh-site-footer__col--map {

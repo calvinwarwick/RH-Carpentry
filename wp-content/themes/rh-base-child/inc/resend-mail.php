@@ -41,9 +41,60 @@ function rh_carpentry_resend_from_email(): string {
 }
 
 /**
+ * Dev/test inbox when the contact form is loaded with ?dev in the URL.
+ */
+function rh_carpentry_resend_dev_email(): string {
+	if (defined('RH_RESEND_DEV_EMAIL') && is_string(RH_RESEND_DEV_EMAIL) && is_email(RH_RESEND_DEV_EMAIL)) {
+		return RH_RESEND_DEV_EMAIL;
+	}
+	return '';
+}
+
+/**
+ * Whether the current request should render ?dev contact-form fields.
+ */
+function rh_carpentry_contact_form_dev_mode_enabled(): bool {
+	if (rh_carpentry_resend_dev_email() === '') {
+		return false;
+	}
+	// phpcs:ignore WordPress.Security.NonceVerification.Recommended
+	return isset($_GET['dev']);
+}
+
+/**
+ * Whether a submission should go to the dev inbox (requires ?dev page + nonce).
+ */
+function rh_carpentry_contact_form_use_dev_recipient(): bool {
+	if (rh_carpentry_resend_dev_email() === '') {
+		return false;
+	}
+	if (! isset($_POST['rh_contact_dev']) || (string) wp_unslash($_POST['rh_contact_dev']) !== '1') {
+		return false;
+	}
+	if (! isset($_POST['rh_contact_dev_nonce']) || ! wp_verify_nonce(sanitize_text_field(wp_unslash($_POST['rh_contact_dev_nonce'])), 'rh_contact_dev')) {
+		return false;
+	}
+	return true;
+}
+
+/**
+ * Hidden fields for ?dev test submissions (contact page + overlay forms).
+ */
+function rh_carpentry_contact_form_render_dev_fields(): void {
+	if (! rh_carpentry_contact_form_dev_mode_enabled()) {
+		return;
+	}
+	echo '<input type="hidden" name="rh_contact_dev" value="1" />';
+	wp_nonce_field('rh_contact_dev', 'rh_contact_dev_nonce');
+}
+
+/**
  * Recipient for contact form notifications.
  */
 function rh_carpentry_resend_to_email(): string {
+	if (rh_carpentry_contact_form_use_dev_recipient()) {
+		return rh_carpentry_resend_dev_email();
+	}
 	if (defined('RH_RESEND_TO_EMAIL') && is_string(RH_RESEND_TO_EMAIL) && is_email(RH_RESEND_TO_EMAIL)) {
 		return RH_RESEND_TO_EMAIL;
 	}
@@ -153,6 +204,9 @@ function rh_carpentry_send_contact_form_email(string $name, string $email, strin
 		__('[%s] Website contact form', 'rh-base-child'),
 		$site_name
 	);
+	if (rh_carpentry_contact_form_use_dev_recipient()) {
+		$subject = '[DEV] ' . $subject;
+	}
 
 	$safe_name    = esc_html($name);
 	$safe_email   = esc_html($email);
@@ -190,9 +244,20 @@ function rh_carpentry_send_contact_form_email(string $name, string $email, strin
 		return true;
 	}
 
-	if (defined('WP_DEBUG') && WP_DEBUG) {
-		// phpcs:ignore WordPress.PHP.DevelopmentFunctions.error_log_error_log
-		error_log('RH Resend contact form: ' . ($result['error'] ?? 'unknown error'));
+	$error = $result['error'] ?? 'unknown error';
+	// phpcs:ignore WordPress.PHP.DevelopmentFunctions.error_log_error_log
+	error_log(
+		sprintf(
+			'RH Resend contact form failed (HTTP %s): %s',
+			isset($result['http_code']) ? (string) $result['http_code'] : '?',
+			$error
+		)
+	);
+
+	/* When Resend is configured, do not pretend success via wp_mail — it hides API failures
+	   and nothing appears in the Resend dashboard. Verify your domain and set RH_RESEND_FROM_EMAIL. */
+	if (rh_carpentry_resend_api_key() !== '') {
+		return false;
 	}
 
 	$headers = array('Content-Type: text/html; charset=UTF-8');

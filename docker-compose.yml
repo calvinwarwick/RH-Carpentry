@@ -25,6 +25,9 @@ services:
         condition: service_healthy
     ports:
       - "8088:80"
+    env_file:
+      - path: .env.local
+        required: false
     environment:
       WORDPRESS_DB_HOST: db:3306
       WORDPRESS_DB_USER: wordpress
@@ -32,6 +35,25 @@ services:
       WORDPRESS_DB_NAME: wordpress
       # Must match production dump (wp db export); default wp_ breaks after import
       WORDPRESS_TABLE_PREFIX: tdz_
+      WORDPRESS_CONFIG_EXTRA: |
+        if ( ! defined( 'WP_ENVIRONMENT_TYPE' ) ) {
+          define( 'WP_ENVIRONMENT_TYPE', 'local' );
+        }
+        if ( ! defined( 'RH_RESEND_TO_EMAIL' ) ) {
+          define( 'RH_RESEND_TO_EMAIL', 'calvinwarwick@gmail.com' );
+        }
+        if ( ! defined( 'RH_RESEND_FROM_EMAIL' ) ) {
+          define( 'RH_RESEND_FROM_EMAIL', 'RH Carpentry <noreply@webcube.uk>' );
+        }
+        if ( ! defined( 'RH_RESEND_DEV_EMAIL' ) ) {
+          define( 'RH_RESEND_DEV_EMAIL', 'calvinwarwick@gmail.com' );
+        }
+        if ( ! defined( 'RH_RESEND_API_KEY' ) ) {
+          $$rh_resend_key = getenv( 'RH_RESEND_API_KEY' );
+          if ( is_string( $$rh_resend_key ) && $$rh_resend_key !== '' ) {
+            define( 'RH_RESEND_API_KEY', $$rh_resend_key );
+          }
+        }
     volumes:
       - rhc_wp_core:/var/www/html
       - ./wp-content:/var/www/html/wp-content

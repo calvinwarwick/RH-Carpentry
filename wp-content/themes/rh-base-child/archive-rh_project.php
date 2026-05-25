@@ -73,14 +73,9 @@ $rh_rest_url    = rest_url('rh/v1/projects');
 		<?php if (! have_posts()) : ?>
 			<p class="rh-archive-projects__empty"><?php esc_html_e('No projects published yet.', 'rh-base-child'); ?></p>
 		<?php else : ?>
-			<div
-				class="rh-archive-projects__delayed-fx"
-				data-rh-fx-group
-				data-rh-fx-stagger="76"
-				data-rh-fx-base="1700"
-			>
+			<div class="rh-archive-projects__delayed-fx">
 				<div
-					class="rh-archive-projects__grid rh-archive-projects__bento"
+					class="rh-archive-projects__grid rh-archive-projects__bento rh-archive-projects__bento--await-reveal"
 					role="list"
 					data-rh-archive-loader
 					data-page="1"

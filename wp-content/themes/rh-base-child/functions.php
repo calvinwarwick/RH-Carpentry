@@ -47,6 +47,7 @@ require_once get_stylesheet_directory() . '/inc/seo.php';
 require_once get_stylesheet_directory() . '/inc/insights.php';
 require_once get_stylesheet_directory() . '/inc/section-overlays.php';
 require_once get_stylesheet_directory() . '/inc/contact.php';
+require_once get_stylesheet_directory() . '/inc/dev-environment.php';
 
 /**
  * URL to a homepage section (fragment id without leading #, e.g. about, services, contact).
@@ -282,6 +283,7 @@ function rh_base_child_enqueue_styles(): void {
 			'ajaxUrl'  => admin_url('admin-ajax.php'),
 			'action'   => 'rh_home_contact',
 			'messages' => rh_carpentry_home_contact_messages(),
+			'devMode'  => rh_carpentry_contact_form_dev_mode_enabled(),
 		)
 	);
 

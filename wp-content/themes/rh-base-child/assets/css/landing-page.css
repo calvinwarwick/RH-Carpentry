@@ -452,13 +452,20 @@ body.rh-carpentry-inner .rh-archive-projects > .rh-archive-projects__inner:first
 	border: 1px solid rgba(0, 0, 0, 0.2);
 	background: transparent;
 	font: inherit;
+	font-family: inherit;
+	color: var(--rh-color-text, #1a1a1a);
+	-webkit-text-fill-color: currentColor;
+	appearance: none;
+	-webkit-appearance: none;
 	cursor: pointer;
 }
 
 .rh-archive-projects__filter.is-active,
-.rh-archive-projects__filter:hover {
+.rh-archive-projects__filter:hover,
+.rh-archive-projects__filter:focus-visible {
 	background: #1a1a1a;
 	color: #fff;
+	-webkit-text-fill-color: currentColor;
 	border-color: #1a1a1a;
 }
 

@@ -54,6 +54,7 @@ $messages = rh_carpentry_home_contact_messages();
 				<form class="rh-contact-overlay__form" method="post" action="<?php echo esc_url(admin_url('admin-ajax.php')); ?>" data-rh-contact-form novalidate>
 					<input type="hidden" name="action" value="rh_home_contact" />
 					<?php wp_nonce_field('rh_home_contact', 'rh_home_contact_nonce'); ?>
+					<?php rh_carpentry_contact_form_render_dev_fields(); ?>
 
 					<div class="rh-contact-overlay__fields">
 						<div class="rh-contact-overlay__field">

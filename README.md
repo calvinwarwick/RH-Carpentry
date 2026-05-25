@@ -16,6 +16,22 @@ docker compose up -d
 
 - Site: `http://localhost:8088`
 - phpMyAdmin: `http://localhost:8082`
+- **Dev favicon:** green circle on local (`localhost` / `WP_ENVIRONMENT_TYPE=local`) so you can tell it apart from live
+
+### Copy production to local (full site)
+
+Requires SSH host `sg-calvinw15` (see `.env.example`). Pulls database, uploads, plugins, and themes from live, then rewrites URLs to `http://localhost:8088`:
+
+```bash
+chmod +x scripts/sync-from-production.sh scripts/pull-remote-db.sh
+./scripts/sync-from-production.sh
+```
+
+Database dumps are saved under `data/` (gitignored). To refresh only the DB:
+
+```bash
+./scripts/pull-remote-db.sh
+```
 
 ## Deploy themes to live server
 

@@ -1,6 +1,6 @@
 <?php
 /**
- * Global site footer: brand (left), map (centre), primary menu + social (end).
+ * Global site footer: primary menu + social (left), map (centre), brand / logos / webcube (end).
  *
  * @package RH_Base_Child
  */

@@ -71,7 +71,7 @@ $card_prefix   = sanitize_html_class($heading_id !== '' ? $heading_id : 'rh-proj
 							<?php echo esc_html($title); ?>
 						</h2>
 					</div>
-					<a class="rh-hero-btn rh-hero-btn--muted rh-single-related__cta" href="<?php echo esc_url($archive_url); ?>" data-rh-fx="fade">
+					<a class="rh-hero-btn rh-hero-btn--muted rh-single-related__cta rh-single-related__cta--desktop" href="<?php echo esc_url($archive_url); ?>" data-rh-fx="fade">
 						<?php esc_html_e('View all projects', 'rh-base-child'); ?>
 					</a>
 				</header>
@@ -216,6 +216,9 @@ $card_prefix   = sanitize_html_class($heading_id !== '' ? $heading_id : 'rh-proj
 						</div>
 						<?php endif; ?>
 					</div>
+					<a class="rh-hero-btn rh-hero-btn--muted rh-single-related__cta rh-single-related__cta--mobile" href="<?php echo esc_url($archive_url); ?>">
+						<?php esc_html_e('View all projects', 'rh-base-child'); ?>
+					</a>
 				</div>
 			</div>
 		</div>

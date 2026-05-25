@@ -18,29 +18,35 @@ $hide_cta_buttons  = isset($hide_cta_buttons) && $hide_cta_buttons;
 ?>
 <div class="rh-home-section__inner">
 	<?php if ($show_header) : ?>
-		<header class="rh-home-section__header rh-home-section__header--features rh-home-section__header--row">
+		<header class="rh-home-section__header rh-home-section__header--features rh-home-section__header--row" data-rh-fx-group data-rh-fx-stagger="140">
 			<div>
-				<p class="rh-home-kicker">
+				<p class="rh-home-kicker" data-rh-fx="wipe" data-rh-fx-tone="dark">
 					<span class="rh-home-kicker__line" aria-hidden="true"></span>
 					<?php esc_html_e('What we offer', 'rh-base-child'); ?>
 				</p>
-				<h2 class="rh-home-heading rh-home-heading--section" id="<?php echo esc_attr($heading_id); ?>"><?php esc_html_e('Services', 'rh-base-child'); ?></h2>
+				<h2 class="rh-home-heading rh-home-heading--section" id="<?php echo esc_attr($heading_id); ?>" data-rh-fx="wipe" data-rh-fx-tone="dark"><?php esc_html_e('Services', 'rh-base-child'); ?></h2>
 			</div>
 			<?php if (! $hide_cta_buttons) : ?>
 				<?php if ($show_landing_link && function_exists('rh_carpentry_services_landing_url')) : ?>
-					<a class="rh-hero-btn rh-hero-btn--muted" href="<?php echo esc_url(rh_carpentry_services_landing_url()); ?>"><?php esc_html_e('All services', 'rh-base-child'); ?></a>
+					<a class="rh-hero-btn rh-hero-btn--muted" href="<?php echo esc_url(rh_carpentry_services_landing_url()); ?>" data-rh-fx="fade" data-rh-fx-tone="dark"><?php esc_html_e('All services', 'rh-base-child'); ?></a>
 				<?php endif; ?>
-				<a class="rh-hero-btn rh-hero-btn--accent" href="<?php echo esc_url($cta_contact); ?>"><?php esc_html_e('Get in touch', 'rh-base-child'); ?></a>
+				<a class="rh-hero-btn rh-hero-btn--accent" href="<?php echo esc_url($cta_contact); ?>" data-rh-fx="fade" data-rh-fx-tone="dark"><?php esc_html_e('Get in touch', 'rh-base-child'); ?></a>
 			<?php endif; ?>
 		</header>
 	<?php endif; ?>
-	<div class="rh-home-features rh-home-features--services" role="list">
+	<div
+		class="rh-home-features rh-home-features--services"
+		role="list"
+		data-rh-fx-group
+		data-rh-fx-stagger="90"
+		data-rh-fx-base="<?php echo $show_header ? '480' : '0'; ?>"
+	>
 		<?php foreach ($home_services as $service) : ?>
 			<?php
 			$service_bg_url = rh_carpentry_get_service_card_image_url($service['card_slug']);
 			$service_url    = rh_carpentry_service_url($service['slug']);
 			?>
-			<article class="rh-home-feature rh-home-feature--service rh-home-service-bento--<?php echo esc_attr($service['bento']); ?>" role="listitem">
+			<article class="rh-home-feature rh-home-feature--service rh-home-service-bento--<?php echo esc_attr($service['bento']); ?>" role="listitem" data-rh-fx="scale">
 				<a class="rh-home-service-card__link" href="<?php echo esc_url($service_url); ?>">
 					<span class="screen-reader-text"><?php echo esc_html($service['label']); ?></span>
 					<span class="rh-home-service-card__cta" aria-hidden="true">

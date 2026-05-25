@@ -53,7 +53,7 @@ if ($rh_about_subtitle === '') {
 				<?php if ($rh_fire_credentials !== array()) : ?>
 					<div class="rh-home-about__credentials-panel" role="region" aria-label="<?php esc_attr_e('Fire door accreditations', 'rh-base-child'); ?>" data-rh-fx="fade" data-rh-fx-tone="dark">
 						<ul class="rh-home-feature__credentials-list">
-							<?php foreach ($rh_fire_credentials as $cred) : ?>
+							<?php foreach ($rh_fire_credentials as $cred_index => $cred) : ?>
 								<?php
 								$cred_src = '';
 								$cred_alt = isset($cred['alt']) ? (string) $cred['alt'] : '';
@@ -74,7 +74,7 @@ if ($rh_about_subtitle === '') {
 									continue;
 								}
 								?>
-								<li class="rh-home-feature__credentials-item">
+								<li class="rh-home-feature__credentials-item<?php echo $cred_index === 0 ? ' rh-home-feature__credentials-item--uk-fire-door' : ''; ?>">
 									<img src="<?php echo esc_url($cred_src); ?>" alt="<?php echo esc_attr($cred_alt); ?>" loading="lazy" decoding="async" />
 								</li>
 							<?php endforeach; ?>

@@ -25,6 +25,7 @@ if ($wrapper_class === '') {
 		<input type="hidden" name="action" value="rh_home_contact" />
 		<input type="hidden" name="rh_contact_return" value="<?php echo esc_url($return_url); ?>" />
 		<?php wp_nonce_field('rh_home_contact', 'rh_home_contact_nonce'); ?>
+		<?php rh_carpentry_contact_form_render_dev_fields(); ?>
 
 		<div class="rh-contact-overlay__fields">
 			<div class="rh-contact-overlay__field">

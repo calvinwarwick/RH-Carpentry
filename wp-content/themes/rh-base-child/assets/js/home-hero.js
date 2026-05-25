@@ -1575,6 +1575,132 @@
 })();
 
 /**
+ * Contact forms (overlay + contact page): AJAX submit and success/error notices.
+ */
+(function () {
+	const ajaxConfig = typeof rhContactForm === 'object' && rhContactForm ? rhContactForm : null;
+	if (!ajaxConfig || !ajaxConfig.ajaxUrl) {
+		return;
+	}
+
+	const bindContactForm = (form) => {
+		const root = form.closest('[data-rh-contact-overlay], [data-rh-contact-page-form]');
+		if (!root) {
+			return;
+		}
+
+		const noticeSlot = root.querySelector('[data-rh-contact-notice-slot]');
+		const noticeEl = root.querySelector('[data-rh-contact-notice]');
+		const introEl = root.querySelector('.rh-contact-overlay__intro');
+
+		const clearAjaxNotice = () => {
+			if (!noticeSlot || !noticeEl) {
+				return;
+			}
+			noticeSlot.hidden = true;
+			noticeEl.textContent = '';
+			noticeEl.classList.remove('rh-contact-overlay__notice--success', 'rh-contact-overlay__notice--warn');
+			noticeEl.removeAttribute('role');
+			if (introEl) {
+				introEl.hidden = false;
+			}
+		};
+
+		const showAjaxNotice = (status, message) => {
+			if (!noticeSlot || !noticeEl || !message) {
+				return;
+			}
+			const isSuccess = status === 'sent';
+			noticeEl.textContent = message;
+			noticeEl.classList.toggle('rh-contact-overlay__notice--success', isSuccess);
+			noticeEl.classList.toggle('rh-contact-overlay__notice--warn', !isSuccess);
+			noticeEl.setAttribute('role', isSuccess ? 'status' : 'alert');
+			noticeSlot.hidden = false;
+			if (isSuccess && introEl) {
+				introEl.hidden = true;
+			}
+			noticeEl.focus({ preventScroll: true });
+		};
+
+		form.addEventListener('submit', async (e) => {
+			e.preventDefault();
+			clearAjaxNotice();
+
+			const submitBtn = form.querySelector('.rh-contact-overlay__submit');
+			if (submitBtn instanceof HTMLButtonElement) {
+				if (submitBtn.disabled) {
+					return;
+				}
+				submitBtn.disabled = true;
+				submitBtn.setAttribute('aria-busy', 'true');
+			}
+
+			const body = new FormData(form);
+			body.set('action', ajaxConfig.action);
+
+			try {
+				const res = await fetch(ajaxConfig.ajaxUrl, {
+					method: 'POST',
+					body,
+					credentials: 'same-origin',
+					headers: {
+						'X-Requested-With': 'XMLHttpRequest',
+					},
+				});
+
+				let payload = null;
+				try {
+					payload = await res.json();
+				} catch {
+					payload = null;
+				}
+
+				const data = payload && typeof payload === 'object' ? payload.data : null;
+				const status =
+					data && typeof data.status === 'string'
+						? data.status
+						: payload && payload.success
+							? 'sent'
+							: 'failed';
+				const message =
+					data && typeof data.message === 'string'
+						? data.message
+						: status === 'sent'
+							? ''
+							: '';
+
+				const fallback =
+					ajaxConfig.messages && typeof ajaxConfig.messages[status] === 'string'
+						? ajaxConfig.messages[status]
+						: '';
+				showAjaxNotice(status, message || fallback);
+
+				if (status === 'sent') {
+					form.reset();
+				}
+			} catch {
+				const failedMsg =
+					ajaxConfig.messages && typeof ajaxConfig.messages.failed === 'string'
+						? ajaxConfig.messages.failed
+						: '';
+				showAjaxNotice('failed', failedMsg);
+			} finally {
+				if (submitBtn instanceof HTMLButtonElement) {
+					submitBtn.disabled = false;
+					submitBtn.removeAttribute('aria-busy');
+				}
+			}
+		});
+	};
+
+	document.querySelectorAll('[data-rh-contact-form]').forEach((form) => {
+		if (form instanceof HTMLFormElement) {
+			bindContactForm(form);
+		}
+	});
+})();
+
+/**
  * Full-screen #contact overlay: hash, close control, Escape, scroll lock.
  */
 (function () {
@@ -1730,105 +1856,6 @@
 		true
 	);
 
-	const form = overlay.querySelector('[data-rh-contact-form]');
-	const noticeSlot = overlay.querySelector('[data-rh-contact-notice-slot]');
-	const noticeEl = overlay.querySelector('[data-rh-contact-notice]');
-	const ajaxConfig = typeof rhContactForm === 'object' && rhContactForm ? rhContactForm : null;
-
-	const clearAjaxNotice = () => {
-		if (!noticeSlot || !noticeEl) {
-			return;
-		}
-		noticeSlot.hidden = true;
-		noticeEl.textContent = '';
-		noticeEl.classList.remove('rh-contact-overlay__notice--success', 'rh-contact-overlay__notice--warn');
-		noticeEl.removeAttribute('role');
-	};
-
-	const showAjaxNotice = (status, message) => {
-		if (!noticeSlot || !noticeEl || !message) {
-			return;
-		}
-		const isSuccess = status === 'sent';
-		noticeEl.textContent = message;
-		noticeEl.classList.toggle('rh-contact-overlay__notice--success', isSuccess);
-		noticeEl.classList.toggle('rh-contact-overlay__notice--warn', !isSuccess);
-		noticeEl.setAttribute('role', isSuccess ? 'status' : 'alert');
-		noticeSlot.hidden = false;
-		noticeEl.focus({ preventScroll: true });
-	};
-
-	if (form instanceof HTMLFormElement && ajaxConfig && ajaxConfig.ajaxUrl) {
-		form.addEventListener('submit', async (e) => {
-			e.preventDefault();
-			clearAjaxNotice();
-
-			const submitBtn = form.querySelector('.rh-contact-overlay__submit');
-			if (submitBtn instanceof HTMLButtonElement) {
-				if (submitBtn.disabled) {
-					return;
-				}
-				submitBtn.disabled = true;
-				submitBtn.setAttribute('aria-busy', 'true');
-			}
-
-			const body = new FormData(form);
-			body.set('action', ajaxConfig.action);
-
-			try {
-				const res = await fetch(ajaxConfig.ajaxUrl, {
-					method: 'POST',
-					body,
-					credentials: 'same-origin',
-					headers: {
-						'X-Requested-With': 'XMLHttpRequest',
-					},
-				});
-
-				let payload = null;
-				try {
-					payload = await res.json();
-				} catch {
-					payload = null;
-				}
-
-				const data = payload && typeof payload === 'object' ? payload.data : null;
-				const status =
-					data && typeof data.status === 'string'
-						? data.status
-						: payload && payload.success
-							? 'sent'
-							: 'failed';
-				const message =
-					data && typeof data.message === 'string'
-						? data.message
-						: status === 'sent'
-							? ''
-							: '';
-
-				const fallback =
-					ajaxConfig.messages && typeof ajaxConfig.messages[status] === 'string'
-						? ajaxConfig.messages[status]
-						: '';
-				showAjaxNotice(status, message || fallback);
-
-				if (status === 'sent') {
-					form.reset();
-				}
-			} catch {
-				const failedMsg =
-					ajaxConfig.messages && typeof ajaxConfig.messages.failed === 'string'
-						? ajaxConfig.messages.failed
-						: '';
-				showAjaxNotice('failed', failedMsg);
-			} finally {
-				if (submitBtn instanceof HTMLButtonElement) {
-					submitBtn.disabled = false;
-					submitBtn.removeAttribute('aria-busy');
-				}
-			}
-		});
-	}
 })();
 
 /**
@@ -2412,6 +2439,18 @@
 			startObserver();
 		} else {
 			sentinel.hidden = true;
+		}
+	}
+
+	/* First load: stagger cards in without the rh-fx hide/reveal flash. */
+	if (!prefersReduced && grid.classList.contains('rh-archive-projects__bento--await-reveal')) {
+		const runInitialReveal = () => {
+			grid.classList.add('is-initial-reveal');
+		};
+		if (typeof window.requestAnimationFrame === 'function') {
+			window.requestAnimationFrame(runInitialReveal);
+		} else {
+			runInitialReveal();
 		}
 	}
 })();
